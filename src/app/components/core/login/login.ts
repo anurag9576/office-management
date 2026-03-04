@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +15,7 @@ export class Login {
   passwordVisible = false;
   isLoading = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
@@ -34,7 +34,7 @@ export class Login {
       // Simulate API call
       setTimeout(() => {
         this.isLoading = false;
-        alert('Login successful! (Simulated)');
+        this.router.navigate(['/dashboard']);
       }, 1500);
     } else {
       this.loginForm.markAllAsTouched();

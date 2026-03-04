@@ -1,0 +1,15 @@
+<div class="dashboard-layout h-screen flex overflow-hidden bg-brand-5">
+    <!-- Sidebar -->
+    <app-sidebar></app-sidebar>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        <!-- Top Navbar -->
+        <app-navbar></app-navbar>
+
+        <!-- Content Area (with brand-theme consistency) -->
+        <main class="flex-1 overflow-y-auto p-8 custom-scrollbar relative z-0 bg-white/5 shadow-inner">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>

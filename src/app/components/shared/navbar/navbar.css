@@ -1,0 +1,40 @@
+.navbar-container {
+  background: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.text-brand-5 {
+  color: var(--color-brand-5);
+}
+
+.text-brand-3 {
+  color: var(--color-brand-3);
+}
+
+.group-focus-within\:text-brand-1:focus-within {
+  color: var(--color-brand-1);
+}
+
+.bg-brand-2\/10 {
+  background-color: color-mix(in srgb, var(--color-brand-2), transparent 90%);
+}
+
+.border-brand-2\/20 {
+  border-color: color-mix(in srgb, var(--color-brand-2), transparent 80%);
+}
+
+.focus\:ring-brand-1\/20:focus {
+  --tw-ring-color: color-mix(in srgb, var(--color-brand-1), transparent 80%);
+}
+
+.focus\:border-brand-1:focus {
+  border-color: var(--color-brand-1);
+}
+
+.hover\:text-brand-1:hover {
+  color: var(--color-brand-1);
+}
+
+.hover\:bg-brand-1\/10:hover {
+  background-color: color-mix(in srgb, var(--color-brand-1), transparent 90%);
+}

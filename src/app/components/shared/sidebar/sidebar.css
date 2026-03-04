@@ -1,0 +1,68 @@
+/* Active Route Styling */
+.active-nav {
+  background: var(--color-brand-1) !important;
+  color: white !important;
+  box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.4);
+}
+
+.active-nav .icon-container {
+  background: white !important;
+  color: var(--color-brand-1) !important;
+  border-color: white !important;
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+}
+
+.active-nav .active-dot {
+  opacity: 1 !important;
+  transform: scaleY(1) !important;
+}
+
+/* Base styles for labels */
+.nav-label-text {
+  transition: all 0.3s ease;
+}
+
+/* User name and role highlight */
+.user-name {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Brand Logo Shiny Effect */
+.brand-logo::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: rotate(45deg);
+  animation: shine 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%) rotate(45deg); }
+  25%, 100% { transform: translateX(100%) rotate(45deg); }
+}
+
+/* Scrollbar customization - Hidden but functional */
+.custom-scrollbar-hidden::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.custom-scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+:host {
+  display: block;
+  z-index: 50;
+}

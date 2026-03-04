@@ -1,0 +1,19 @@
+.dashboard-layout {
+  height: 100vh;
+  width: 100vw;
+}
+
+main {
+  /* Ensuring the main content area has a nice background that contrasts with both Navbar and Sidebar */
+  background-color: #f8fafc;
+}
+
+/* Page transitions */
+.router-container {
+  animation: fade-in 0.4s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
