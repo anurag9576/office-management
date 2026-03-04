@@ -18,7 +18,17 @@ export class Sidebar {
   brandName = signal('hamsa hitech');
   showLogoutModal = signal(false);
   
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      const parsedUser = JSON.parse(savedUser);
+      this.user.set({
+        name: parsedUser.name,
+        role: parsedUser.role,
+        initials: parsedUser.initials
+      });
+    }
+  }
   
   user = signal({
     name: 'Ankit Sharma',
@@ -41,6 +51,7 @@ export class Sidebar {
 
   confirmLogout() {
     this.showLogoutModal.set(false);
+    localStorage.removeItem('currentUser');
     this.router.navigate(['/login']);
   }
 

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1",
+    "name": " Ankit Sharma ",
+    "email": "test@hamsa.com",
+    "password": "Test@123",
+    "role": "Employee",
+    "initials": "AS"
+  },
+  {
+    "id": "2",
+    "name": "Admin User",
+    "email": "admin@hamsa.com",
+    "password": "adminpassword",
+    "role": "Admin",
+    "initials": "AU"
+  }
+]
