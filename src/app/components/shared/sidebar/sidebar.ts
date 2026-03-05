@@ -17,6 +17,11 @@ interface NavItem {
 export class Sidebar {
   brandName = signal('hamsa hitech');
   showLogoutModal = signal(false);
+  isCollapsed = signal(false);
+
+  toggleSidebar() {
+    this.isCollapsed.set(!this.isCollapsed());
+  }
   
   constructor(private router: Router) {
     const savedUser = localStorage.getItem('currentUser');
@@ -38,10 +43,10 @@ export class Sidebar {
   
   navItems = signal<NavItem[]>([
     { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard' },
+    { label: 'Profile', icon: 'person', route: '/dashboard/profile' },
     { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves' },
     { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll' },
-    { label: 'Attendance', icon: 'calendar_month', route: '/dashboard/attendance' },
-    { label: 'Profile', icon: 'person', route: '/dashboard/profile' },
+    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement' },
     { label: 'Help', icon: 'help_outline', route: '/dashboard/help' },
   ]);
 
