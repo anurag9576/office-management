@@ -1,0 +1,173 @@
+<div class="leaves-page p-6 sm:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <!-- Header: Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div *ngFor="let stat of leaveStats()"
+            class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-brand-2/10 hover:shadow-xl transition-all hover:scale-[1.02] group">
+            <div class="flex items-center space-x-4">
+                <div
+                    [class]="'w-14 h-14 rounded-2xl flex items-center justify-center ' + stat.color + ' group-hover:scale-110 transition-transform'">
+                    <span class="material-symbols-outlined text-[32px]">{{stat.icon}}</span>
+                </div>
+                <div>
+                    <p class="text-[11px] font-black text-brand-3 uppercase tracking-widest">{{stat.label}}</p>
+                    <h3 class="text-2xl font-black text-brand-5 leading-none">{{stat.value}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Main Area: Calendar & Holidays -->
+        <div class="lg:col-span-8 space-y-8">
+            <!-- Professional Calendar -->
+            <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-brand-2/10 relative overflow-hidden">
+                <div class="flex items-center justify-between mb-4 relative z-10">
+                    <div>
+                        <h2 class="text-2xl font-black text-brand-5 tracking-tight">{{monthYearString()}}</h2>
+                        <p class="text-brand-3 text-sm font-medium">Plan your vacations ahead of time</p>
+                    </div>
+                    <div class="flex items-center space-x-2 bg-slate-50 p-1.5 rounded-2xl">
+                        <button type="button" (click)="prevMonth()"
+                            class="p-2 hover:bg-white hover:shadow-md rounded-xl transition-all cursor-pointer text-brand-3 hover:text-brand-1">
+                            <span class="material-symbols-outlined">chevron_left</span>
+                        </button>
+                        <button type="button" (click)="nextMonth()"
+                            class="p-2 hover:bg-white hover:shadow-md rounded-xl transition-all cursor-pointer text-brand-3 hover:text-brand-1">
+                            <span class="material-symbols-outlined">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-7 gap-1 relative z-10 justify-items-center">
+                    <!-- Weekday Headers -->
+                    <div *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; let i = index" [class]="'text-[10px] font-black uppercase mb-3 flex items-center justify-center h-8 w-full transition-colors ' + 
+                                (i === 0 || i === 6 ? 'text-red-500' : 'text-brand-2')">
+                        {{day}}
+                    </div>
+
+                    <!-- Calendar Days -->
+                    <div *ngFor="let item of calendarDays()"
+                        [class]="'p-2 rounded-xl text-sm font-bold transition-all relative group flex items-center justify-center h-10 w-10 ' + 
+                                (item.day ? 'bg-brand-1/5 text-brand-4 hover:bg-brand-5 hover:text-white cursor-pointer' : 'opacity-0 pointer-events-none') +
+                                (item.isToday ? ' ring-2 ring-brand-1 ring-offset-2 !bg-brand-1 !text-white z-10' : '') +
+                                (item.isHoliday ? ' !bg-red-50 !text-red-500' : '') +
+                                (item.isWeekend && !item.isHoliday && !item.isToday ? ' !bg-red-50/40 !text-red-400' : '')">
+                        {{item.day}}
+
+                        <!-- Holiday indicator -->
+                        <div *ngIf="item.isHoliday"
+                            class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full border-2 border-white">
+                        </div>
+
+                        <!-- Tooltip on hover -->
+                        <div *ngIf="item.holidayName"
+                            class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-brand-5 text-white text-[10px] rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-lg border border-white/10">
+                            {{item.holidayName}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Applications Table -->
+            <div class="bg-white/80 backdrop-blur-md p-8 rounded-[3rem] shadow-sm border border-brand-2/10">
+                <h2 class="text-2xl font-black text-brand-5 mb-8 tracking-tight">Recent Applications</h2>
+                <div class="space-y-4">
+                    <div *ngFor="let item of recentLeaves()"
+                        class="flex items-center p-4 rounded-3xl bg-white border border-brand-2/10 hover:shadow-lg transition-all group">
+                        <div
+                            class="w-12 h-12 rounded-2xl bg-brand-1/10 text-brand-1 flex items-center justify-center mr-6 group-hover:bg-brand-1 group-hover:text-white transition-colors">
+                            <span class="material-symbols-outlined">description</span>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-black text-brand-5 text-[15px]">{{item.type}}</h4>
+                            <p class="text-xs text-brand-3 font-medium">{{item.from}} to {{item.to}} ({{item.days}}
+                                Days)</p>
+                        </div>
+                        <div
+                            class="px-6 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-green-50 text-green-500 border border-green-100">
+                            {{item.status}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Action Panel -->
+        <div class="lg:col-span-4 space-y-8">
+            <!-- Apply Leave Card (Interactive Highlight) -->
+            <div class="bg-brand-5 p-10 rounded-[3rem] shadow-2xl text-white relative overflow-hidden group">
+                <div
+                    class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
+                </div>
+
+                <h2 class="text-3xl font-black mb-10 relative z-10 leading-tight">Apply for Leave</h2>
+
+                <form class="space-y-5 relative z-10">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-brand-2">Leave Type</label>
+                        <select
+                            class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-bold outline-none ring-brand-1 focus:ring-2 appearance-none cursor-pointer">
+                            <option value="sick">Sick Leave</option>
+                            <option value="casual">Casual Leave</option>
+                            <option value="earned">Earned Leave</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest text-brand-2">From</label>
+                            <input type="date"
+                                class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-bold outline-none cursor-pointer">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest text-brand-1">To</label>
+                            <input type="date"
+                                class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-bold outline-none cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <button type="button"
+                            class="w-full py-5 bg-brand-1 hover:bg-white hover:text-brand-5 text-white font-black rounded-2xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                            Submit Application
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Company Holidays (Vibrant List) -->
+            <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-brand-2/10">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-black text-brand-5 tracking-tight">Holidays 2026</h2>
+                    <span
+                        class="text-[10px] font-black text-brand-1 bg-brand-1/10 px-3 py-1.5 rounded-xl">UPCOMING</span>
+                </div>
+
+                <div class="space-y-6">
+                    <div *ngFor="let holiday of displayedHolidays()"
+                        class="flex items-start space-x-5 group transition-all hover:translate-x-1">
+                        <div
+                            class="w-1.5 h-12 rounded-full bg-brand-2/20 relative group-hover:bg-brand-1 transition-colors">
+                            <div
+                                class="absolute top-0 w-full h-4 rounded-full bg-brand-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-[10px] font-black text-brand-3 uppercase tracking-widest">{{holiday.date}}
+                            </p>
+                            <h4 class="font-black text-brand-5 text-[15px] group-hover:text-brand-1 transition-colors">
+                                {{holiday.name}}</h4>
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{holiday.type}}
+                                Day</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button (click)="showAllHolidays.set(!showAllHolidays())"
+                    class="w-full mt-10 py-4 bg-slate-50 hover:bg-brand-1/5 text-brand-3 font-black text-xs rounded-2xl transition-all uppercase tracking-widest border border-slate-100 cursor-pointer">
+                    {{ showAllHolidays() ? 'Show Less' : 'View Full List' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -38,11 +38,11 @@ export class Sidebar {
   
   navItems = signal<NavItem[]>([
     { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard' },
-    { label: 'Leaves', icon: 'vacation', route: '/leaves' },
-    { label: 'Payroll', icon: 'payments', route: '/payroll' },
-    { label: 'Attendance', icon: 'calendar_month', route: '/attendance' },
-    { label: 'Profile', icon: 'person', route: '/profile' },
-    { label: 'Help', icon: 'help_outline', route: '/help' },
+    { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves' },
+    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll' },
+    { label: 'Attendance', icon: 'calendar_month', route: '/dashboard/attendance' },
+    { label: 'Profile', icon: 'person', route: '/dashboard/profile' },
+    { label: 'Help', icon: 'help_outline', route: '/dashboard/help' },
   ]);
 
   onLogout() {
