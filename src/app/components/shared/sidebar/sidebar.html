@@ -23,6 +23,7 @@
         <div class="px-4 mb-3 text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Management</div>
 
         <a *ngFor="let item of navItems()" [routerLink]="item.route" routerLinkActive="active-nav"
+            [routerLinkActiveOptions]="{exact: true}"
             class="group flex items-center px-4 py-3 rounded-2xl transition-all duration-300 relative overflow-hidden text-brand-2 hover:text-white">
 
             <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
