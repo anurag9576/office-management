@@ -4,9 +4,10 @@ import { ForgotPassword } from './components/core/forgot-password/forgot-passwor
 import { Dashboard } from './components/dashboard/dashboard';
 import { DashboardHome } from './components/dashboard/dashboard-home/dashboard-home';
 import { Leaves } from './components/dashboard/leaves/leaves';
-import { Attendance } from './components/dashboard/attendance/attendance';
+import { Announcement } from './components/dashboard/announcement/announcement';
 import { Payroll } from './components/dashboard/payroll/payroll';
 import { Profile } from './components/dashboard/profile/profile';
+import { Help } from './components/dashboard/help/help';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -17,9 +18,10 @@ export const routes: Routes = [
     children: [
       { path: '', component: DashboardHome },
       { path: 'leaves', component: Leaves },
-      { path: 'attendance', component: Attendance },
+      { path: 'announcement', component: Announcement },
       { path: 'payroll', component: Payroll },
       { path: 'profile', component: Profile },
+      { path: 'help', component: Help },
       // Other feature routes will go here
     ]
   },

@@ -1,0 +1,94 @@
+<div class="min-h-screen bg-slate-50/50 p-6 lg:p-10 custom-scrollbar overflow-y-auto">
+    <div class="max-w-4xl mx-auto space-y-12 animate-fade-in pb-20">
+
+        <!-- Header & Search -->
+        <div class="text-center space-y-8 py-10">
+            <div class="space-y-4">
+                <h1 class="text-4xl lg:text-5xl font-black text-slate-900 tracking-tighter uppercase">IT Service &
+                    Support</h1>
+                <p class="text-slate-500 font-bold max-w-xl mx-auto text-sm">
+                    Get help with hardware, software, security access, and HR-related queries for IT employees.
+                </p>
+            </div>
+
+            <div class="relative max-w-2xl mx-auto group">
+                <input [(ngModel)]="searchQuery" placeholder="Search VPN, MFA, ID Card, Laptop issues..."
+                    class="w-full pl-14 pr-6 py-5 bg-white border-2 border-slate-100 rounded-[2rem] shadow-xl text-sm font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-brand-1 focus:ring-8 focus:ring-brand-1/5 transition-all">
+                <span
+                    class="material-symbols-outlined absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-brand-1 transition-colors">search</span>
+            </div>
+        </div>
+
+        <!-- Categories Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div *ngFor="let cat of categories"
+                class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group text-center space-y-3">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-brand-1/5 text-brand-1 flex items-center justify-center mx-auto group-hover:bg-brand-1 group-hover:text-white transition-all">
+                    <span class="material-symbols-outlined">{{cat.icon}}</span>
+                </div>
+                <h3 class="font-black text-slate-900 text-xs tracking-tight">{{cat.label}}</h3>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{{cat.count}} Docs</p>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="space-y-6">
+            <div class="flex items-center justify-between px-4">
+                <h2 class="text-2xl font-black text-slate-900 tracking-tighter">Frequently Asked Questions</h2>
+                <button class="text-[10px] font-black uppercase text-brand-1 tracking-widest hover:underline">View
+                    all</button>
+            </div>
+
+            <div class="space-y-4">
+                <div *ngFor="let faq of filteredFaqs()"
+                    class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-all">
+                    <button (click)="toggleFaq(faq.id)"
+                        class="w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none group">
+                        <span
+                            class="font-black text-slate-800 text-sm tracking-tight group-hover:text-brand-1 transition-colors">{{faq.question}}</span>
+                        <span class="material-symbols-outlined text-slate-300 transition-transform duration-300"
+                            [class.rotate-180]="faq.isOpen" [class.text-brand-1]="faq.isOpen">expand_more</span>
+                    </button>
+                    <div *ngIf="faq.isOpen" class="px-8 pb-8 animate-slide-up">
+                        <div class="h-px bg-slate-50 mb-6"></div>
+                        <p class="text-slate-600 text-sm leading-relaxed font-medium">
+                            {{faq.answer}}
+                        </p>
+                        <div class="mt-6 flex items-center gap-2">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Was this helpful?</span>
+                            <button
+                                class="w-8 h-8 rounded-lg hover:bg-green-50 text-slate-300 hover:text-green-500 transition-all">
+                                <span class="material-symbols-outlined text-[18px]">thumb_up</span>
+                            </button>
+                            <button
+                                class="w-8 h-8 rounded-lg hover:bg-red-50 text-slate-300 hover:text-red-500 transition-all">
+                                <span class="material-symbols-outlined text-[18px]">thumb_down</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Support -->
+        <div class="relative bg-slate-900 rounded-[3rem] p-10 lg:p-14 overflow-hidden group">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-brand-1/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+            <div class="absolute bottom-0 left-0 w-48 h-48 bg-brand-1/10 rounded-full blur-[80px] -ml-24 -mb-24"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="space-y-4 text-center md:text-left">
+                    <h2 class="text-3xl font-black text-white tracking-tighter">Still have questions?</h2>
+                    <p class="text-slate-400 font-medium max-w-md">Our friendly team is here to help you. We respond
+                        within 24 hours.</p>
+                </div>
+                <button (click)="contactSupport()"
+                    class="px-10 py-5 bg-brand-1 text-white font-black uppercase text-xs rounded-2xl shadow-2xl hover:bg-white hover:text-slate-900 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center gap-3">
+                    <span class="material-symbols-outlined">support_agent</span>
+                    Contact Support
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
