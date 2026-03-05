@@ -1,0 +1,55 @@
+.payroll-page {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+    min-height: 100%;
+}
+
+/* Glassmorphism effects */
+.bg-white {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(20px);
+}
+
+/* Animations */
+@keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes grow-width {
+    from { width: 0; }
+    to { width: var(--final-width); }
+}
+
+.payroll-page > * {
+    animation: slide-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.payroll-page > *:nth-child(1) { animation-delay: 0.1s; }
+.payroll-page > *:nth-child(2) { animation-delay: 0.2s; }
+.payroll-page > *:nth-child(3) { animation-delay: 0.3s; }
+
+.progress-bar {
+    --final-width: 0%;
+    animation: grow-width 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar-hidden::-webkit-scrollbar {
+    display: none;
+}
+
+.custom-scrollbar-hidden {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Glass card hover */
+.glass-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-hover:hover {
+    background: white !important;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+}

@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  @apply antialiased text-slate-900;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'Inter', sans-serif; /* Already very strong black weights used in Inter */
+  letter-spacing: -0.02em;
+}
+
 @theme {
   --color-primary: #3987b7;    /* Brand 1 */
   --color-secondary: #a0c1d2;  /* Brand 2 */

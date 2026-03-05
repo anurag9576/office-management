@@ -1,0 +1,40 @@
+.leaves-page {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
+    min-height: 100%;
+}
+
+/* Glassmorphism effects */
+.bg-white {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(20px);
+}
+
+/* Calendar Day Customization */
+.grid-cols-7 div {
+    aspect-ratio: 1/1;
+}
+
+/* Custom Date Input for Premium Feel */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Animations */
+@keyframes slide-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.leaves-page > * {
+    animation: slide-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.leaves-page > *:nth-child(1) { animation-delay: 0.1s; }
+.leaves-page > *:nth-child(2) { animation-delay: 0.2s; }
+
+/* Selection fix for brand select */
+select option {
+    background-color: #1a365d; /* Brand 5 approx */
+    color: white;
+}
