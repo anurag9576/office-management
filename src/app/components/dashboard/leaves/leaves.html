@@ -9,8 +9,8 @@
                     <span class="material-symbols-outlined text-[32px]">{{stat.icon}}</span>
                 </div>
                 <div>
-                    <p class="text-[11px] font-black text-brand-3 uppercase tracking-widest">{{stat.label}}</p>
-                    <h3 class="text-2xl font-black text-brand-5 leading-none">{{stat.value}}</h3>
+                    <p class="text-[11px] font-semibold text-brand-3 uppercase tracking-widest">{{stat.label}}</p>
+                    <h3 class="text-2xl font-bold text-brand-5 leading-none">{{stat.value}}</h3>
                 </div>
             </div>
         </div>
@@ -23,7 +23,7 @@
             <div class="bg-white p-4 rounded-[2rem] shadow-sm border border-brand-2/10 relative overflow-hidden">
                 <div class="flex items-center justify-between mb-4 relative z-10">
                     <div>
-                        <h2 class="text-2xl font-black text-brand-5 tracking-tight">{{monthYearString()}}</h2>
+                        <h2 class="text-2xl font-bold text-brand-5 tracking-tight">{{monthYearString()}}</h2>
                         <p class="text-brand-3 text-sm font-medium">Plan your vacations ahead of time</p>
                     </div>
                     <div class="flex items-center space-x-2 bg-slate-50 p-1.5 rounded-2xl">
@@ -40,14 +40,14 @@
 
                 <div class="grid grid-cols-7 gap-1 relative z-10 justify-items-center">
                     <!-- Weekday Headers -->
-                    <div *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; let i = index" [class]="'text-[10px] font-black uppercase mb-3 flex items-center justify-center h-8 w-full transition-colors ' + 
+                    <div *ngFor="let day of ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']; let i = index" [class]="'text-[10px] font-semibold uppercase mb-3 flex items-center justify-center h-8 w-full transition-colors ' + 
                                 (i === 0 || i === 6 ? 'text-red-500' : 'text-brand-2')">
                         {{day}}
                     </div>
 
                     <!-- Calendar Days -->
                     <div *ngFor="let item of calendarDays()"
-                        [class]="'p-2 rounded-xl text-sm font-bold transition-all relative group flex items-center justify-center h-10 w-10 ' + 
+                        [class]="'p-2 rounded-xl text-sm font-semibold transition-all relative group flex items-center justify-center h-10 w-10 ' + 
                                 (item.day ? 'bg-brand-1/5 text-brand-4 hover:bg-brand-5 hover:text-white cursor-pointer' : 'opacity-0 pointer-events-none') +
                                 (item.isToday ? ' ring-2 ring-brand-1 ring-offset-2 !bg-brand-1 !text-white z-10' : '') +
                                 (item.isHoliday ? ' !bg-red-50 !text-red-500' : '') +
@@ -71,7 +71,7 @@
             <!-- Recent Applications Table -->
             <div
                 class="bg-white/80 backdrop-blur-md p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] shadow-sm border border-brand-2/10">
-                <h2 class="text-xl sm:text-2xl font-black text-brand-5 mb-6 sm:mb-8 tracking-tight">Recent Applications
+                <h2 class="text-xl sm:text-2xl font-bold text-brand-5 mb-6 sm:mb-8 tracking-tight">Recent Applications
                 </h2>
                 <div class="space-y-4">
                     <div *ngFor="let item of recentLeaves()"
@@ -81,12 +81,12 @@
                             <span class="material-symbols-outlined">description</span>
                         </div>
                         <div class="flex-1">
-                            <h4 class="font-black text-brand-5 text-[15px]">{{item.type}}</h4>
+                            <h4 class="font-bold text-brand-5 text-[15px]">{{item.type}}</h4>
                             <p class="text-xs text-brand-3 font-medium">{{item.from}} to {{item.to}} ({{item.days}}
                                 Days)</p>
                         </div>
                         <div
-                            class="px-6 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest bg-green-50 text-green-500 border border-green-100">
+                            class="px-6 py-2 rounded-2xl text-[10px] font-semibold uppercase tracking-widest bg-green-50 text-green-500 border border-green-100">
                             {{item.status}}
                         </div>
                     </div>
@@ -103,13 +103,13 @@
                     class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
                 </div>
 
-                <h2 class="text-3xl font-black mb-10 relative z-10 leading-tight">Apply for Leave</h2>
+                <h2 class="text-3xl font-bold mb-10 relative z-10 leading-tight">Apply for Leave</h2>
 
                 <form class="space-y-5 relative z-10">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-brand-2">Leave Type</label>
+                        <label class="text-[10px] font-semibold uppercase tracking-widest text-brand-2">Leave Type</label>
                         <select
-                            class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-bold outline-none ring-brand-1 focus:ring-2 appearance-none cursor-pointer">
+                            class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-semibold outline-none ring-brand-1 focus:ring-2 appearance-none cursor-pointer">
                             <option value="sick">Sick Leave</option>
                             <option value="casual">Casual Leave</option>
                             <option value="earned">Earned Leave</option>
@@ -118,20 +118,20 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-brand-2">From</label>
+                            <label class="text-[10px] font-semibold uppercase tracking-widest text-brand-2">From</label>
                             <input type="date"
-                                class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-bold outline-none cursor-pointer">
+                                class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-semibold outline-none cursor-pointer">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-[10px] font-black uppercase tracking-widest text-brand-1">To</label>
+                            <label class="text-[10px] font-semibold uppercase tracking-widest text-brand-1">To</label>
                             <input type="date"
-                                class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-bold outline-none cursor-pointer">
+                                class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-semibold outline-none cursor-pointer">
                         </div>
                     </div>
 
                     <div class="space-y-2 pt-2">
                         <button type="button"
-                            class="w-full py-5 bg-brand-1 hover:bg-white hover:text-brand-5 text-white font-black rounded-2xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                            class="w-full py-5 bg-brand-1 hover:bg-white hover:text-brand-5 text-white font-bold rounded-2xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
                             Submit Application
                         </button>
                     </div>
@@ -142,9 +142,9 @@
             <div
                 class="bg-white px-2 py-6 sm:p-6 lg:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-sm border border-brand-2/10">
                 <div class="flex items-center justify-between mb-6 sm:mb-8">
-                    <h2 class="text-xl sm:text-2xl font-black text-brand-5 tracking-tight">Holidays 2026</h2>
+                    <h2 class="text-xl sm:text-2xl font-bold text-brand-5 tracking-tight">Holidays 2026</h2>
                     <span
-                        class="text-[10px] font-black text-brand-1 bg-brand-1/10 px-3 py-1.5 rounded-xl">UPCOMING</span>
+                        class="text-[10px] font-semibold text-brand-1 bg-brand-1/10 px-3 py-1.5 rounded-xl">UPCOMING</span>
                 </div>
 
                 <div class="space-y-6">
@@ -157,18 +157,18 @@
                             </div>
                         </div>
                         <div class="flex-1">
-                            <p class="text-[10px] font-black text-brand-3 uppercase tracking-widest">{{holiday.date}}
+                            <p class="text-[10px] font-semibold text-brand-3 uppercase tracking-widest">{{holiday.date}}
                             </p>
-                            <h4 class="font-black text-brand-5 text-[15px] group-hover:text-brand-1 transition-colors">
+                            <h4 class="font-bold text-brand-5 text-[15px] group-hover:text-brand-1 transition-colors">
                                 {{holiday.name}}</h4>
-                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">{{holiday.type}}
+                            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-tighter">{{holiday.type}}
                                 Day</p>
                         </div>
                     </div>
                 </div>
 
                 <button (click)="showAllHolidays.set(!showAllHolidays())"
-                    class="w-full mt-10 py-4 bg-slate-50 hover:bg-brand-1/5 text-brand-3 font-black text-xs rounded-2xl transition-all uppercase tracking-widest border border-slate-100 cursor-pointer">
+                    class="w-full mt-10 py-4 bg-slate-50 hover:bg-brand-1/5 text-brand-3 font-semibold text-xs rounded-2xl transition-all uppercase tracking-widest border border-slate-100 cursor-pointer">
                     {{ showAllHolidays() ? 'Show Less' : 'View Full List' }}
                 </button>
             </div>
