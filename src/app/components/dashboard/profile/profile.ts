@@ -47,6 +47,13 @@ export class Profile {
     }
   });
 
+  sharedDocuments = signal([
+    { name: 'Joining_Letter.pdf', sender: 'HR Department', date: '05 Jan 2025', size: '1.2 MB', icon: 'description' },
+    { name: 'Code_of_Conduct.pdf', sender: 'Admin', date: '12 Feb 2025', size: '2.4 MB', icon: 'policy' },
+    { name: 'Project_Guidelines.zip', sender: 'Sarah Jenkins (Manager)', date: '28 Feb 2025', size: '15.8 MB', icon: 'folder_zip' },
+    { name: 'Quarterly_Review_Q1.pdf', sender: 'Finance Dept', date: '01 Mar 2025', size: '850 KB', icon: 'assessment' }
+  ]);
+
   showModal = signal(false);
   editSection = signal<string>('');
   tempEmployee = signal<any>({});

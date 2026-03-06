@@ -9,6 +9,11 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './announcement.css',
 })
 export class Announcement {
+  // Role & User State
+  isAdmin = signal(false);
+  currentUser = signal<any>(null);
+
+  // Announcements Feed
   announcements = signal<any[]>([
     {
       id: 1,
@@ -54,6 +59,124 @@ export class Announcement {
       showComments: false
     }
   ]);
+
+  // Form State (Signals for better reactivity)
+  activeTab = signal('post');
+  newPostTitle = signal('');
+  newPostContent = signal('');
+  newPostImage = signal('');
+  
+  newPollTitle = signal('');
+  newPollContent = signal('');
+  pollOptions = signal([{ label: '' }, { label: '' }]);
+
+  constructor() {
+    this.loadUser();
+  }
+
+  private loadUser() {
+    try {
+      const savedUser = localStorage.getItem('currentUser');
+      if (savedUser) {
+        const user = JSON.parse(savedUser);
+        this.currentUser.set(user);
+        this.isAdmin.set(user.role?.toLowerCase() === 'admin');
+      }
+    } catch (e) {
+      console.error('Error loading user:', e);
+    }
+  }
+
+  addPollOption() {
+    this.pollOptions.update(opts => [...opts, { label: '' }]);
+  }
+
+  removePollOption(index: number) {
+    this.pollOptions.update(opts => opts.filter((_, i) => i !== index));
+  }
+
+  createPost() {
+    if (!this.newPostTitle().trim() || !this.newPostContent().trim()) {
+      alert('Please fill in both title and content.');
+      return;
+    }
+
+    const newPost = {
+      id: Date.now(),
+      author: this.currentUser()?.name || 'Admin',
+      role: 'Admin',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&h=100&auto=format&fit=crop',
+      time: 'Just now',
+      type: 'post',
+      title: this.newPostTitle(),
+      content: this.newPostContent(),
+      image: this.newPostImage(),
+      likes: 0,
+      hasLiked: false,
+      comments: [],
+      newComment: '',
+      showComments: false
+    };
+
+    this.announcements.update(posts => [newPost, ...posts]);
+    this.resetForm();
+  }
+
+  createPoll() {
+    if (!this.newPollTitle().trim() || this.pollOptions().some(o => !o.label.trim())) {
+      alert('Please fill in the question and all options.');
+      return;
+    }
+
+    const newPoll = {
+      id: Date.now(),
+      author: this.currentUser()?.name || 'Admin',
+      role: 'Admin',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&h=100&auto=format&fit=crop',
+      time: 'Just now',
+      type: 'poll',
+      title: this.newPollTitle(),
+      content: this.newPollContent(),
+      likes: 0,
+      hasLiked: false,
+      poll: {
+        totalVotes: 0,
+        voted: false,
+        options: this.pollOptions().map((opt, idx) => ({ id: idx + 1, label: opt.label, votes: 0 }))
+      },
+      comments: [],
+      newComment: '',
+      showComments: false
+    };
+
+    this.announcements.update(posts => [newPoll, ...posts]);
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.newPostTitle.set('');
+    this.newPostContent.set('');
+    this.newPostImage.set('');
+    this.newPollTitle.set('');
+    this.newPollContent.set('');
+    this.pollOptions.set([{ label: '' }, { label: '' }]);
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.newPostImage.set(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removeSelectedImage() {
+    this.newPostImage.set('');
+  }
+
 
   toggleCommentMenu(postId: number, commentIndex: number) {
     this.announcements.update((posts: any[]) => posts.map((p: any) => {

@@ -1,0 +1,31 @@
+:host {
+    display: block;
+    min-height: 100vh;
+}
+
+.table-container {
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #f8fafc;
+}
+
+/* Custom Scrollbar for the table */
+.table-container::-webkit-scrollbar {
+    width: 6px;
+}
+.table-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.table-container::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #cbd5e1;
+}

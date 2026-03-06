@@ -1,0 +1,215 @@
+<div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-semibold text-slate-600 tracking-tighter">Employee Management</h1>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">Directory of all office staff
+            </p>
+        </div>
+        <button (click)="showAddModal()"
+            class="bg-brand-1 text-white px-6 py-3 rounded-2xl font-semibold text-xs uppercase tracking-widest shadow-lg shadow-brand-1/20 hover:bg-brand-5 transition-all flex items-center gap-2 w-fit">
+            <span class="material-symbols-outlined text-sm">add</span>
+            Add New Employee
+        </button>
+    </div>
+
+    <!-- Table Section -->
+    <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+        <div class="table-container">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th
+                            class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest group/th cursor-pointer">
+                            <div class="flex items-center gap-1">
+                                Employee
+                                <span
+                                    class="material-symbols-outlined text-[6px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
+                            </div>
+                        </th>
+                        <th
+                            class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest group/th cursor-pointer">
+                            <div class="flex items-center gap-1">
+                                Department
+                                <span
+                                    class="material-symbols-outlined text-[6px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
+                            </div>
+                        </th>
+                        <th
+                            class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest group/th cursor-pointer">
+                            <div class="flex items-center gap-1">
+                                Email
+                                <span
+                                    class="material-symbols-outlined text-[6px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
+                            </div>
+                        </th>
+                        <th
+                            class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest group/th cursor-pointer">
+                            <div class="flex items-center gap-1">
+                                Status
+                                <span
+                                    class="material-symbols-outlined text-[6px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
+                            </div>
+                        </th>
+                        <th
+                            class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest group/th cursor-pointer text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                Actions
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    <tr *ngFor="let emp of employees()" class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-brand-1/10 flex items-center justify-center text-brand-1 font-semibold text-xs uppercase shadow-inner">
+                                    {{emp.name.charAt(0)}}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{emp.name}}</p>
+                                    <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
+                                        {{emp.designation || 'Staff'}} • {{emp.role}} • {{emp.id}}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span
+                                class="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-medium text-slate-600 uppercase tracking-wider">{{emp.dept}}</span>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span
+                                class="text-[11px] font-medium text-slate-500 lowercase tracking-tight">{{emp.email}}</span>
+                        </td>
+                        <td class="px-8 py-5">
+                            <span
+                                [class]="'px-3 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider ' + (emp.status === 'Active' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600')">
+                                {{emp.status}}
+                            </span>
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button (click)="editEmployee(emp)"
+                                    class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-brand-1/10 hover:text-brand-1 transition-all">
+                                    <span class="material-symbols-outlined text-sm">edit</span>
+                                </button>
+                                <button (click)="deleteEmployee(emp.id)"
+                                    class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all">
+                                    <span class="material-symbols-outlined text-sm">delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div *ngIf="showModal()" class="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
+            (click)="closeModal()"></div>
+
+        <!-- Modal Content -->
+        <div
+            class="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <div class="p-8 sm:p-10">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl font-semibold text-slate-900 tracking-tight">{{ isEditing() ? 'Update
+                            Employee'
+                            : 'Add Employee' }}</h2>
+                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">{{ isEditing()
+                            ?
+                            'Modify member details' : 'Onboard a new team member' }}</p>
+                    </div>
+                    <button (click)="closeModal()"
+                        class="w-10 h-10 rounded-xl bg-slate-50 text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <!-- Error Message -->
+                <div *ngIf="errorMessage()"
+                    class="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2 text-red-600 animate-in slide-in-from-top-2 duration-300">
+                    <span class="material-symbols-outlined text-sm">error</span>
+                    <p class="text-[10px] font-semibold uppercase tracking-wider">{{ errorMessage() }}</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Full
+                                Name</label>
+                            <input [(ngModel)]="newEmployee.name" type="text" placeholder="John Doe"
+                                class="w-full px-5 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Employee
+                                ID</label>
+                            <input [(ngModel)]="newEmployee.id" type="text" placeholder="EMP123"
+                                class="w-full px-5 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Email
+                                Address</label>
+                            <input [(ngModel)]="newEmployee.email" type="email" placeholder="john@hamsa.com"
+                                class="w-full px-5 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                            <div class="relative">
+                                <input [(ngModel)]="newEmployee.password" [type]="showPassword() ? 'text' : 'password'"
+                                    placeholder="••••••••"
+                                    class="w-full px-5 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all pr-12">
+                                <button (click)="showPassword.set(!showPassword())"
+                                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-1 transition-colors">
+                                    <span class="material-symbols-outlined text-sm">
+                                        {{ showPassword() ? 'visibility' : 'visibility_off' }}
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Role</label>
+                            <div class="relative">
+                                <select [(ngModel)]="newEmployee.role"
+                                    class="w-full px-5 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all appearance-none cursor-pointer pr-10">
+                                    <option value="" disabled selected>Select Role</option>
+                                    <option *ngFor="let role of roles" [value]="role">{{role}}</option>
+                                </select>
+                                <span
+                                    class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-sm">
+                                    expand_more
+                                </span>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label
+                                class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Designation</label>
+                            <input [(ngModel)]="newEmployee.designation" type="text" placeholder="e.g. Senior Developer"
+                                class="w-full px-5 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
+                        </div>
+                    </div>
+
+                    <div class="pt-6">
+                        <button (click)="saveEmployee()"
+                            class="w-full py-5 bg-brand-5 text-white rounded-2xl font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-5/20 hover:bg-brand-1 hover:-translate-y-1 transition-all active:scale-95">
+                            {{ isEditing() ? 'Update Details' : 'Add Employee' }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

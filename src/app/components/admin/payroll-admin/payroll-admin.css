@@ -1,0 +1,53 @@
+:host { display: block; }
+
+.stats-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+}
+
+.table-container {
+    max-height: calc(100vh - 350px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #e2e8f0 transparent;
+}
+
+.table-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #ffffff;
+}
+
+.status-paid {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.status-pending {
+    background: #fffbeb;
+    color: #d97706;
+}
+
+@keyframes pulse-soft {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.processing-pulse {
+    animation: pulse-soft 2s infinite ease-in-out;
+}

@@ -46,9 +46,11 @@ export class Login {
           setTimeout(() => {
             this.isLoading = false;
             if (user) {
-              // Store user info for sidebar
+              // Store user info (including role) for sidebar to use
               localStorage.setItem('currentUser', JSON.stringify(user));
-              this.router.navigate(['/dashboard']);
+              
+              const targetPath = user.role.toLowerCase() === 'admin' ? '/dashboard/admin-home' : '/dashboard';
+              this.router.navigate([targetPath]);
             } else {
               this.loginError.set('Invalid email or password. Please try again.');
             }

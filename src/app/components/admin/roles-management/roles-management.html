@@ -1,0 +1,92 @@
+<div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <div class="mb-8">
+        <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tighter">Roles Management</h1>
+        <p class="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">Assign roles and manage access
+            levels
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100">
+            <h3 class="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-1">security</span>
+                Role Assignments
+            </h3>
+
+            <div class="space-y-4">
+                <div *ngFor="let item of roles(); let i = index"
+                    class="p-5 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between group/item hover:border-brand-1 transition-all">
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <p class="text-sm font-semibold text-slate-800">{{item.role}}</p>
+                            <div class="flex flex-wrap gap-1 mt-1.5">
+                                <span *ngFor="let perm of item.permissions"
+                                    class="px-2 py-0.5 bg-white border border-slate-100 rounded-md text-[8px] font-semibold text-brand-1 uppercase tracking-tight">
+                                    {{perm}}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <button (click)="editRole(i)"
+                        class="p-2 text-slate-400 hover:text-brand-1 hover:bg-white rounded-lg transition-all opacity-0 group-hover/item:opacity-100">
+                        <span class="material-symbols-outlined text-sm">edit</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-brand-1 to-brand-5 p-8 rounded-[2.5rem] shadow-2xl text-white">
+            <h3 class="text-lg font-semibold mb-2">
+                {{ editingIndex() !== null ? 'Edit Administrative Role' : 'Quick Role Creator' }}
+            </h3>
+            <p class="text-white/70 text-sm mb-8 leading-relaxed italic">
+                {{ editingIndex() !== null ? 'Update the selected role permissions.' : 'Select the modules this new role
+                should have access to.' }}
+            </p>
+
+            <div class="space-y-6">
+                <!-- Role Name Input -->
+                <div class="space-y-2">
+                    <label class="text-[10px] font-semibold uppercase tracking-widest opacity-70 ml-1">Role
+                        Title</label>
+                    <input type="text" placeholder="e.g. Operations Head" [ngModel]="newRoleName()"
+                        (ngModelChange)="newRoleName.set($event)"
+                        class="w-full bg-white/10 border border-white/20 rounded-xl px-5 py-4 text-white placeholder:text-white/40 outline-none focus:bg-white/20 transition-all font-medium text-xs">
+                </div>
+
+                <!-- Permissions Grid -->
+                <div class="space-y-3">
+                    <label class="text-[10px] font-semibold uppercase tracking-widest opacity-70 ml-1">Module
+                        Permissions</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <label *ngFor="let perm of permissionOptions"
+                            class="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl cursor-pointer hover:bg-white/10 transition-all group overflow-hidden relative">
+                            <div class="relative flex items-center justify-center">
+                                <input type="checkbox" [checked]="selectedPermissions().includes(perm)"
+                                    (change)="togglePermission(perm)"
+                                    class="peer h-5 w-5 cursor-pointer appearance-none rounded-md border border-white/30 checked:bg-white checked:border-white transition-all shadow-sm">
+                                <span
+                                    class="material-symbols-outlined absolute opacity-0 peer-checked:opacity-100 text-brand-1 text-sm pointer-events-none font-black">
+                                    check
+                                </span>
+                            </div>
+                            <span class="text-[11px] font-medium tracking-wide truncate">{{perm}}</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button *ngIf="editingIndex() !== null" (click)="cancelEdit()"
+                        class="flex-1 bg-white/10 text-white py-4 mt-2 rounded-xl font-semibold uppercase text-xs tracking-widest hover:bg-white/20 transition-all">
+                        Cancel
+                    </button>
+                    <button (click)="createRole()"
+                        class="flex-[2] bg-white text-brand-1 py-4 mt-2 rounded-xl font-semibold uppercase text-xs tracking-widest hover:bg-slate-100 transition-all shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        [disabled]="!newRoleName().trim() || selectedPermissions().length === 0">
+                        {{ editingIndex() !== null ? 'Update Role' : 'Create Administrative Role' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

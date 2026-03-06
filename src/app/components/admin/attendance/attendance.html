@@ -1,0 +1,51 @@
+<div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tighter">Attendance Tracking</h1>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">Real-time attendance logs</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <input type="date"
+                class="bg-white border border-slate-100 rounded-xl px-4 py-2 text-xs font-semibold text-slate-600 outline-none focus:border-brand-1">
+            <button
+                class="bg-brand-5 text-white px-6 py-3 rounded-2xl font-semibold text-xs uppercase tracking-widest shadow-lg hover:bg-brand-1 transition-all">Export
+                Report</button>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-100">
+                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+                            Employee
+                        </th>
+                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Check
+                            In
+                        </th>
+                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Check
+                            Out
+                        </th>
+                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-400 uppercase tracking-widest">Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    <tr *ngFor="let record of attendanceRecords()" class="hover:bg-slate-50/50 transition-colors">
+                        <td class="px-8 py-5 text-sm font-semibold text-slate-800">{{record.name}}</td>
+                        <td class="px-8 py-5 text-sm font-medium text-slate-600">{{record.checkIn}}</td>
+                        <td class="px-8 py-5 text-sm font-medium text-slate-600">{{record.checkOut}}</td>
+                        <td class="px-8 py-5">
+                            <span
+                                [class]="'px-3 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider ' + 
+                                (record.status === 'Present' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600')">
+                                {{record.status}}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+<div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-700">
+    <!-- Header -->
+    <div class="mb-10">
+        <h1 class="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tighter">Admin Dashboard</h1>
+        <p class="text-xs font-medium text-slate-400 uppercase tracking-[0.3em] mt-2">Organization Overview & Global
+            Controls</p>
+    </div>
+
+    <!-- Top Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div *ngFor="let stat of stats()"
+            class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-100 hover:border-brand-1 transition-all group overflow-hidden relative">
+            <div
+                [class]="'absolute top-0 right-0 w-24 h-24 ' + stat.color + '/5 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-700'">
+            </div>
+
+            <div class="relative z-10">
+                <div
+                    [class]="'w-12 h-12 ' + stat.color + '/10 rounded-2xl flex items-center justify-center ' + stat.color.replace('bg-', 'text-') + ' mb-6 group-hover:scale-110 transition-all'">
+                    <span class="material-symbols-outlined text-2xl uppercase">{{stat.icon}}</span>
+                </div>
+                <h3 class="text-3xl font-semibold text-slate-800 mb-1">{{stat.value}}</h3>
+                <p class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-4">{{stat.label}}</p>
+                <p
+                    [class]="'text-[10px] font-medium ' + (stat.color === 'bg-amber-500' ? 'text-amber-600' : 'text-emerald-500')">
+                    {{stat.trend}}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Action Control Center -->
+        <div
+            class="lg:col-span-2 bg-brand-5 p-8 sm:p-10 rounded-[3rem] shadow-2xl text-white relative overflow-hidden group">
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-1/40 to-transparent pointer-events-none"></div>
+
+            <div class="flex items-center justify-between mb-10 relative z-10">
+                <h2 class="text-2xl font-semibold tracking-tight">Administrative Hub</h2>
+                <span
+                    class="px-4 py-1.5 bg-white/10 rounded-full text-[10px] font-semibold uppercase tracking-widest border border-white/10">Quick
+                    Access</span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 relative z-10">
+                <a routerLink="/dashboard/employees"
+                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn">
+                    <span
+                        class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">group</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-widest">Team</span>
+                </a>
+                <a routerLink="/dashboard/payroll-admin"
+                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn">
+                    <span
+                        class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">payments</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-widest">Payroll</span>
+                </a>
+                <a routerLink="/dashboard/leaves-admin"
+                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn">
+                    <span
+                        class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">event_busy</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-widest">Leaves</span>
+                </a>
+                <a routerLink="/dashboard/reports"
+                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn">
+                    <span
+                        class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">analytics</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-widest">Reports</span>
+                </a>
+                <a routerLink="/dashboard/attendance"
+                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn">
+                    <span
+                        class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">event_available</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-widest">Logs</span>
+                </a>
+                <a routerLink="/dashboard/settings"
+                    class="p-6 bg-white/10 border border-white/20 rounded-[2rem] hover:bg-white hover:text-brand-5 transition-all text-center flex flex-col items-center group/btn shadow-lg shadow-black/10">
+                    <span class="material-symbols-outlined mb-3 text-3xl">settings</span>
+                    <span class="text-[10px] font-semibold uppercase tracking-widest">Config</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100">
+            <h2 class="text-xl font-semibold text-slate-800 mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-brand-1">history</span>
+                Audit Logs
+            </h2>
+
+            <div class="space-y-6 relative border-l-2 border-slate-50 ml-2 pl-6">
+                <div *ngFor="let log of recentActions()" class="relative">
+                    <div class="absolute -left-[31px] top-1 w-2 h-2 rounded-full bg-brand-1 ring-4 ring-white"></div>
+                    <p class="text-[10px] font-semibold text-brand-1 uppercase tracking-widest mb-1">{{log.time}}</p>
+                    <p class="text-sm font-semibold text-slate-800 leading-snug">{{log.action}}</p>
+                    <p class="text-[10px] font-medium text-slate-400 mt-1">by {{log.admin}}</p>
+                </div>
+            </div>
+
+            <button
+                class="w-full mt-10 py-4 bg-slate-50 text-slate-400 font-semibold uppercase text-[10px] tracking-widest rounded-2xl hover:bg-brand-5 hover:text-white transition-all">View
+                All Logs</button>
+        </div>
+    </div>
+</div>

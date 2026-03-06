@@ -1,6 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { SidebarService } from '../../../services/sidebar.service';
 
 @Component({
   selector: 'app-navbar',
@@ -13,8 +15,10 @@ export class Navbar {
   currentTime = new Date();
   showSettingsDropdown = signal(false);
   showNotificationsDropdown = signal(false);
+  currentTitle = signal('Dashboard');
 
   notifications = [
+    // ... notifications content remains same
     {
       id: 1,
       title: 'New Leave Request',
@@ -44,10 +48,42 @@ export class Navbar {
     }
   ];
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    public sidebarService: SidebarService
+  ) {
     setInterval(() => {
       this.currentTime = new Date();
     }, 1000);
+
+    // Dynamic Title Logic
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: any) => {
+      this.updateTitle(event.urlAfterRedirects);
+    });
+
+    // Initial title
+    this.updateTitle(this.router.url);
+  }
+
+  private updateTitle(url: string) {
+    if (url.includes('admin-home')) this.currentTitle.set('Admin Dashboard');
+    else if (url.includes('employees')) this.currentTitle.set('Employee Mgmt');
+    else if (url.includes('departments')) this.currentTitle.set('Dept Mgmt');
+    else if (url.includes('roles')) this.currentTitle.set('Roles Mgmt');
+    else if (url.includes('attendance')) this.currentTitle.set('Attendance');
+    else if (url.includes('leaves-admin')) this.currentTitle.set('Leave Mgmt');
+    else if (url.includes('payroll-admin')) this.currentTitle.set('Payroll');
+    else if (url.includes('tasks')) this.currentTitle.set('Tasks');
+    else if (url.includes('reports')) this.currentTitle.set('Reports');
+    else if (url.includes('announcement')) this.currentTitle.set('Announcement');
+    else if (url.includes('settings')) this.currentTitle.set('Settings');
+    else if (url.includes('profile')) this.currentTitle.set('Profile');
+    else if (url.includes('leaves')) this.currentTitle.set('Leaves');
+    else if (url.includes('payroll')) this.currentTitle.set('Payroll');
+    else if (url.includes('help')) this.currentTitle.set('Help');
+    else this.currentTitle.set('Dashboard');
   }
 
   toggleSettings() {

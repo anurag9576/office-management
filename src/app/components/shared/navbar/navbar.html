@@ -1,10 +1,10 @@
 <header
     class="navbar-container flex items-center justify-between px-6 h-16 border-b border-brand-1/30 bg-white shadow-sm z-20">
     <!-- Left side: Search and Breadcrumb-like title -->
-    <div class="flex items-center space-x-6">
-        <h2 class="text-brand-5 font-bold text-lg">Dashboard Overview</h2>
+    <div class="flex items-center space-x-3 md:space-x-6">
+        <h2 class="text-brand-5 font-bold text-sm md:text-lg whitespace-nowrap">{{currentTitle()}}</h2>
 
-        <div class="relative group">
+        <div class="relative group hidden sm:block">
             <span
                 class="absolute inset-y-0 left-0 pl-3 flex items-center text-brand-3 group-focus-within:text-brand-1 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -13,8 +13,8 @@
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </span>
-            <input type="text" placeholder="Search anything..."
-                class="bg-brand-2/10 border border-brand-2/20 rounded-lg pl-9 pr-4 py-1.5 text-sm outline-none focus:ring-2 focus:ring-brand-1/20 focus:border-brand-1 focus:bg-white w-64 transition-all" />
+            <input type="text" placeholder="Search..."
+                class="bg-brand-2/10 border border-brand-2/20 rounded-lg pl-9 pr-4 py-1.5 text-sm outline-none focus:ring-2 focus:ring-brand-1/20 focus:border-brand-1 focus:bg-white w-32 md:w-64 transition-all" />
         </div>
     </div>
 
@@ -45,7 +45,7 @@
 
             <!-- Notification Menu -->
             <div *ngIf="showNotificationsDropdown()"
-                class="absolute right-0 mt-2 w-[340px] bg-white rounded-2xl shadow-2xl border border-slate-100 z-[50] animate-in fade-in zoom-in-95 duration-200 origin-top-right overflow-hidden">
+                class="fixed sm:absolute left-1/2 sm:left-auto -translate-x-1/2 sm:translate-x-0 sm:right-0 top-[60px] sm:top-auto mt-2 w-[calc(100vw-32px)] sm:w-[340px] bg-white rounded-2xl shadow-2xl border border-slate-100 z-[150] animate-in fade-in zoom-in-95 duration-200 origin-top overflow-hidden">
                 <!-- Header -->
                 <div class="px-4 py-3 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Notifications</h3>
@@ -96,7 +96,7 @@
 
             <!-- Dropdown Menu -->
             <div *ngIf="showSettingsDropdown()"
-                class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 py-1.5 z-[50] animate-in fade-in zoom-in-95 duration-200 origin-top-right overflow-hidden">
+                class="fixed sm:absolute right-4 sm:right-0 top-[60px] sm:top-auto mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 py-1.5 z-[150] animate-in fade-in zoom-in-95 duration-200 origin-top-right overflow-hidden">
                 <button (click)="navigateToForgot()"
                     class="w-full flex items-center px-4 py-2.5 text-sm font-black text-slate-700 hover:bg-brand-1 hover:text-white transition-all group/item">
                     <span

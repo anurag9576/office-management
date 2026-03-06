@@ -1,6 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { SidebarService } from '../../../services/sidebar.service';
+import { filter } from 'rxjs/operators';
 
 interface NavItem {
   label: string;
@@ -17,13 +19,48 @@ interface NavItem {
 export class Sidebar {
   brandName = signal('hamsa hitech');
   showLogoutModal = signal(false);
-  isCollapsed = signal(false);
+  isCollapsed = signal(window.innerWidth < 768);
+
+  // Admin Specific Tabs
+  private adminNavItems: NavItem[] = [
+    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard/admin-home' },
+    { label: 'Employee Mgmt', icon: 'group', route: '/dashboard/employees' },
+    { label: 'Dept Mgmt', icon: 'lan', route: '/dashboard/departments' },
+    { label: 'Roles Mgmt', icon: 'manage_accounts', route: '/dashboard/roles' },
+    { label: 'Attendance', icon: 'event_available', route: '/dashboard/attendance' },
+    { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin' },
+    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll-admin' },
+    { label: 'Tasks', icon: 'task', route: '/dashboard/tasks' },
+    { label: 'Reports', icon: 'analytics', route: '/dashboard/reports' },
+    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement' },
+    { label: 'Settings', icon: 'settings', route: '/dashboard/settings' },
+  ];
+
+  // Employee Specific Tabs
+  private employeeNavItems: NavItem[] = [
+    { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard' },
+    { label: 'Profile', icon: 'person', route: '/dashboard/profile' },
+    { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves' },
+    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll' },
+    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement' },
+    { label: 'Help', icon: 'help_outline', route: '/dashboard/help' },
+  ];
 
   toggleSidebar() {
     this.isCollapsed.set(!this.isCollapsed());
   }
   
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    public sidebarService: SidebarService
+  ) {
+    // Auto-close mobile sidebar on route change
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      this.sidebarService.closeMobile();
+    });
+
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       const parsedUser = JSON.parse(savedUser);
@@ -36,19 +73,17 @@ export class Sidebar {
   }
   
   user = signal({
-    name: 'Ankit Sharma',
+    name: 'User',
     role: 'Employee',
-    initials: 'AS'
+    initials: 'U'
   });
   
-  navItems = signal<NavItem[]>([
-    { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard' },
-    { label: 'Profile', icon: 'person', route: '/dashboard/profile' },
-    { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves' },
-    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll' },
-    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement' },
-    { label: 'Help', icon: 'help_outline', route: '/dashboard/help' },
-  ]);
+  // Reactive Navigation Items based on Role
+  navItems = computed(() => {
+    const user = this.user();
+    const role = (user?.role || 'employee').toLowerCase();
+    return role === 'admin' ? this.adminNavItems : this.employeeNavItems;
+  });
 
   onLogout() {
     this.showLogoutModal.set(true);

@@ -11,7 +11,7 @@
     "id": "2",
     "name": "Admin User",
     "email": "admin@hamsa.com",
-    "password": "adminpassword",
+    "password": "Test@123",
     "role": "Admin",
     "initials": "AU"
   }

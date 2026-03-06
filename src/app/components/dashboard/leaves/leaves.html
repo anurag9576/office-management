@@ -1,4 +1,4 @@
-<div class="leaves-page p-6 sm:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+<div class="leaves-page px-2 py-6 sm:p-8 space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
     <!-- Header: Quick Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div *ngFor="let stat of leaveStats()"
@@ -69,8 +69,10 @@
             </div>
 
             <!-- Recent Applications Table -->
-            <div class="bg-white/80 backdrop-blur-md p-8 rounded-[3rem] shadow-sm border border-brand-2/10">
-                <h2 class="text-2xl font-black text-brand-5 mb-8 tracking-tight">Recent Applications</h2>
+            <div
+                class="bg-white/80 backdrop-blur-md p-5 sm:p-8 rounded-[2rem] sm:rounded-[3rem] shadow-sm border border-brand-2/10">
+                <h2 class="text-xl sm:text-2xl font-black text-brand-5 mb-6 sm:mb-8 tracking-tight">Recent Applications
+                </h2>
                 <div class="space-y-4">
                     <div *ngFor="let item of recentLeaves()"
                         class="flex items-center p-4 rounded-3xl bg-white border border-brand-2/10 hover:shadow-lg transition-all group">
@@ -95,7 +97,8 @@
         <!-- Right Side: Action Panel -->
         <div class="lg:col-span-4 space-y-8">
             <!-- Apply Leave Card (Interactive Highlight) -->
-            <div class="bg-brand-5 p-10 rounded-[3rem] shadow-2xl text-white relative overflow-hidden group">
+            <div
+                class="bg-brand-5 p-6 sm:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-2xl text-white relative overflow-hidden group">
                 <div
                     class="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700">
                 </div>
@@ -136,9 +139,10 @@
             </div>
 
             <!-- Company Holidays (Vibrant List) -->
-            <div class="bg-white p-10 rounded-[3rem] shadow-sm border border-brand-2/10">
-                <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-2xl font-black text-brand-5 tracking-tight">Holidays 2026</h2>
+            <div
+                class="bg-white px-2 py-6 sm:p-6 lg:p-10 rounded-[2rem] sm:rounded-[3rem] shadow-sm border border-brand-2/10">
+                <div class="flex items-center justify-between mb-6 sm:mb-8">
+                    <h2 class="text-xl sm:text-2xl font-black text-brand-5 tracking-tight">Holidays 2026</h2>
                     <span
                         class="text-[10px] font-black text-brand-1 bg-brand-1/10 px-3 py-1.5 rounded-xl">UPCOMING</span>
                 </div>
