@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +20,7 @@ export class Login {
   constructor(
     private fb: FormBuilder, 
     private router: Router,
-    private http: HttpClient
+    private apiService: ApiService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -39,27 +39,52 @@ export class Login {
       this.loginError.set(null);
       const { email, password } = this.loginForm.value;
 
-      this.http.get<any[]>('data/users.json').subscribe({
-        next: (users) => {
-          const user = users.find(u => u.email === email && u.password === password);
+      this.apiService.login({ email, password }).subscribe({
+        next: (response: any) => {
+          this.isLoading = false;
+          console.log('Backend Login Response:', response);
+
+          // Handle both direct user object and { success: true, data: user } structure
+          const userResponse = response.data || response;
+          const token = response.token || (response.data ? response.data.token : null);
+
+          if (!userResponse || !userResponse.role) {
+            console.error('User data or role missing in response');
+            this.loginError.set('Login successful, but user data is invalid.');
+            return;
+          }
+
+          // Ensure we have first and last names, fallback to empty strings or email part
+          const fName = (userResponse.firstName || '').trim();
+          const lName = (userResponse.lastName || '').trim();
+          const emailPart = userResponse.email ? userResponse.email.split('@')[0] : 'User';
+
+          // Map backend fields to frontend expected fields
+          const user = {
+            ...userResponse,
+            name: fName && lName ? `${fName} ${lName}` : (fName || lName || emailPart),
+            initials: ((fName[0] || '') + (lName[0] || emailPart[0])).toUpperCase(),
+            token: token // Ensure token is attached to the user object we store
+          };
           
-          setTimeout(() => {
-            this.isLoading = false;
-            if (user) {
-              // Store user info (including role) for sidebar to use
-              localStorage.setItem('currentUser', JSON.stringify(user));
-              
-              const targetPath = user.role.toLowerCase() === 'admin' ? '/dashboard/admin-home' : '/dashboard';
-              this.router.navigate([targetPath]);
-            } else {
-              this.loginError.set('Invalid email or password. Please try again.');
-            }
-          }, 1000);
+          console.log('Mapped User Object for storage:', user);
+
+          // Store user info and token
+          localStorage.setItem('currentUser', JSON.stringify(user));
+          if (token) localStorage.setItem('token', token);
+          
+          const role = (user.role || '').toLowerCase();
+          const targetPath = role === 'admin' ? '/dashboard/admin-home' : '/dashboard';
+          
+          console.log('Navigating to:', targetPath, 'User Role is:', role);
+          this.router.navigateByUrl(targetPath);
         },
         error: (err) => {
           this.isLoading = false;
-          this.loginError.set('Something went wrong. Please try again later.');
-          console.error('Login error:', err);
+          console.error('Login error details:', err);
+          // Angular HttpClient handles non-2xx status as errors
+          const errorMsg = err.error?.message || 'Invalid email or password. Please try again.';
+          this.loginError.set(errorMsg);
         }
       });
     } else {

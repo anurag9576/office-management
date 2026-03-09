@@ -12,6 +12,7 @@ interface NavItem {
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
@@ -22,7 +23,7 @@ export class Sidebar {
   isCollapsed = signal(window.innerWidth < 768);
 
   // Admin Specific Tabs
-  private adminNavItems: NavItem[] = [
+  public adminNavItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard/admin-home' },
     { label: 'Employee Mgmt', icon: 'group', route: '/dashboard/employees' },
     { label: 'Dept Mgmt', icon: 'lan', route: '/dashboard/departments' },
@@ -37,7 +38,7 @@ export class Sidebar {
   ];
 
   // Employee Specific Tabs
-  private employeeNavItems: NavItem[] = [
+  public employeeNavItems: NavItem[] = [
     { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard' },
     { label: 'Profile', icon: 'person', route: '/dashboard/profile' },
     { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves' },
@@ -61,28 +62,37 @@ export class Sidebar {
       this.sidebarService.closeMobile();
     });
 
-    const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
-      const parsedUser = JSON.parse(savedUser);
-      this.user.set({
-        name: parsedUser.name,
-        role: parsedUser.role,
-        initials: parsedUser.initials
-      });
-    }
+    this.loadUserInfo();
   }
-  
+
   user = signal({
     name: 'User',
     role: 'Employee',
     initials: 'U'
   });
+
+  private loadUserInfo() {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        const name = parsedUser.name || 'User';
+        const role = parsedUser.role || 'Employee';
+        const initials = parsedUser.initials || name.charAt(0).toUpperCase();
+
+        this.user.set({ name, role, initials });
+        console.log('Sidebar loaded user:', name, 'Role:', role);
+      } catch (e) {
+        console.error('Error parsing user data', e);
+      }
+    }
+  }
   
   // Reactive Navigation Items based on Role
   navItems = computed(() => {
-    const user = this.user();
-    const role = (user?.role || 'employee').toLowerCase();
-    return role === 'admin' ? this.adminNavItems : this.employeeNavItems;
+    const userRole = (this.user().role || 'Employee').toLowerCase();
+    console.log('Sidebar rendering for role:', userRole);
+    return userRole === 'admin' ? this.adminNavItems : this.employeeNavItems;
   });
 
   onLogout() {

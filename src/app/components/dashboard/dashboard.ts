@@ -6,6 +6,7 @@ import { Navbar } from '../shared/navbar/navbar';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
   imports: [CommonModule, RouterOutlet, Sidebar, Navbar],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',

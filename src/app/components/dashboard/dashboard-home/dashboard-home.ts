@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -9,17 +9,21 @@ import { Router } from '@angular/router';
   templateUrl: './dashboard-home.html',
   styleUrl: './dashboard-home.css'
 })
-export class DashboardHome {
+export class DashboardHome implements OnInit {
   userName = signal('User');
 
-  constructor(private router: Router) {
+  constructor(private router: Router) {}
+
+  ngOnInit() {
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       const user = JSON.parse(savedUser);
       if (user.role.toLowerCase() === 'admin') {
-        this.router.navigate(['/dashboard/admin-home']);
+        console.log('Redirecting Admin from DashboardHome to Admin Dashboard');
+        this.router.navigateByUrl('/dashboard/admin-home');
+      } else {
+        this.userName.set(user.name.split(' ')[0]);
       }
-      this.userName.set(user.name.split(' ')[0]);
     }
   }
 }

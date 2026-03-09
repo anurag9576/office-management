@@ -18,6 +18,7 @@ import { SettingsAdmin } from './components/admin/settings/settings';
 import { LeavesAdmin } from './components/admin/leaves-admin/leaves-admin';
 import { PayrollAdmin } from './components/admin/payroll-admin/payroll-admin';
 import { AdminHome } from './components/admin/admin-home/admin-home';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -25,21 +26,22 @@ export const routes: Routes = [
   { 
     path: 'dashboard', 
     component: Dashboard,
+    canActivate: [authGuard],
     children: [
-      { path: '', component: DashboardHome },
-      { path: 'admin-home', component: AdminHome },
-      { path: 'employees', component: EmployeesMgmt },
-      { path: 'departments', component: DepartmentsMgmt },
-      { path: 'roles', component: RolesMgmt },
-      { path: 'attendance', component: AttendanceMgmt },
-      { path: 'leaves', component: Leaves },
-      { path: 'leaves-admin', component: LeavesAdmin },
+      { path: '', component: DashboardHome, data: { role: 'Employee' } },
+      { path: 'admin-home', component: AdminHome, data: { role: 'Admin' } },
+      { path: 'employees', component: EmployeesMgmt, data: { role: 'Admin' } },
+      { path: 'departments', component: DepartmentsMgmt, data: { role: 'Admin' } },
+      { path: 'roles', component: RolesMgmt, data: { role: 'Admin' } },
+      { path: 'attendance', component: AttendanceMgmt, data: { role: 'Admin' } },
+      { path: 'leaves', component: Leaves }, // Both can see their respective versions
+      { path: 'leaves-admin', component: LeavesAdmin, data: { role: 'Admin' } },
       { path: 'announcement', component: Announcement },
-      { path: 'payroll', component: Payroll },
-      { path: 'payroll-admin', component: PayrollAdmin },
+      { path: 'payroll', component: Payroll, data: { role: 'Employee' } },
+      { path: 'payroll-admin', component: PayrollAdmin, data: { role: 'Admin' } },
       { path: 'tasks', component: TaskMgmt },
-      { path: 'reports', component: Reports },
-      { path: 'settings', component: SettingsAdmin },
+      { path: 'reports', component: Reports, data: { role: 'Admin' } },
+      { path: 'settings', component: SettingsAdmin, data: { role: 'Admin' } },
       { path: 'profile', component: Profile },
       { path: 'help', component: Help },
     ]
