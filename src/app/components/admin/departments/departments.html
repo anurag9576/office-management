@@ -28,14 +28,18 @@
                     </div>
                     <div>
                         <h3 class="text-lg font-semibold text-slate-800 leading-tight">{{dept.name}}</h3>
-                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">Head: {{dept.head}}</p>
+                        <p class="text-[10px] font-medium text-slate-400 uppercase tracking-widest mt-1">
+                            Head: {{dept.head ? (dept.head.firstName + ' ' + dept.head.lastName) : 'Not Assigned'}}
+                        </p>
                     </div>
                 </div>
+
+                <p class="text-[11px] text-slate-500 mb-6 line-clamp-2 leading-relaxed">{{dept.description}}</p>
 
                 <div class="flex items-center justify-between pt-6 border-t border-slate-50">
                     <div class="flex items-center gap-2">
                         <span class="material-symbols-outlined text-slate-400 text-sm">groups</span>
-                        <span class="text-xs font-semibold text-slate-600 uppercase">{{dept.count}} Employees</span>
+                        <span class="text-xs font-semibold text-slate-600 uppercase">{{dept.employeeCount || 0}} Employees</span>
                     </div>
                     <button
                         class="text-brand-1 hover:text-brand-5 font-semibold text-[10px] uppercase tracking-widest flex items-center gap-1">

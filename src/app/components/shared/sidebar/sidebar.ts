@@ -26,7 +26,6 @@ export class Sidebar {
   public adminNavItems: NavItem[] = [
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard/admin-home' },
     { label: 'Employee Mgmt', icon: 'group', route: '/dashboard/employees' },
-    { label: 'Dept Mgmt', icon: 'lan', route: '/dashboard/departments' },
     { label: 'Roles Mgmt', icon: 'manage_accounts', route: '/dashboard/roles' },
     { label: 'Attendance', icon: 'event_available', route: '/dashboard/attendance' },
     { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin' },

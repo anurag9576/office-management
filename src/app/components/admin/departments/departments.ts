@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-departments',
@@ -8,11 +9,24 @@ import { CommonModule } from '@angular/common';
   templateUrl: './departments.html',
   styleUrl: './departments.css'
 })
-export class DepartmentsMgmt {
-  departments = signal([
-    { name: 'IT Department', head: 'Rajesh Gupta', count: 12 },
-    { name: 'HR Department', head: 'Sarah Jenkins', count: 4 },
-    { name: 'Finance', head: 'Amitabh Sen', count: 6 },
-    { name: 'Operations', head: 'Vikas Roy', count: 25 }
-  ]);
+export class DepartmentsMgmt implements OnInit {
+  private apiService = inject(ApiService);
+  departments = signal<any[]>([]);
+
+  ngOnInit() {
+    this.loadDepartments();
+  }
+
+  loadDepartments() {
+    this.apiService.getDepartments().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.departments.set(res.data);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading departments:', err);
+      }
+    });
+  }
 }
