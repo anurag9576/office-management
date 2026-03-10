@@ -19,6 +19,7 @@ export class EmployeesMgmt implements OnInit {
   isEditing = signal(false);
   errorMessage = signal('');
   roles = ['HR Manager', 'QA', 'Developer', 'Manager', 'IT Team'];
+  statuses = ['Active', 'On Leave', 'Terminated'];
   
   newEmployee = {
     _id: '',
@@ -28,7 +29,8 @@ export class EmployeesMgmt implements OnInit {
     email: '',
     password: '',
     role: '',
-    designation: ''
+    designation: '',
+    status: 'Active'
   };
 
   ngOnInit() {
@@ -60,7 +62,8 @@ export class EmployeesMgmt implements OnInit {
       email: '',
       password: '',
       role: '',
-      designation: ''
+      designation: '',
+      status: 'Active'
     };
     this.showPassword.set(false);
     this.showModal.set(true);
@@ -78,6 +81,13 @@ export class EmployeesMgmt implements OnInit {
     this.showModal.set(false);
   }
 
+  successMessage = signal('');
+
+  showSuccess(msg: string) {
+    this.successMessage.set(msg);
+    setTimeout(() => this.successMessage.set(''), 1000);
+  }
+
   saveEmployee() {
     const emp = this.newEmployee;
     if (!emp.firstName || !emp.lastName || !emp.email || !emp.employeeId || !emp.role || (!this.isEditing() && !emp.password)) {
@@ -92,6 +102,7 @@ export class EmployeesMgmt implements OnInit {
           if (res.success) {
             this.loadEmployees();
             this.closeModal();
+            this.showSuccess('Employee data updated successfully!');
           }
         },
         error: (err) => {
@@ -104,6 +115,7 @@ export class EmployeesMgmt implements OnInit {
           if (res.success) {
             this.loadEmployees();
             this.closeModal();
+            this.showSuccess('Successfull add employee!');
           }
         },
         error: (err) => {
@@ -113,18 +125,38 @@ export class EmployeesMgmt implements OnInit {
     }
   }
 
-  deleteEmployee(id: string) {
-    if (confirm('Are you sure you want to remove this employee?')) {
-      this.apiService.deleteEmployee(id).subscribe({
-        next: (res) => {
-          if (res.success) {
-            this.loadEmployees();
-          }
-        },
-        error: (err) => {
-          alert('Failed to delete employee');
+  showDeleteModal = signal(false);
+  employeeToDeleteId = signal('');
+
+  showDeleteConfirm(id: string) {
+    this.employeeToDeleteId.set(id);
+    this.showDeleteModal.set(true);
+  }
+
+  cancelDelete() {
+    this.showDeleteModal.set(false);
+    this.employeeToDeleteId.set('');
+  }
+
+  confirmDelete() {
+    const id = this.employeeToDeleteId();
+    if (!id) return;
+
+    this.apiService.deleteEmployee(id).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.loadEmployees();
+          this.cancelDelete();
         }
-      });
-    }
+      },
+      error: (err) => {
+        alert('Failed to delete employee');
+        this.cancelDelete();
+      }
+    });
+  }
+
+  deleteEmployee(id: string) {
+    // This method is now handled via showDeleteConfirm
   }
 }

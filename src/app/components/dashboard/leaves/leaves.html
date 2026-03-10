@@ -1,4 +1,36 @@
 <div class="leaves-page px-2 py-6 sm:p-8 space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <!-- Status Overlays -->
+    <div *ngIf="isLoading()"
+        class="fixed inset-0 z-[10000] flex items-center justify-center bg-white/60 backdrop-blur-sm">
+        <div class="flex flex-col items-center gap-4">
+            <div class="w-12 h-12 border-4 border-brand-1 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-sm font-black text-slate-600 uppercase tracking-widest">Processing...</p>
+        </div>
+    </div>
+
+    <!-- Error/Success Feedbacks -->
+    <div *ngIf="errorMessage()"
+        class="bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-red-500">error</span>
+            <p class="text-xs font-bold text-red-700">{{errorMessage()}}</p>
+        </div>
+        <button (click)="errorMessage.set('')" class="text-red-400 hover:text-red-600">
+            <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+    </div>
+
+    <div *ngIf="successMessage()"
+        class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-emerald-500">check_circle</span>
+            <p class="text-xs font-bold text-emerald-700">{{successMessage()}}</p>
+        </div>
+        <button (click)="successMessage.set('')" class="text-emerald-400 hover:text-emerald-600">
+            <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+    </div>
+
     <!-- Header: Quick Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div *ngFor="let stat of leaveStats()"
@@ -85,8 +117,10 @@
                             <p class="text-xs text-brand-3 font-medium">{{item.from}} to {{item.to}} ({{item.days}}
                                 Days)</p>
                         </div>
-                        <div
-                            class="px-6 py-2 rounded-2xl text-[10px] font-semibold uppercase tracking-widest bg-green-50 text-green-500 border border-green-100">
+                        <div [class]="'px-6 py-2 rounded-2xl text-[10px] font-semibold uppercase tracking-widest border ' + 
+                            (item.status.toLowerCase() === 'approved' ? 'bg-emerald-50 text-emerald-500 border-emerald-100' : 
+                             item.status.toLowerCase() === 'pending' ? 'bg-amber-50 text-amber-500 border-amber-100' : 
+                             'bg-rose-50 text-rose-500 border-rose-100')">
                             {{item.status}}
                         </div>
                     </div>
@@ -105,34 +139,41 @@
 
                 <h2 class="text-3xl font-bold mb-10 relative z-10 leading-tight">Apply for Leave</h2>
 
-                <form class="space-y-5 relative z-10">
+                <form (ngSubmit)="applyLeave()" #lForm="ngForm" class="space-y-5 relative z-10">
                     <div class="space-y-2">
                         <label class="text-[10px] font-semibold uppercase tracking-widest text-brand-2">Leave Type</label>
-                        <select
+                        <select name="type" [(ngModel)]="leaveForm.type"
                             class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-semibold outline-none ring-brand-1 focus:ring-2 appearance-none cursor-pointer">
-                            <option value="sick">Sick Leave</option>
-                            <option value="casual">Casual Leave</option>
-                            <option value="earned">Earned Leave</option>
+                            <option class="text-brand-5" value="Sick Leave">Sick Leave</option>
+                            <option class="text-brand-5" value="Casual Leave">Casual Leave</option>
+                            <option class="text-brand-5" value="Optional Leave">Optional Leave</option>
                         </select>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-2">
                             <label class="text-[10px] font-semibold uppercase tracking-widest text-brand-2">From</label>
-                            <input type="date"
+                            <input type="date" name="startDate" [(ngModel)]="leaveForm.startDate"
                                 class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-semibold outline-none cursor-pointer">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-semibold uppercase tracking-widest text-brand-1">To</label>
-                            <input type="date"
+                            <input type="date" name="endDate" [(ngModel)]="leaveForm.endDate"
                                 class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-semibold outline-none cursor-pointer">
                         </div>
                     </div>
 
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-semibold uppercase tracking-widest text-brand-2">Reason</label>
+                        <textarea name="reason" [(ngModel)]="leaveForm.reason" rows="2"
+                            class="w-full bg-white/10 border border-white/20 rounded-2xl p-4 text-white font-semibold outline-none ring-brand-1 focus:ring-2 resize-none"
+                            placeholder="Brief reason for leave..."></textarea>
+                    </div>
+
                     <div class="space-y-2 pt-2">
-                        <button type="button"
-                            class="w-full py-5 bg-brand-1 hover:bg-white hover:text-brand-5 text-white font-bold rounded-2xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
-                            Submit Application
+                        <button type="submit" [disabled]="isLoading()"
+                            class="w-full py-5 bg-brand-1 hover:bg-white hover:text-brand-5 text-white font-bold rounded-2xl transition-all shadow-xl hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">
+                            {{ isLoading() ? 'Submitting...' : 'Submit Application' }}
                         </button>
                     </div>
                 </form>

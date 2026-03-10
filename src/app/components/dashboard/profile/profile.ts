@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-profile',
@@ -9,64 +10,140 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
-export class Profile {
-  employee = signal({
-    name: 'Anurag Kumar',
-    role: 'Software Developer',
-    id: 'EMP1024',
-    status: 'Active',
+export class Profile implements OnInit {
+  private apiService = inject(ApiService);
+  
+  employee = signal<any>({
+    name: '',
+    role: '',
+    id: '',
+    status: '',
     avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200',
-    email: 'anurag.k@personal.com',
-    officeEmail: 'test@hamsa.com',
-    phone: '+91 98765 43210',
-    address: 'H-202, Blue Ridge Society, Hinjewadi Phase 1, Pune, Maharashtra 411057',
-    emergencyContact: 'Amit Kumar (+91 99887 76655)',
-    location: 'Pune',
-    joinDate: '10 Jan 2025',
-    department: 'IT',
-    manager: 'Sarah Jenkins',
-    currentProject: 'Modern HRM Portal',
-    experience: '4.5 Years',
-    bio: 'Passionate software developer focused on building robust and scalable applications. Experienced in modern web technologies and full-stack development.',
-    skills: [
-      { name: 'Java', level: '90%' },
-      { name: 'Angular', level: '85%' },
-      { name: 'SQL', level: '80%' },
-      { name: 'Spring Boot', level: '75%' }
-    ],
-    documents: [
-      { name: 'Education_Docs.pdf', type: 'Educational Certificates', date: 'Jan 2025', isSubmitted: true },
-      { name: 'PAN_Card.pdf', type: 'PAN Card', date: 'Jan 2025', isSubmitted: true },
-      { name: 'Aadhar_Card.pdf', type: 'Aadhaar Card', date: 'Jan 2025', isSubmitted: true },
-      { name: 'Photo.jpg', type: 'Passport Sized Photograph', date: 'Jan 2025', isSubmitted: false }
-    ],
+    email: '',
+    officeEmail: '',
+    phone: '',
+    address: '',
+    emergencyContact: '',
+    location: '',
+    joinDate: '',
+    department: '',
+    manager: '',
+    currentProject: '',
+    experience: '',
+    bio: '',
+    skills: [],
+    documents: [],
     performance: {
-      rating: '4.8/5.0',
-      achievements: 12,
-      completedTasks: 156
+      rating: '0/5',
+      achievements: 0,
+      completedTasks: 0
     }
   });
 
-  sharedDocuments = signal([
-    { name: 'Joining_Letter.pdf', sender: 'HR Department', date: '05 Jan 2025', size: '1.2 MB', icon: 'description' },
-    { name: 'Code_of_Conduct.pdf', sender: 'Admin', date: '12 Feb 2025', size: '2.4 MB', icon: 'policy' },
-    { name: 'Project_Guidelines.zip', sender: 'Sarah Jenkins (Manager)', date: '28 Feb 2025', size: '15.8 MB', icon: 'folder_zip' },
-    { name: 'Quarterly_Review_Q1.pdf', sender: 'Finance Dept', date: '01 Mar 2025', size: '850 KB', icon: 'assessment' }
-  ]);
+  sharedDocuments = signal<any[]>([]);
 
   showModal = signal(false);
   editSection = signal<string>('');
-  tempEmployee = signal<any>({});
+  tempEmployee: any = {};
+  isLoading = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
+
+  ngOnInit() {
+    this.loadProfile();
+  }
+
+  loadProfile() {
+    const userStr = localStorage.getItem('currentUser');
+    if (!userStr) return;
+
+    const user = JSON.parse(userStr);
+    const userId = user._id || user.id;
+    if (!userId) return;
+
+    this.isLoading.set(true);
+    this.apiService.getEmployeeById(userId).subscribe({
+      next: (res) => {
+        const data = res.data || res;
+        // Format the date if it exists
+        const joinDateFormatted = data.joiningDate 
+          ? new Date(data.joiningDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+          : 'N/A';
+
+        // Map backend fields to frontend signal
+        this.employee.set({
+          ...this.employee(), // Keep defaults for missing fields
+          ...data,
+          name: data.firstName && data.lastName ? `${data.firstName} ${data.lastName}` : (data.name || ''),
+          id: data.employeeId || data.id || '',
+          officeEmail: data.email || '',
+          email: data.personalEmail || '', // Backend 'personalEmail' maps to frontend 'email'
+          joinDate: joinDateFormatted,
+          location: data.location || 'Baner, Pune' // Default location
+        });
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching profile:', err);
+        this.errorMessage.set('Failed to load profile data.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  showSuccess(msg: string) {
+    this.successMessage.set(msg);
+    setTimeout(() => this.successMessage.set(''), 3000);
+  }
 
   openEditModal(section: string) {
     this.editSection.set(section);
-    this.tempEmployee.set(JSON.parse(JSON.stringify(this.employee())));
+    this.tempEmployee = JSON.parse(JSON.stringify(this.employee()));
     this.showModal.set(true);
   }
 
   saveChanges() {
-    this.employee.set(this.tempEmployee());
-    this.showModal.set(false);
+    const userId = this.tempEmployee._id || this.tempEmployee.id;
+    if (!userId) {
+      this.errorMessage.set('User ID not found.');
+      return;
+    }
+
+    this.isLoading.set(true);
+    const updateData = { ...this.tempEmployee };
+    
+    // Reverse field mapping for backend compatibility
+    updateData.personalEmail = this.tempEmployee.email; // 'email' field in UI is personal
+    updateData.email = this.tempEmployee.officeEmail; // 'officeEmail' in UI is work email
+    
+    // Clean up temporary UI fields before sending to backend
+    delete updateData.email_ui; // (if any)
+    delete updateData.officeEmail;
+    delete updateData.id; 
+    // Note: We keep _id as it's often ignored by findByIdAndUpdate but used in the URL
+
+    // Split name into firstName and lastName for backend compatibility
+    if (this.tempEmployee.name) {
+      const names = this.tempEmployee.name.trim().split(/\s+/);
+      updateData.firstName = names[0] || '';
+      updateData.lastName = names.slice(1).join(' ') || '';
+    }
+
+    this.apiService.updateEmployee(userId, updateData).subscribe({
+      next: (res) => {
+        // Update the main signal with the confirmed data from backend
+        const data = res.data || res;
+        this.loadProfile(); // Re-run load to get fresh formatted data
+        this.showModal.set(false);
+        this.isLoading.set(false);
+        this.showSuccess('Profile updated successfully!');
+      },
+      error: (err) => {
+        console.error('Error updating profile:', err);
+        this.errorMessage.set(err.error?.message || 'Failed to save profile changes.');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   closeModal() {
@@ -76,11 +153,36 @@ export class Profile {
   onPhotoSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
+      // Validate file size (e.g., 5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        this.errorMessage.set('Image size should be less than 5MB');
+        return;
+      }
+
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.employee.update(emp => ({ ...emp, avatar: e.target.result }));
+        const avatarData = e.target.result;
+        
+        // Optionally save to backend immediately
+        const userId = this.employee()._id || this.employee().id;
+        if (userId) {
+          this.isLoading.set(true);
+          this.apiService.updateEmployee(userId, { avatar: avatarData }).subscribe({
+            next: (res) => {
+              this.employee.update(emp => ({ ...emp, avatar: avatarData }));
+              this.isLoading.set(false);
+              this.showSuccess('Profile photo updated!');
+            },
+            error: (err) => {
+              console.error('Error uploading photo:', err);
+              this.errorMessage.set('Failed to upload photo.');
+              this.isLoading.set(false);
+            }
+          });
+        }
       };
       reader.readAsDataURL(file);
     }
   }
 }
+

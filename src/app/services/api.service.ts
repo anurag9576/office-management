@@ -19,7 +19,9 @@ export class ApiService {
     });
   }
 
-  // --- Auth Endpoints ---
+  // ==========================================
+  // 1. Authentication (Login/Register)
+  // ==========================================
   login(credentials: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/auth/login`, credentials);
   }
@@ -28,24 +30,33 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/auth/register`, userData, { headers: this.getHeaders() });
   }
 
-  // --- Employee Endpoints ---
+  // ==========================================
+  // 2. Employee Management (Profile/Updates)
+  // ==========================================
+  
+  // Get all employees list
   getEmployees(): Observable<any> {
     return this.http.get(`${this.baseUrl}/employees`, { headers: this.getHeaders() });
   }
 
+  // Get single employee by ID (used for Profile)
   getEmployeeById(id: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/employees/${id}`, { headers: this.getHeaders() });
   }
 
+  // Update employee details (including Profile Photo)
   updateEmployee(id: string, data: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/employees/${id}`, data, { headers: this.getHeaders() });
   }
 
+  // Delete an employee
   deleteEmployee(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/employees/${id}`, { headers: this.getHeaders() });
   }
 
-  // --- Department Endpoints ---
+  // ==========================================
+  // 3. Department Management
+  // ==========================================
   getDepartments(): Observable<any> {
     return this.http.get(`${this.baseUrl}/departments`, { headers: this.getHeaders() });
   }
@@ -54,7 +65,9 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/departments`, data, { headers: this.getHeaders() });
   }
 
-  // --- Announcement Endpoints ---
+  // ==========================================
+  // 4. Announcements / Notice Board
+  // ==========================================
   getAnnouncements(): Observable<any> {
     return this.http.get(`${this.baseUrl}/announcements`, { headers: this.getHeaders() });
   }
@@ -67,7 +80,9 @@ export class ApiService {
     return this.http.put(`${this.baseUrl}/announcements/${id}/like`, {}, { headers: this.getHeaders() });
   }
 
-  // --- Attendance Endpoints ---
+  // ==========================================
+  // 5. Attendance (Check-in/Out)
+  // ==========================================
   checkIn(): Observable<any> {
     return this.http.post(`${this.baseUrl}/attendance/check-in`, {}, { headers: this.getHeaders() });
   }
@@ -80,19 +95,26 @@ export class ApiService {
     return this.http.get(`${this.baseUrl}/attendance/reports`, { headers: this.getHeaders() });
   }
 
-  // --- Leave Endpoints ---
+  // ==========================================
+  // 6. Leave Management
+  // ==========================================
+  
+  // Apply for a new leave
   applyLeave(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/leaves`, data, { headers: this.getHeaders() });
   }
 
+  // Get current user's leaves & stats
   getMyLeaves(): Observable<any> {
     return this.http.get(`${this.baseUrl}/leaves/my-leaves`, { headers: this.getHeaders() });
   }
 
+  // Get all leaves (Admin view)
   getAllLeaves(): Observable<any> {
     return this.http.get(`${this.baseUrl}/leaves`, { headers: this.getHeaders() });
   }
 
+  // Update leave status (Approve/Reject)
   updateLeaveStatus(id: string, status: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/leaves/${id}`, { status }, { headers: this.getHeaders() });
   }

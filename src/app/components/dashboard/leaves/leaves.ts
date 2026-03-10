@@ -1,6 +1,7 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-leaves',
@@ -9,16 +10,17 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './leaves.html',
   styleUrl: './leaves.css',
 })
-export class Leaves {
+export class Leaves implements OnInit {
+  private apiService = inject(ApiService);
   currentDate = signal(new Date());
   calendarDays = signal<{ day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, holidayName?: string }[]>([]);
   monthYearString = signal('');
 
   leaveStats = signal([
-    { label: 'Total Leaves', value: 24, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
-    { label: 'Taken', value: 9, icon: 'event_busy', color: 'bg-orange-50 text-orange-500' },
-    { label: 'Available', value: 15, icon: 'today', color: 'bg-green-50 text-green-500' },
-    { label: 'Pending', value: 2, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' }
+    { label: 'Total Leaves', value: 18, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
+    { label: 'Taken', value: 0, icon: 'event_busy', color: 'bg-orange-50 text-orange-500' },
+    { label: 'Available', value: 18, icon: 'today', color: 'bg-green-50 text-green-500' },
+    { label: 'Pending', value: 0, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' }
   ]);
 
   holidays = signal([
@@ -34,17 +36,95 @@ export class Leaves {
     { name: 'Christmas', date: 'Dec 25, 2026', type: 'Mandatory', day: 25, month: 11, year: 2026 }
   ]);
 
-  recentLeaves = signal([
-    { type: 'Sick Leave', from: 'Feb 10', to: 'Feb 11', days: 2, status: 'Approved' },
-    { type: 'Casual Leave', from: 'Jan 15', to: 'Jan 15', days: 1, status: 'Approved' },
-    { type: 'Optional Leave', from: 'Dec 25', to: 'Dec 25', days: 1, status: 'Approved' }
-  ]);
+  recentLeaves = signal<any[]>([]);
+
+  leaveForm = {
+    type: 'Casual Leave',
+    startDate: '',
+    endDate: '',
+    reason: ''
+  };
+
+  isLoading = signal(false);
+  errorMessage = signal('');
+  successMessage = signal('');
 
   showAllHolidays = signal(false);
   displayedHolidays = computed(() => this.showAllHolidays() ? this.holidays() : this.holidays().slice(0, 3));
 
   constructor() {
     this.generateCalendar();
+  }
+
+  ngOnInit() {
+    this.loadMyLeaves();
+  }
+
+  loadMyLeaves() {
+    this.isLoading.set(true);
+    this.apiService.getMyLeaves().subscribe({
+      next: (res) => {
+        if (res.success) {
+          const stats = res.stats;
+          this.leaveStats.set([
+            { label: 'Total Leaves', value: stats.total, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
+            { label: 'Taken', value: stats.taken, icon: 'event_busy', color: 'bg-orange-50 text-orange-500' },
+            { label: 'Available', value: stats.available, icon: 'today', color: 'bg-green-50 text-green-500' },
+            { label: 'Pending', value: stats.pending, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' }
+          ]);
+
+          // Format recent leaves for display
+          this.recentLeaves.set(res.data.map((l: any) => ({
+            type: l.type,
+            from: new Date(l.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+            to: new Date(l.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+            days: l.days,
+            status: l.status
+          })));
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching leaves:', err);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  applyLeave() {
+    if (!this.leaveForm.startDate || !this.leaveForm.endDate || !this.leaveForm.reason) {
+      this.errorMessage.set('Please fill all fields');
+      return;
+    }
+
+    const start = new Date(this.leaveForm.startDate);
+    const end = new Date(this.leaveForm.endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    const leaveData = {
+      ...this.leaveForm,
+      days: diffDays
+    };
+
+    this.isLoading.set(true);
+    this.apiService.applyLeave(leaveData).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.successMessage.set('Leave application submitted successfully!');
+          this.loadMyLeaves(); // Reload stats and list
+          // Reset form
+          this.leaveForm = { type: 'Casual Leave', startDate: '', endDate: '', reason: '' };
+        }
+        this.isLoading.set(false);
+        setTimeout(() => this.successMessage.set(''), 3000);
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.message || 'Failed to submit application');
+        this.isLoading.set(false);
+        setTimeout(() => this.errorMessage.set(''), 3000);
+      }
+    });
   }
 
   generateCalendar() {
