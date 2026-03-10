@@ -220,7 +220,7 @@
                                             class="text-[9px] font-black text-brand-3 uppercase tracking-wider">{{doc.sender}}</span>
                                         <span class="text-[9px] font-bold text-slate-400 mt-0.5">{{doc.date}}</span>
                                     </div>
-                                    <button
+                                    <button (click)="downloadDoc(doc.url)"
                                         class="w-9 h-9 bg-brand-5 text-white rounded-xl flex items-center justify-center hover:bg-brand-1 transition-all shadow-lg active:scale-90">
                                         <span class="material-symbols-outlined text-[18px]">download</span>
                                     </button>

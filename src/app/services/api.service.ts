@@ -118,4 +118,33 @@ export class ApiService {
   updateLeaveStatus(id: string, status: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/leaves/${id}`, { status }, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 7. Payroll & Payslips
+  // ==========================================
+  
+  // Get current user's payroll records
+  getMyPayrolls(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/payroll/my-payrolls`, { headers: this.getHeaders() });
+  }
+
+  // Get all payrolls (Admin view)
+  getAllPayrolls(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/payroll`, { headers: this.getHeaders() });
+  }
+
+  // Generate a new payroll (Admin only)
+  generatePayroll(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/payroll`, data, { headers: this.getHeaders() });
+  }
+
+  // Update an existing payroll (Admin only)
+  updatePayroll(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/payroll/${id}`, data, { headers: this.getHeaders() });
+  }
+
+  // Delete a payroll (Admin only)
+  deletePayroll(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/payroll/${id}`, { headers: this.getHeaders() });
+  }
 }

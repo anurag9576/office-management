@@ -81,6 +81,26 @@ export class Profile implements OnInit {
           joinDate: joinDateFormatted,
           location: data.location || 'Baner, Pune' // Default location
         });
+        // Set dummy documents that point to our real backend public folder
+        this.sharedDocuments.set([
+          { 
+            name: 'Joining_Letter.pdf', 
+            sender: 'HR Department',
+            size: '1.2 MB', 
+            icon: 'description',
+            date: '05 Jan 2025', 
+            url: 'http://localhost:5000/docs/Joining_Letter.pdf' 
+          },
+          { 
+            name: 'Code_of_Conduct.pdf', 
+            sender: 'Admin',
+            size: '2.4 MB', 
+            icon: 'policy',
+            date: '12 Feb 2025', 
+            url: 'http://localhost:5000/docs/Code_of_Conduct.pdf' 
+          }
+        ]);
+
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -182,6 +202,23 @@ export class Profile implements OnInit {
         }
       };
       reader.readAsDataURL(file);
+    }
+  }
+
+  downloadDoc(url: string) {
+    if (url) {
+      alert("Downloading document... " + url.split('/').pop());
+      // Primary method: Open in new tab
+      window.open(url, '_blank');
+      
+      // Fallback: Create a hidden link and click it
+      const link = document.createElement('a');
+      link.href = url;
+      link.target = '_blank';
+      link.download = url.split('/').pop() || 'document.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   }
 }
