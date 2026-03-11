@@ -53,8 +53,8 @@ export class Announcement implements OnInit {
               ...p,
               id: p._id,
               author: authorName,
-              role: 'Admin', // Assuming only admins post for now
-              avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&h=100&auto=format&fit=crop',
+              role: p.author?.role || 'Admin',
+              avatar: p.author?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&h=100&auto=format&fit=crop',
               time: this.formatTime(p.createdAt),
               type: p.type.toLowerCase(),
               image: p.imageUrl,
@@ -63,6 +63,8 @@ export class Announcement implements OnInit {
               comments: p.comments.map((c: any) => ({
                 id: c._id,
                 user: c.user ? `${c.user.firstName} ${c.user.lastName}` : 'User',
+                avatar: c.user?.avatar,
+                initials: c.user ? (c.user.firstName[0] + (c.user.lastName ? c.user.lastName[0] : '')).toUpperCase() : 'U',
                 text: c.text,
                 time: this.formatTime(c.date),
                 isUser: c.user?._id === userId || c.user === userId,

@@ -222,9 +222,10 @@
                     <!-- Comment List (Conditional) -->
                     <div *ngIf="post.showComments" class="space-y-4 mb-6">
                         <div *ngFor="let comment of post.comments; let i = index" class="flex gap-3 animate-slide-up">
-                            <div
-                                class="w-8 h-8 rounded-xl bg-brand-1/10 text-brand-1 flex items-center justify-center font-black text-[10px] shrink-0">
-                                {{comment.user.substring(0,2)}}
+                            <!-- Commenter Avatar -->
+                            <div class="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-slate-100 shadow-sm bg-brand-1/5 flex items-center justify-center">
+                                <img *ngIf="comment.avatar" [src]="comment.avatar" class="w-full h-full object-cover">
+                                <span *ngIf="!comment.avatar" class="text-[10px] font-black text-brand-1 uppercase tracking-tighter">{{comment.initials}}</span>
                             </div>
                             <div
                                 [class]="'p-4 rounded-2xl rounded-tl-none border flex-1 shadow-sm group transition-all ' + (comment.isFlagged ? 'bg-red-50 border-red-100' : 'bg-white border-slate-100/80')">
@@ -295,7 +296,11 @@
 
                     <!-- New Comment Input -->
                     <div class="flex gap-3 pt-2">
-                        <div class="w-8 h-8 rounded-xl bg-slate-200 shrink-0"></div>
+                        <!-- Current User Avatar -->
+                        <div class="w-8 h-8 rounded-xl bg-slate-200 shrink-0 overflow-hidden flex items-center justify-center text-[10px] font-bold text-slate-400 border border-white">
+                            <img *ngIf="currentUser()?.avatar" [src]="currentUser().avatar" class="w-full h-full object-cover">
+                            <span *ngIf="!currentUser()?.avatar">{{currentUser()?.initials || 'U'}}</span>
+                        </div>
                         <div class="relative flex-1">
                             <input [(ngModel)]="post.newComment" (keyup.enter)="addComment(post.id)"
                                 placeholder="Add a comment..."
