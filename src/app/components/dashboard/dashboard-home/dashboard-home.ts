@@ -1,6 +1,7 @@
-import { Component, signal, OnInit } from '@angular/core';
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-dashboard-home',
@@ -10,9 +11,13 @@ import { Router, RouterLink } from '@angular/router';
   styleUrl: './dashboard-home.css'
 })
 export class DashboardHome implements OnInit {
+  private apiService = inject(ApiService);
+  private router = inject(Router);
+  
   userName = signal('User');
-
-  constructor(private router: Router) {}
+  availableLeaves = signal(0);
+  pendingLeaves = signal(0);
+  isLoading = signal(false);
 
   ngOnInit() {
     const savedUser = localStorage.getItem('currentUser');
@@ -23,7 +28,25 @@ export class DashboardHome implements OnInit {
         this.router.navigateByUrl('/dashboard/admin-home');
       } else {
         this.userName.set(user.name.split(' ')[0]);
+        this.loadLeaveStats();
       }
     }
+  }
+
+  loadLeaveStats() {
+    this.isLoading.set(true);
+    this.apiService.getMyLeaves().subscribe({
+      next: (res) => {
+        if (res.success && res.stats) {
+          this.availableLeaves.set(res.stats.available);
+          this.pendingLeaves.set(res.stats.pending);
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error fetching dashboard leave stats:', err);
+        this.isLoading.set(false);
+      }
+    });
   }
 }

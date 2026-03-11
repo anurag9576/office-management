@@ -83,12 +83,18 @@
                                 (item.day ? 'bg-brand-1/5 text-brand-4 hover:bg-brand-5 hover:text-white cursor-pointer' : 'opacity-0 pointer-events-none') +
                                 (item.isToday ? ' ring-2 ring-brand-1 ring-offset-2 !bg-brand-1 !text-white z-10' : '') +
                                 (item.isHoliday ? ' !bg-red-50 !text-red-500' : '') +
-                                (item.isWeekend && !item.isHoliday && !item.isToday ? ' !bg-red-50/40 !text-red-400' : '')">
+                                (item.isLeave ? ' !bg-emerald-50 !text-emerald-600 !ring-2 !ring-emerald-200 !ring-inset' : '') +
+                                (item.isWeekend && !item.isHoliday && !item.isToday && !item.isLeave ? ' !bg-red-50/40 !text-red-400' : '')">
                         {{item.day}}
 
                         <!-- Holiday indicator -->
                         <div *ngIf="item.isHoliday"
                             class="absolute -top-1 -right-1 bg-red-500 w-2 h-2 rounded-full border-2 border-white">
+                        </div>
+
+                        <!-- Leave Indicator dot (Subtle) -->
+                        <div *ngIf="item.isLeave"
+                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-emerald-400 w-1.5 h-1.5 rounded-full ring-2 ring-white">
                         </div>
 
                         <!-- Tooltip on hover -->

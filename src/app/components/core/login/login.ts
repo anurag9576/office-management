@@ -62,9 +62,10 @@ export class Login {
           // Map backend fields to frontend expected fields
           const user = {
             ...userResponse,
-            name: fName && lName ? `${fName} ${lName}` : (fName || lName || emailPart),
-            initials: ((fName[0] || '') + (lName[0] || emailPart[0])).toUpperCase(),
-            token: token // Ensure token is attached to the user object we store
+            // Priority: existing name -> combined firstName+lastName -> email part
+            name: userResponse.fullName || userResponse.name || (fName && lName ? `${fName} ${lName}` : (fName || lName || emailPart)),
+            initials: ((fName[0] || '') + (lName[0] || emailPart[0] || 'U')).toUpperCase(),
+            token: token 
           };
           
           console.log('Mapped User Object for storage:', user);

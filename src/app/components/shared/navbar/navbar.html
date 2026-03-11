@@ -37,9 +37,9 @@
                         d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 <!-- Notification Badge with Count -->
-                <span
+                <span *ngIf="unreadCount() > 0"
                     class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center bg-red-500 text-white text-[10px] font-black rounded-full border-2 border-white shadow-sm px-1">
-                    3
+                    {{unreadCount()}}
                 </span>
             </button>
 
@@ -49,13 +49,22 @@
                 <!-- Header -->
                 <div class="px-4 py-3 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
                     <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">Notifications</h3>
-                    <span class="px-2 py-0.5 bg-brand-1 text-white text-[10px] font-bold rounded-full">3 New</span>
+                    <div class="flex items-center gap-2">
+                        <span *ngIf="unreadCount() > 0" class="px-2 py-0.5 bg-brand-1 text-white text-[10px] font-bold rounded-full">{{unreadCount()}} New</span>
+                        <button *ngIf="unreadCount() > 0" (click)="markAllAsRead()" class="text-[10px] font-bold text-brand-1 hover:underline uppercase tracking-tighter">Mark all read</button>
+                    </div>
                 </div>
 
                 <!-- List -->
                 <div class="max-h-[400px] overflow-y-auto">
                     <div *ngFor="let note of notifications"
-                        class="p-4 border-b border-slate-50 hover:bg-brand-1/5 transition-colors cursor-pointer group/note">
+                        (click)="handleNotificationClick(note)"
+                        [class]="'p-4 border-b border-slate-50 transition-colors cursor-pointer group/note relative ' + 
+                                 (note.isRead ? 'bg-white hover:bg-slate-50' : 'bg-brand-1/5 hover:bg-brand-1/[0.08]')">
+                        
+                        <!-- Unread Status Dot/Indicator -->
+                        <div *ngIf="!note.isRead" class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-brand-1 rounded-r-full"></div>
+
                         <div class="flex gap-4">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-transform group-hover/note:scale-110"
                                 [ngClass]="note.color">
@@ -63,12 +72,20 @@
                             </div>
                             <div class="flex-1">
                                 <div class="flex justify-between items-start mb-1">
-                                    <h4 class="text-xs font-bold text-slate-900">{{note.title}}</h4>
-                                    <span class="text-[10px] text-slate-400 font-medium">{{note.time}}</span>
+                                    <h4 [class]="'text-xs tracking-tight ' + (note.isRead ? 'font-semibold text-slate-600' : 'font-bold text-slate-900')">{{note.title}}</h4>
+                                    <span class="text-[10px] text-slate-400 font-medium whitespace-nowrap ml-2">{{note.createdAt | date:'shortTime'}}</span>
                                 </div>
-                                <p class="text-[11px] text-slate-500 leading-relaxed">{{note.message}}</p>
+                                <p [class]="'text-[11px] leading-relaxed ' + (note.isRead ? 'text-slate-400' : 'text-slate-500')">{{note.message}}</p>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div *ngIf="notifications.length === 0" class="py-12 flex flex-col items-center justify-center text-center px-6">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 border border-slate-100/50">
+                            <span class="material-symbols-outlined text-slate-200 text-3xl">notifications_off</span>
+                        </div>
+                        <p class="text-xs font-bold text-slate-400 tracking-tight uppercase">No new alerts</p>
                     </div>
                 </div>
 

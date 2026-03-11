@@ -13,8 +13,9 @@ import { ApiService } from '../../../services/api.service';
 export class Leaves implements OnInit {
   private apiService = inject(ApiService);
   currentDate = signal(new Date());
-  calendarDays = signal<{ day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, holidayName?: string }[]>([]);
+  calendarDays = signal<{ day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, isLeave: boolean, holidayName?: string }[]>([]);
   monthYearString = signal('');
+  rawLeaves = signal<any[]>([]);
 
   leaveStats = signal([
     { label: 'Total Leaves', value: 18, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
@@ -81,6 +82,9 @@ export class Leaves implements OnInit {
             days: l.days,
             status: l.status
           })));
+
+          this.rawLeaves.set(res.data);
+          this.generateCalendar();
         }
         this.isLoading.set(false);
       },
@@ -138,11 +142,11 @@ export class Leaves implements OnInit {
     const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
 
-    const days: { day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, holidayName?: string }[] = [];
+    const days: { day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, isLeave: boolean, holidayName?: string }[] = [];
 
     // Fill leading empty days
     for (let i = 0; i < firstDayOfMonth; i++) {
-        days.push({ day: null, isToday: false, isHoliday: false, isWeekend: false });
+        days.push({ day: null, isToday: false, isHoliday: false, isWeekend: false, isLeave: false });
     }
 
     // Fill actual days
@@ -152,11 +156,25 @@ export class Leaves implements OnInit {
         
         const isToday = today.getDate() === i && today.getMonth() === month && today.getFullYear() === year;
         const holiday = (this.holidays() as any[]).find(h => h.day === i && h.month === month && h.year === year);
+        
+        // Check if this date is part of an approved leave
+        const currentDateObj = new Date(year, month, i);
+        const isLeave = this.rawLeaves().some(l => {
+            const start = new Date(l.startDate);
+            const end = new Date(l.endDate);
+            // Reset hours for accurate comparison
+            start.setHours(0,0,0,0);
+            end.setHours(0,0,0,0);
+            currentDateObj.setHours(0,0,0,0);
+            return l.status.toLowerCase() === 'approved' && currentDateObj >= start && currentDateObj <= end;
+        });
+
         days.push({ 
             day: i, 
             isToday, 
             isHoliday: !!holiday,
             isWeekend,
+            isLeave,
             holidayName: holiday?.name
         });
     }

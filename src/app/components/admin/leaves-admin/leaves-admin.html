@@ -51,12 +51,27 @@
                         </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
-                    <tr *ngFor="let request of leaveRequests(); let i = index"
+                <tbody class="divide-y divide-slate-50 relative">
+                    <!-- Loading Overlay -->
+                    <div *ngIf="isLoading()" class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                        <div class="w-8 h-8 border-4 border-brand-1 border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+
+                    <tr *ngFor="let request of leaveRequests()"
                         class="hover:bg-slate-50/50 transition-colors">
-                        <td class="px-8 py-5 text-sm font-semibold text-slate-800">{{request.name}}</td>
+                        <td class="px-8 py-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-brand-1/10 flex items-center justify-center text-brand-1 text-[10px] font-bold uppercase">
+                                    {{request.employee.firstName.substring(0,1)}}{{request.employee.lastName.substring(0,1)}}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-slate-800">{{request.employee.firstName}} {{request.employee.lastName}}</div>
+                                    <div class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{request.employee.employeeId}}</div>
+                                </div>
+                            </div>
+                        </td>
                         <td class="px-8 py-5 text-sm font-medium text-slate-600">{{request.type}}</td>
-                        <td class="px-8 py-5 text-sm font-medium text-slate-600">{{request.duration}}</td>
+                        <td class="px-8 py-5 text-sm font-medium text-slate-600">{{request.days}} Days</td>
                         <td class="px-8 py-5">
                             <span
                                 [class]="'px-3 py-1 rounded-lg text-[10px] font-semibold uppercase tracking-wider ' + 
@@ -67,14 +82,29 @@
                         </td>
                         <td class="px-8 py-5">
                             <div *ngIf="request.status === 'Pending'" class="flex items-center justify-end gap-2">
-                                <button (click)="approveLeave(i)"
-                                    class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all">
+                                <button (click)="approveLeave(request._id)"
+                                    class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all"
+                                    title="Approve">
                                     <span class="material-symbols-outlined text-sm">check</span>
                                 </button>
-                                <button (click)="rejectLeave(i)"
-                                    class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                                <button (click)="rejectLeave(request._id)"
+                                    class="w-8 h-8 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"
+                                    title="Reject">
                                     <span class="material-symbols-outlined text-sm">close</span>
                                 </button>
+                            </div>
+                            <div *ngIf="request.status !== 'Pending'" class="text-right">
+                                <span class="text-[9px] font-black uppercase tracking-widest text-slate-300">Processed</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="leaveRequests().length === 0 && !isLoading()">
+                        <td colspan="5" class="px-8 py-20 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <span class="material-symbols-outlined text-4xl text-slate-200">event_busy</span>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No leave requests found</p>
                             </div>
                         </td>
                     </tr>

@@ -66,21 +66,6 @@ export class ApiService {
   }
 
   // ==========================================
-  // 4. Announcements / Notice Board
-  // ==========================================
-  getAnnouncements(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/announcements`, { headers: this.getHeaders() });
-  }
-
-  createAnnouncement(data: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/announcements`, data, { headers: this.getHeaders() });
-  }
-
-  toggleLike(id: string): Observable<any> {
-    return this.http.put(`${this.baseUrl}/announcements/${id}/like`, {}, { headers: this.getHeaders() });
-  }
-
-  // ==========================================
   // 5. Attendance (Check-in/Out)
   // ==========================================
   checkIn(): Observable<any> {
@@ -123,28 +108,79 @@ export class ApiService {
   // 7. Payroll & Payslips
   // ==========================================
   
-  // Get current user's payroll records
   getMyPayrolls(): Observable<any> {
     return this.http.get(`${this.baseUrl}/payroll/my-payrolls`, { headers: this.getHeaders() });
   }
 
-  // Get all payrolls (Admin view)
   getAllPayrolls(): Observable<any> {
     return this.http.get(`${this.baseUrl}/payroll`, { headers: this.getHeaders() });
   }
 
-  // Generate a new payroll (Admin only)
   generatePayroll(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}/payroll`, data, { headers: this.getHeaders() });
   }
 
-  // Update an existing payroll (Admin only)
   updatePayroll(id: string, data: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/payroll/${id}`, data, { headers: this.getHeaders() });
   }
 
-  // Delete a payroll (Admin only)
   deletePayroll(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/payroll/${id}`, { headers: this.getHeaders() });
+  }
+
+  // ==========================================
+  // 8. Announcements
+  // ==========================================
+  
+  getAnnouncements(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/announcements`, { headers: this.getHeaders() });
+  }
+
+  createAnnouncement(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/announcements`, data, { headers: this.getHeaders() });
+  }
+
+  updateAnnouncement(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/announcements/${id}`, data, { headers: this.getHeaders() });
+  }
+
+  deleteAnnouncement(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/announcements/${id}`, { headers: this.getHeaders() });
+  }
+
+  toggleLike(id: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/announcements/${id}/like`, {}, { headers: this.getHeaders() });
+  }
+
+  addComment(announcementId: string, text: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/announcements/${announcementId}/comments`, { text }, { headers: this.getHeaders() });
+  }
+
+  deleteComment(announcementId: string, commentId: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/announcements/${announcementId}/comments/${commentId}`, { headers: this.getHeaders() });
+  }
+
+  toggleFlagComment(announcementId: string, commentId: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/announcements/${announcementId}/comments/${commentId}/flag`, {}, { headers: this.getHeaders() });
+  }
+
+  votePoll(announcementId: string, optionId: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/announcements/${announcementId}/vote`, { optionId }, { headers: this.getHeaders() });
+  }
+
+  // ==========================================
+  // 9. Notifications
+  // ==========================================
+
+  getMyNotifications(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/notifications`, { headers: this.getHeaders() });
+  }
+
+  markNotificationAsRead(id: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/notifications/${id}/read`, {}, { headers: this.getHeaders() });
+  }
+
+  markAllNotificationsAsRead(): Observable<any> {
+    return this.http.put(`${this.baseUrl}/notifications/read-all`, {}, { headers: this.getHeaders() });
   }
 }

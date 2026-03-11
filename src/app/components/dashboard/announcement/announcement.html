@@ -71,11 +71,17 @@
                 <div class="flex items-center justify-between gap-4 pt-1">
                     <p class="text-[10px] font-medium text-slate-400 italic font-medium">Add images or polls to engage
                         more staff.</p>
-                    <button (click)="createPost()"
-                        class="bg-brand-5 text-white px-10 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-brand-1 shadow-lg transition-all active:scale-95 disabled:opacity-50"
-                        [disabled]="!newPostTitle().trim() || !newPostContent().trim()">
-                        Post Now
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <button *ngIf="isEditingAnnouncement()" (click)="resetForm()"
+                            class="text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all">
+                            Cancel Edit
+                        </button>
+                        <button (click)="createPost()"
+                            class="bg-brand-5 text-white px-10 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-brand-1 shadow-lg transition-all active:scale-95 disabled:opacity-50"
+                            [disabled]="!newPostTitle().trim() || !newPostContent().trim() || isLoading()">
+                            {{ isEditingAnnouncement() ? 'Update Post' : 'Post Now' }}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -101,10 +107,16 @@
                     </button>
                 </div>
 
-                <div class="pt-4">
+                <div class="pt-4 flex items-center gap-4">
+                    <button *ngIf="isEditingAnnouncement()" (click)="resetForm()"
+                        class="flex-1 text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all">
+                        Cancel Edit
+                    </button>
                     <button (click)="createPoll()"
-                        class="w-full bg-brand-5 text-white py-4 rounded-1xl font-semibold text-[10px] uppercase tracking-widest hover:bg-brand-1 shadow-lg transition-all">Launch
-                        Poll</button>
+                        class="flex-[2] bg-brand-5 text-white py-4 rounded-1xl font-semibold text-[10px] uppercase tracking-widest hover:bg-brand-1 shadow-lg transition-all disabled:opacity-50"
+                        [disabled]="isLoading()">
+                        {{ isEditingAnnouncement() ? 'Update Poll' : 'Launch Poll' }}
+                    </button>
                 </div>
             </div>
         </div>
@@ -125,9 +137,25 @@
                         <p class="text-[10px] text-slate-400 font-bold mt-1.5 uppercase tracking-widest">{{post.time}}
                         </p>
                     </div>
-                    <button class="text-slate-300 hover:text-slate-600 transition-colors">
-                        <span class="material-symbols-outlined">more_horiz</span>
-                    </button>
+                    <div *ngIf="isAdmin()" class="relative">
+                        <button (click)="toggleCommentMenu(post.id, -1)" class="text-slate-300 hover:text-brand-1 transition-colors">
+                            <span class="material-symbols-outlined">more_horiz</span>
+                        </button>
+                        <!-- Post Admin Menu -->
+                        <div *ngIf="post.menuIndex === -1"
+                            class="absolute right-0 top-full mt-1 w-32 bg-white rounded-xl shadow-xl border border-slate-100 z-50 animate-slide-up py-1">
+                            <button (click)="startEditAnnouncement(post); closeCommentMenu(post.id)"
+                                class="w-full px-3 py-2 flex items-center gap-2 hover:bg-brand-1/5 text-slate-600 hover:text-brand-1 transition-all text-[9px] font-black uppercase tracking-wider text-left">
+                                <span class="material-symbols-outlined text-[14px]">edit</span>
+                                Edit Post
+                            </button>
+                            <button (click)="deleteAnnouncement(post.id); closeCommentMenu(post.id)"
+                                class="w-full px-3 py-2 flex items-center gap-2 hover:bg-red-50 text-slate-600 hover:text-red-500 transition-all text-[9px] font-black uppercase tracking-wider text-left border-t border-slate-50">
+                                <span class="material-symbols-outlined text-[14px]">delete</span>
+                                Delete Post
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Post Content -->
@@ -179,12 +207,12 @@
                     <div class="flex items-center gap-6">
                         <button (click)="toggleComments(post.id)"
                             class="flex items-center gap-2 text-slate-400 hover:text-brand-1 transition-colors">
-                            <span class="material-symbols-outlined">chat_bubble</span>
-                            <span class="text-xs font-black">{{post.comments.length}} Comments</span>
+                            <span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+                            <span class="text-xs font-semibold text-slate-500">{{post.comments.length}} Comments</span>
                         </button>
                     </div>
                     <button *ngIf="post.comments.length > 0" (click)="toggleComments(post.id)"
-                        class="text-[10px] font-black uppercase tracking-widest text-brand-1 hover:underline">
+                        class="text-[10px] font-bold uppercase tracking-widest text-brand-1 hover:underline">
                         {{ post.showComments ? 'Hide all' : 'View all' }}
                     </button>
                 </div>
@@ -199,14 +227,19 @@
                                 {{comment.user.substring(0,2)}}
                             </div>
                             <div
-                                class="bg-white p-3 rounded-2xl rounded-tl-none border border-slate-100 flex-1 shadow-sm group">
-                                <div class="flex items-center gap-3 mb-1">
-                                    <span class="font-black text-slate-900 text-[11px]">{{comment.user}}</span>
+                                [class]="'p-4 rounded-2xl rounded-tl-none border flex-1 shadow-sm group transition-all ' + (comment.isFlagged ? 'bg-red-50 border-red-100' : 'bg-white border-slate-100/80')">
+                                <div class="flex items-center gap-3 mb-1.5">
+                                    <span class="font-bold text-slate-800 text-[11px]">{{comment.user}}</span>
                                     <span
-                                        class="text-[9px] text-slate-400 font-black uppercase tracking-widest">{{comment.time}}</span>
+                                        class="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">{{comment.time}}</span>
+                                    <!-- Flagged Badge -->
+                                    <span *ngIf="comment.isFlagged" class="px-1.5 py-0.5 bg-red-500 text-white text-[8px] font-bold uppercase tracking-tighter rounded-md flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-[10px]">flag</span>
+                                        Flagged
+                                    </span>
 
-                                    <!-- More Options Dropdown (Only for current user) -->
-                                    <div *ngIf="comment.isUser" class="relative ml-auto">
+                                    <!-- More Options Dropdown (Only for current user or admin) -->
+                                    <div *ngIf="comment.isUser || isAdmin()" class="relative ml-auto">
                                         <button (click)="toggleCommentMenu(post.id, i)"
                                             class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-slate-50 text-slate-300 hover:text-brand-1 transition-all">
                                             <span class="material-symbols-outlined text-[16px]">more_horiz</span>
@@ -215,13 +248,23 @@
                                         <!-- Dropdown Menu -->
                                         <div *ngIf="post.menuIndex === i"
                                             class="absolute right-0 bottom-full mb-1 w-28 bg-white rounded-xl shadow-xl border border-slate-100 z-50 animate-slide-up py-1">
-                                            <button (click)="startEditComment(post.id, i); closeCommentMenu(post.id)"
-                                                class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-brand-1/5 text-slate-600 hover:text-brand-1 transition-all text-[9px] font-black uppercase tracking-wider text-left">
+                                            <!-- Admin Flag Option -->
+                                            <button *ngIf="isAdmin()" (click)="toggleFlagComment(post.id, comment.id); closeCommentMenu(post.id)"
+                                                [class]="'w-full px-3 py-1.5 flex items-center gap-2 hover:bg-red-50 transition-all text-[9px] font-bold uppercase tracking-wider text-left ' + (comment.isFlagged ? 'text-red-500' : 'text-slate-600')">
+                                                <span class="material-symbols-outlined text-[14px]">{{ comment.isFlagged ? 'flag_circle' : 'outlined_flag' }}</span>
+                                                {{ comment.isFlagged ? 'Unflag' : 'Flag' }}
+                                            </button>
+
+                                            <!-- Edit Option (Owner only) -->
+                                            <button *ngIf="comment.isUser" (click)="startEditComment(post.id, i); closeCommentMenu(post.id)"
+                                                class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-brand-1/5 text-slate-600 hover:text-brand-1 transition-all text-[9px] font-bold uppercase tracking-wider text-left">
                                                 <span class="material-symbols-outlined text-[14px]">edit</span>
                                                 Edit
                                             </button>
-                                            <button (click)="deleteComment(post.id, i); closeCommentMenu(post.id)"
-                                                class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-red-50 text-slate-600 hover:text-red-500 transition-all text-[9px] font-black uppercase tracking-wider text-left">
+
+                                            <!-- Delete Option (Owner or Admin) -->
+                                            <button (click)="deleteComment(post.id, comment.id); closeCommentMenu(post.id)"
+                                                class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-red-50 text-slate-600 hover:text-red-500 transition-all text-[9px] font-bold uppercase tracking-wider text-left">
                                                 <span class="material-symbols-outlined text-[14px]">delete</span>
                                                 Delete
                                             </button>
@@ -231,18 +274,18 @@
 
                                 <!-- Comment Content or Edit Mode -->
                                 <div *ngIf="post.editingIndex !== i; else editMode">
-                                    <p class="text-xs text-slate-600 leading-relaxed">{{comment.text}}</p>
+                                    <p class="text-xs text-slate-600 leading-relaxed font-medium">{{comment.text}}</p>
                                 </div>
                                 <ng-template #editMode>
                                     <div class="space-y-2 mt-2">
                                         <textarea [(ngModel)]="post.editText"
-                                            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-brand-1 transition-all"
+                                            class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-1 transition-all"
                                             rows="2"></textarea>
                                         <div class="flex justify-end gap-2">
                                             <button (click)="cancelEditComment(post.id)"
-                                                class="text-[9px] font-black uppercase text-slate-400 hover:text-slate-600">Cancel</button>
+                                                class="text-[9px] font-bold uppercase text-slate-400 hover:text-slate-600">Cancel</button>
                                             <button (click)="saveEditComment(post.id, i)"
-                                                class="px-3 py-1.5 bg-brand-1 text-white text-[9px] font-black uppercase rounded-lg shadow-md">Update</button>
+                                                class="px-3 py-1.5 bg-brand-1 text-white text-[9px] font-bold uppercase rounded-lg shadow-md">Update</button>
                                         </div>
                                     </div>
                                 </ng-template>
@@ -256,9 +299,9 @@
                         <div class="relative flex-1">
                             <input [(ngModel)]="post.newComment" (keyup.enter)="addComment(post.id)"
                                 placeholder="Add a comment..."
-                                class="w-full pl-4 pr-12 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-bold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-brand-1 focus:ring-4 focus:ring-brand-1/5 transition-all">
+                                class="w-full pl-5 pr-12 py-3.5 bg-white border border-slate-200/60 rounded-2xl text-xs font-semibold text-slate-700 placeholder:text-slate-400 focus:outline-none focus:border-brand-1 focus:ring-4 focus:ring-brand-1/5 transition-all shadow-sm">
                             <button (click)="addComment(post.id)"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 text-brand-1 hover:scale-110 transition-all">
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-brand-1/40 hover:text-brand-1 hover:scale-110 transition-all">
                                 <span class="material-symbols-outlined text-[20px]">send</span>
                             </button>
                         </div>
