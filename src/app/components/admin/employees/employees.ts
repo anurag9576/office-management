@@ -18,7 +18,7 @@ export class EmployeesMgmt implements OnInit {
   showPassword = signal(false);
   isEditing = signal(false);
   errorMessage = signal('');
-  roles = ['HR Manager', 'QA', 'Developer', 'Manager', 'IT Team'];
+  roles = signal<string[]>([]);
   statuses = ['Active', 'On Leave', 'Terminated'];
   
   newEmployee = {
@@ -35,6 +35,22 @@ export class EmployeesMgmt implements OnInit {
 
   ngOnInit() {
     this.loadEmployees();
+    this.loadRoles();
+  }
+
+  loadRoles() {
+    this.apiService.getRoles().subscribe({
+      next: (res) => {
+        if (res.success) {
+          // Extract only the names from the role objects
+          const roleNames = res.data.map((r: any) => r.name);
+          this.roles.set(roleNames);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading roles:', err);
+      }
+    });
   }
 
   loadEmployees() {

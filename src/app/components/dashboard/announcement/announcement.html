@@ -12,8 +12,8 @@
             </div>
         </div>
 
-        <!-- Admin: Create Post/Poll -->
-        <div *ngIf="isAdmin()"
+        <!-- Management: Create Post/Poll -->
+        <div *ngIf="canManage()"
             class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 sm:p-8 animate-in slide-in-from-top-4 duration-500">
             <div class="flex items-center gap-4 mb-6 border-b border-slate-50 pb-4">
                 <button (click)="activeTab.set('post')"
@@ -137,7 +137,7 @@
                         <p class="text-[10px] text-slate-400 font-bold mt-1.5 uppercase tracking-widest">{{post.time}}
                         </p>
                     </div>
-                    <div *ngIf="isAdmin()" class="relative">
+                    <div *ngIf="canManage()" class="relative">
                         <button (click)="toggleCommentMenu(post.id, -1)" class="text-slate-300 hover:text-brand-1 transition-colors">
                             <span class="material-symbols-outlined">more_horiz</span>
                         </button>
@@ -239,8 +239,8 @@
                                         Flagged
                                     </span>
 
-                                    <!-- More Options Dropdown (Only for current user or admin) -->
-                                    <div *ngIf="comment.isUser || isAdmin()" class="relative ml-auto">
+                                    <!-- More Options Dropdown (Only for current user or manager) -->
+                                    <div *ngIf="comment.isUser || canManage()" class="relative ml-auto">
                                         <button (click)="toggleCommentMenu(post.id, i)"
                                             class="w-6 h-6 flex items-center justify-center rounded-full hover:bg-slate-50 text-slate-300 hover:text-brand-1 transition-all">
                                             <span class="material-symbols-outlined text-[16px]">more_horiz</span>
@@ -249,8 +249,8 @@
                                         <!-- Dropdown Menu -->
                                         <div *ngIf="post.menuIndex === i"
                                             class="absolute right-0 bottom-full mb-1 w-28 bg-white rounded-xl shadow-xl border border-slate-100 z-50 animate-slide-up py-1">
-                                            <!-- Admin Flag Option -->
-                                            <button *ngIf="isAdmin()" (click)="toggleFlagComment(post.id, comment.id); closeCommentMenu(post.id)"
+                                            <!-- Manager Flag Option -->
+                                            <button *ngIf="canManage()" (click)="toggleFlagComment(post.id, comment.id); closeCommentMenu(post.id)"
                                                 [class]="'w-full px-3 py-1.5 flex items-center gap-2 hover:bg-red-50 transition-all text-[9px] font-bold uppercase tracking-wider text-left ' + (comment.isFlagged ? 'text-red-500' : 'text-slate-600')">
                                                 <span class="material-symbols-outlined text-[14px]">{{ comment.isFlagged ? 'flag_circle' : 'outlined_flag' }}</span>
                                                 {{ comment.isFlagged ? 'Unflag' : 'Flag' }}

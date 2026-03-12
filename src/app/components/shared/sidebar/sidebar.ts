@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { SidebarService } from '../../../services/sidebar.service';
 import { filter } from 'rxjs/operators';
+import { ApiService } from '../../../services/api.service';
 
 interface NavItem {
   label: string;
   icon: string;
   route: string;
+  permissionKey?: string;
 }
 
 @Component({
@@ -21,29 +23,30 @@ export class Sidebar {
   brandName = signal('hamsa hitech');
   showLogoutModal = signal(false);
   isCollapsed = signal(window.innerWidth < 768);
+  permissions = signal<string[]>([]);
 
   // Admin Specific Tabs
   public adminNavItems: NavItem[] = [
-    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard/admin-home' },
-    { label: 'Employee Mgmt', icon: 'group', route: '/dashboard/employees' },
-    { label: 'Roles Mgmt', icon: 'manage_accounts', route: '/dashboard/roles' },
-    { label: 'Attendance', icon: 'event_available', route: '/dashboard/attendance' },
-    { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin' },
-    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll-admin' },
-    { label: 'Tasks', icon: 'task', route: '/dashboard/tasks' },
-    { label: 'Reports', icon: 'analytics', route: '/dashboard/reports' },
-    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement' },
-    { label: 'Settings', icon: 'settings', route: '/dashboard/settings' },
+    { label: 'Dashboard', icon: 'dashboard', route: '/dashboard/admin-home', permissionKey: 'dashboard' },
+    { label: 'Employee Mgmt', icon: 'group', route: '/dashboard/employees', permissionKey: 'employees' },
+    { label: 'Roles Mgmt', icon: 'manage_accounts', route: '/dashboard/roles', permissionKey: 'roles' },
+    { label: 'Attendance', icon: 'event_available', route: '/dashboard/attendance', permissionKey: 'attendance' },
+    { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin', permissionKey: 'leaves-admin' },
+    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll-admin', permissionKey: 'payroll-admin' },
+    { label: 'Tasks', icon: 'task', route: '/dashboard/tasks', permissionKey: 'tasks' },
+    { label: 'Reports', icon: 'analytics', route: '/dashboard/reports', permissionKey: 'reports' },
+    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement', permissionKey: 'announcement' },
+    { label: 'Settings', icon: 'settings', route: '/dashboard/settings', permissionKey: 'settings' },
   ];
 
   // Employee Specific Tabs
   public employeeNavItems: NavItem[] = [
-    { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard' },
-    { label: 'Profile', icon: 'person', route: '/dashboard/profile' },
-    { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves' },
-    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll' },
-    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement' },
-    { label: 'Help', icon: 'help_outline', route: '/dashboard/help' },
+    { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard', permissionKey: 'dashboard' },
+    { label: 'Profile', icon: 'person', route: '/dashboard/profile', permissionKey: 'profile' },
+    { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves', permissionKey: 'leaves' },
+    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll', permissionKey: 'payroll' },
+    { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement', permissionKey: 'announcement' },
+    { label: 'Help', icon: 'help_outline', route: '/dashboard/help', permissionKey: 'help' },
   ];
 
   toggleSidebar() {
@@ -52,7 +55,8 @@ export class Sidebar {
   
   constructor(
     private router: Router,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    private apiService: ApiService
   ) {
     // Auto-close mobile sidebar on route change
     this.router.events.pipe(
@@ -81,17 +85,47 @@ export class Sidebar {
 
         this.user.set({ name, role, initials });
         console.log('Sidebar loaded user:', name, 'Role:', role);
+        
+        // Load Permissions for this role
+        this.loadPermissions(role);
       } catch (e) {
         console.error('Error parsing user data', e);
       }
     }
   }
+
+  private loadPermissions(role: string) {
+    this.apiService.getRolePermissions(role).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.permissions.set(res.permissions);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading permissions:', err);
+        // Fallback to default employee tabs if API fails
+        this.permissions.set(['dashboard', 'profile', 'leaves', 'payroll', 'announcement', 'help']);
+      }
+    });
+  }
   
-  // Reactive Navigation Items based on Role
+  // Reactive Navigation Items based on Role and Permissions
   navItems = computed(() => {
     const userRole = (this.user().role || 'Employee').toLowerCase();
-    console.log('Sidebar rendering for role:', userRole);
-    return userRole === 'admin' ? this.adminNavItems : this.employeeNavItems;
+    const currentPermissions = this.permissions();
+    
+    // Combine all potential items - avoid showing both Admin Dashboard and Employee Dashboard
+    const allItems = userRole === 'admin' 
+      ? this.adminNavItems 
+      : [...this.employeeNavItems, ...this.adminNavItems.filter(i => i.permissionKey !== 'dashboard')];
+    
+    // Filter items based on permissions
+    return allItems.filter(item => {
+      if (!item.permissionKey) return true;
+      return currentPermissions.includes(item.permissionKey);
+    }).filter((item, index, self) => 
+      index === self.findIndex((t) => t.route === item.route)
+    );
   });
 
   onLogout() {

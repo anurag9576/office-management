@@ -183,4 +183,24 @@ export class ApiService {
   markAllNotificationsAsRead(): Observable<any> {
     return this.http.put(`${this.baseUrl}/notifications/read-all`, {}, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 10. Roles & Permissions
+  // ==========================================
+
+  getRoles(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/roles`, { headers: this.getHeaders() });
+  }
+
+  upsertRole(roleData: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/roles`, roleData, { headers: this.getHeaders() });
+  }
+
+  deleteRole(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/roles/${id}`, { headers: this.getHeaders() });
+  }
+
+  getRolePermissions(roleName: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/roles/${roleName}`, { headers: this.getHeaders() });
+  }
 }

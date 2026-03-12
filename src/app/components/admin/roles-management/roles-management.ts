@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-roles-mgmt',
@@ -10,70 +11,131 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './roles-management.css'
 })
 export class RolesMgmt {
-  roles = signal([
-    { user: 'S', role: 'HR Manager', permissions: ['Employee Management', 'Leave Approvals'] },
-    { user: 'V', role: 'Operations Lead', permissions: ['Attendance Logs', 'Task Distribution'] }
-  ]);
+  roles = signal<any[]>([]);
 
   permissionOptions = [
-    'Employee Management',
-    'Department Analytics',
-    'Attendance Logs',
-    'Leave Approvals',
-    'Payroll Disbursement',
-    'Task Distribution',
-    'System Reports',
-    'Audit Logs'
+    { label: 'Dashboard Access', key: 'dashboard' },
+    { label: 'Employee Mgmt', key: 'employees' },
+    { label: 'Roles Mgmt', key: 'roles' },
+    { label: 'Attendance Logs', key: 'attendance' },
+    { label: 'Leave Approvals', key: 'leaves-admin' },
+    { label: 'Payroll Admin', key: 'payroll-admin' },
+    { label: 'Task Distribution', key: 'tasks' },
+    { label: 'System Reports', key: 'reports' },
+    { label: 'Announcements', key: 'announcement' },
+    { label: 'System Settings', key: 'settings' },
+    { label: 'Employee Profile', key: 'profile' },
+    { label: 'Apply Leaves', key: 'leaves' },
+    { label: 'View Payroll', key: 'payroll' },
+    { label: 'Help Center', key: 'help' }
   ];
 
   newRoleName = signal('');
   selectedPermissions = signal<string[]>([]);
-  editingIndex = signal<number | null>(null);
+  editingRole: any = null;
+  isLoading = signal(false);
 
-  togglePermission(perm: string) {
+  constructor(private apiService: ApiService) {}
+
+  ngOnInit() {
+    this.loadRoles();
+  }
+
+  loadRoles() {
+    this.isLoading.set(true);
+    this.apiService.getRoles().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.roles.set(res.data);
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading roles:', err);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  getPermissionLabel(key: string) {
+    return this.permissionOptions.find(o => o.key === key)?.label || key;
+  }
+
+  togglePermission(key: string) {
     const current = this.selectedPermissions();
-    if (current.includes(perm)) {
-      this.selectedPermissions.set(current.filter((p: string) => p !== perm));
+    if (current.includes(key)) {
+      this.selectedPermissions.set(current.filter((p: string) => p !== key));
     } else {
-      this.selectedPermissions.set([...current, perm]);
+      this.selectedPermissions.set([...current, key]);
     }
   }
 
-  editRole(index: number) {
-    const role = this.roles()[index];
-    this.newRoleName.set(role.role);
+  editRole(role: any) {
+    this.newRoleName.set(role.name);
     this.selectedPermissions.set([...role.permissions]);
-    this.editingIndex.set(index);
+    this.editingRole = role;
     
-    // Scroll to form for better UX
+    // Scroll to form
     window.scrollTo({ top: 500, behavior: 'smooth' });
   }
 
-  createRole() {
+  saveRole() {
     if (!this.newRoleName().trim() || this.selectedPermissions().length === 0) return;
 
-    const currentRoles = [...this.roles()];
-    const roleData = {
-      user: this.newRoleName().charAt(0).toUpperCase(),
-      role: this.newRoleName(),
-      permissions: [...this.selectedPermissions()]
+    this.isLoading.set(true);
+    const roleData: any = {
+      name: this.newRoleName(),
+      permissions: [...this.selectedPermissions()],
+      description: `Role for ${this.newRoleName()}`
     };
 
-    if (this.editingIndex() !== null) {
-      currentRoles[this.editingIndex()!] = roleData;
-    } else {
-      currentRoles.push(roleData);
+    if (this.editingRole) {
+      roleData.id = this.editingRole._id;
     }
 
-    this.roles.set(currentRoles);
-    
-    // Reset form
-    this.cancelEdit();
+    this.apiService.upsertRole(roleData).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.loadRoles();
+          this.cancelEdit();
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error saving role:', err);
+        this.isLoading.set(false);
+        alert('Failed to save role. Please check if you have Admin permissions.');
+      }
+    });
+  }
+
+  deleteRole(role: any) {
+    if (role.isSystemRole) {
+      alert('System roles cannot be deleted.');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete the "${role.name}" role?`)) return;
+
+    this.isLoading.set(true);
+    this.apiService.deleteRole(role._id).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.loadRoles();
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error deleting role:', err);
+        this.isLoading.set(false);
+        alert(err.error?.message || 'Failed to delete role.');
+      }
+    });
   }
 
   cancelEdit() {
     this.newRoleName.set('');
     this.selectedPermissions.set([]);
-    this.editingIndex.set(null);
+    this.editingRole = null;
   }
 }

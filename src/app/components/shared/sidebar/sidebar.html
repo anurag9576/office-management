@@ -31,7 +31,7 @@
     <nav class="flex-1 overflow-y-auto py-6 px-2 md:px-5 space-y-4 md:space-y-1 custom-scrollbar-hidden relative z-10">
         @if (!isCollapsed()) {
             <div class="px-4 mb-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 animate-fade-in">
-                Management
+                {{ user().role.toLowerCase() === 'admin' ? 'Management' : 'Employee Hub' }}
             </div>
         }
 

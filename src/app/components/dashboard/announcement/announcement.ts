@@ -15,6 +15,7 @@ export class Announcement implements OnInit {
   
   // Role & User State
   isAdmin = signal(false);
+  canManage = signal(false);
   currentUser = signal<any>(null);
   isLoading = signal(false);
 
@@ -114,7 +115,9 @@ export class Announcement implements OnInit {
       if (savedUser) {
         const user = JSON.parse(savedUser);
         this.currentUser.set(user);
-        this.isAdmin.set(user.role?.toLowerCase() === 'admin');
+        const role = user.role?.toLowerCase();
+        this.isAdmin.set(role === 'admin');
+        this.canManage.set(['admin', 'hr manager', 'manager'].includes(role));
       }
     } catch (e) {
       console.error('Error loading user:', e);
@@ -346,7 +349,7 @@ export class Announcement implements OnInit {
   }
 
   toggleFlagComment(postId: string, commentId: string) {
-    if (!this.isAdmin()) return;
+    if (!this.canManage()) return;
 
     this.apiService.toggleFlagComment(postId, commentId).subscribe({
       next: (res) => {
