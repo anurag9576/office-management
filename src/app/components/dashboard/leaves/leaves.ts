@@ -13,6 +13,7 @@ import { ApiService } from '../../../services/api.service';
 export class Leaves implements OnInit {
   private apiService = inject(ApiService);
   currentDate = signal(new Date());
+  minDate = signal(new Date().toISOString().split('T')[0]);
   calendarDays = signal<{ day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, isLeave: boolean, holidayName?: string }[]>([]);
   monthYearString = signal('');
   rawLeaves = signal<any[]>([]);
@@ -101,8 +102,20 @@ export class Leaves implements OnInit {
       return;
     }
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const start = new Date(this.leaveForm.startDate);
     const end = new Date(this.leaveForm.endDate);
+
+    if (start < today) {
+      this.errorMessage.set('Cannot apply leave for past dates');
+      return;
+    }
+
+    if (end < start) {
+      this.errorMessage.set('End date cannot be before start date');
+      return;
+    }
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 

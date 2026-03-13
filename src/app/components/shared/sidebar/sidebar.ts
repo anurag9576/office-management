@@ -58,7 +58,6 @@ export class Sidebar {
     public sidebarService: SidebarService,
     private apiService: ApiService
   ) {
-    // Auto-close mobile sidebar on route change
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
@@ -86,7 +85,6 @@ export class Sidebar {
         this.user.set({ name, role, initials });
         console.log('Sidebar loaded user:', name, 'Role:', role);
         
-        // Load Permissions for this role
         this.loadPermissions(role);
       } catch (e) {
         console.error('Error parsing user data', e);
@@ -103,25 +101,25 @@ export class Sidebar {
       },
       error: (err) => {
         console.error('Error loading permissions:', err);
-        // Fallback to default employee tabs if API fails
         this.permissions.set(['dashboard', 'profile', 'leaves', 'payroll', 'announcement', 'help']);
       }
     });
   }
   
-  // Reactive Navigation Items based on Role and Permissions
   navItems = computed(() => {
     const userRole = (this.user().role || 'Employee').toLowerCase();
     const currentPermissions = this.permissions();
     
-    // Combine all potential items - avoid showing both Admin Dashboard and Employee Dashboard
     const allItems = userRole === 'admin' 
       ? this.adminNavItems 
       : [...this.employeeNavItems, ...this.adminNavItems.filter(i => i.permissionKey !== 'dashboard')];
-    
-    // Filter items based on permissions
     return allItems.filter(item => {
       if (!item.permissionKey) return true;
+      const personalItems = ['profile', 'leaves', 'payroll', 'help'];
+      if (userRole !== 'admin' && personalItems.includes(item.permissionKey)) {
+        return true;
+      }
+
       return currentPermissions.includes(item.permissionKey);
     }).filter((item, index, self) => 
       index === self.findIndex((t) => t.route === item.route)
