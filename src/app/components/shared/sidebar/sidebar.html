@@ -38,7 +38,7 @@
         @for (item of navItems(); track item.route) {
             <a [routerLink]="item.route" routerLinkActive="active-nav"
                 [routerLinkActiveOptions]="{exact: true}" [title]="isCollapsed() ? item.label : ''"
-                class="group flex items-center p-2 md:py-3 md:px-4 rounded-xl md:rounded-2xl transition-all duration-300 relative overflow-hidden text-brand-2 hover:text-white"
+                class="group flex items-center p-2 md:py-3 md:px-4 rounded-xl md:rounded-2xl transition-all duration-300 relative overflow-hidden text-white hover:text-white"
                 [class.justify-center]="isCollapsed()" [class.justify-start]="!isCollapsed()">
 
                 <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -132,7 +132,7 @@
         <!-- Logout Item -->
         <button (click)="onLogout()" [title]="isCollapsed() ? 'Logout' : ''" [class.justify-center]="isCollapsed()"
             [class.px-0]="isCollapsed()" [class.px-4]="!isCollapsed()"
-            class="group w-full flex items-center py-3 rounded-2xl transition-all duration-300 relative overflow-hidden text-brand-2 hover:text-red-400">
+            class="group w-full flex items-center py-3 rounded-2xl transition-all duration-300 relative overflow-hidden text-white hover:text-red-400">
             <div class="absolute inset-0 bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
             <div class="icon-container p-2 rounded-xl transition-all duration-300 bg-white/5 border border-white/5 group-hover:bg-red-500 group-hover:text-white group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-red-500/20 shrink-0 text-red-400"
                 [class.mr-4]="!isCollapsed()" [class.mx-auto]="isCollapsed()">
@@ -156,7 +156,7 @@
             @if (!isCollapsed()) {
                 <div class="flex-1 min-w-0 animate-fade-in">
                     <p class="text-[12px] font-semibold text-white truncate leading-tight">{{user().name}}</p>
-                    <p class="text-[9px] text-brand-2 truncate font-bold uppercase tracking-wider mt-0.5">{{user().role}}</p>
+                    <p class="text-[9px] text-white truncate font-bold uppercase tracking-wider mt-0.5">{{user().role}}</p>
                 </div>
             }
         </div>
