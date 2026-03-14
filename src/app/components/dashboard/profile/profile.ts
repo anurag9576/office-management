@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-profile',
@@ -12,6 +13,7 @@ import { ApiService } from '../../../services/api.service';
 })
 export class Profile implements OnInit {
   private apiService = inject(ApiService);
+  private serverUrl = environment.serverUrl;
   
   employee = signal<any>({
     name: '',
@@ -89,7 +91,7 @@ export class Profile implements OnInit {
             size: '1.2 MB', 
             icon: 'description',
             date: '05 Jan 2025', 
-            url: 'http://localhost:5000/docs/Joining_Letter.pdf' 
+            url: `${this.serverUrl}/docs/Joining_Letter.pdf` 
           },
           { 
             name: 'Code_of_Conduct.pdf', 
@@ -97,7 +99,7 @@ export class Profile implements OnInit {
             size: '2.4 MB', 
             icon: 'policy',
             date: '12 Feb 2025', 
-            url: 'http://localhost:5000/docs/Code_of_Conduct.pdf' 
+            url: `${this.serverUrl}/docs/Code_of_Conduct.pdf` 
           }
         ]);
 
