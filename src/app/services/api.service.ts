@@ -204,4 +204,11 @@ export class ApiService {
   getRolePermissions(roleName: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/roles/${roleName}`, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 11. Password Management
+  // ==========================================
+  changePassword(data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/auth/change-password`, data, { headers: this.getHeaders() });
+  }
 }

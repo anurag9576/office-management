@@ -5,6 +5,8 @@ import { filter } from 'rxjs/operators';
 import { SidebarService } from '../../../services/sidebar.service';
 import { ApiService } from '../../../services/api.service';
 import { Subscription, interval } from 'rxjs';
+import { environment } from '../../../../environments/environment';
+import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-navbar',
@@ -17,12 +19,19 @@ export class Navbar implements OnInit, OnDestroy {
   private apiService = inject(ApiService);
   private router = inject(Router);
   public sidebarService = inject(SidebarService);
+  private serverUrl = environment.serverUrl;
 
   currentTime = new Date();
-  showSettingsDropdown = signal(false);
   showNotificationsDropdown = signal(false);
   currentTitle = signal('Dashboard');
   unreadCount = signal(0);
+  user = signal({
+    name: 'User',
+    role: 'Employee',
+    initials: 'U',
+    avatar: null as string | null
+  });
+  imageError = signal(false);
   notifications: any[] = [];
   private pollingSubscription?: Subscription;
   private timeInterval: any;
@@ -40,6 +49,7 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.loadUserInfo();
     this.loadNotifications();
     // Poll every 30 seconds
     this.pollingSubscription = interval(30000).subscribe(() => {
@@ -114,19 +124,51 @@ export class Navbar implements OnInit, OnDestroy {
     else this.currentTitle.set('Dashboard');
   }
 
-  toggleSettings() {
-    this.showNotificationsDropdown.set(false);
-    this.showSettingsDropdown.set(!this.showSettingsDropdown());
+  private loadUserInfo() {
+    const savedUser = localStorage.getItem('currentUser');
+    if (savedUser) {
+      try {
+        const parsedUser = JSON.parse(savedUser);
+        const name = parsedUser.name || 'User';
+        const role = parsedUser.role || 'Employee';
+        const initials = parsedUser.initials || name.charAt(0).toUpperCase();
+        const avatar = parsedUser.avatar || null;
+        this.imageError.set(false); // Reset error state on reload
+        this.user.set({ 
+          name, 
+          role, 
+          initials, 
+          avatar: this.getFullAvatarUrl(avatar) 
+        });
+      } catch (e) {
+        console.error('Error parsing user data in Navbar', e);
+      }
+    }
+  }
+
+  onImageError() {
+    this.imageError.set(true);
+  }
+
+  @HostListener('window:storage', ['$event'])
+  onStorageChange(event: StorageEvent) {
+    if (event.key === 'currentUser') {
+      this.loadUserInfo();
+    }
+  }
+
+  private getFullAvatarUrl(url: string | null): string | null {
+    if (!url) return null;
+    if (url.startsWith('http') || url.startsWith('data:image')) return url;
+    return `${this.serverUrl}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
   toggleNotifications() {
-    this.showSettingsDropdown.set(false);
     this.showNotificationsDropdown.set(!this.showNotificationsDropdown());
   }
 
-  navigateToForgot() {
-    this.showSettingsDropdown.set(false);
-    this.router.navigate(['/forgot-password']);
+  navigateToProfile() {
+    this.router.navigate(['/dashboard/profile']);
   }
 
   handleNotificationClick(note: any) {
