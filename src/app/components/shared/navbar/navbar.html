@@ -97,30 +97,17 @@
             </div>
         </div>
 
-        <!-- Settings Dropdown -->
-        <div class="relative">
-            <button (click)="toggleSettings()"
-                class="p-2 text-brand-3 hover:text-brand-1 hover:bg-brand-1/10 rounded-lg transition-all"
-                [class.bg-brand-1/10]="showSettingsDropdown()" [class.text-brand-1]="showSettingsDropdown()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-            </button>
-
-            <!-- Dropdown Menu -->
-            <div *ngIf="showSettingsDropdown()"
-                class="fixed sm:absolute right-4 sm:right-0 top-[60px] sm:top-auto mt-2 w-48 bg-white rounded-xl shadow-2xl border border-slate-100 py-1.5 z-[150] animate-in fade-in zoom-in-95 duration-200 origin-top-right overflow-hidden">
-                <button (click)="navigateToForgot()"
-                    class="w-full flex items-center px-4 py-2.5 text-sm font-black text-slate-700 hover:bg-brand-1 hover:text-white transition-all group/item">
-                    <span
-                        class="material-symbols-outlined text-[18px] mr-3 text-brand-3 group-hover/item:text-white transition-colors">lock_reset</span>
-                    Forgot Password
-                </button>
+        <!-- User Profile Box -->
+        <div (click)="navigateToProfile()" class="flex items-center gap-3 px-3 py-1.5 bg-brand-5 rounded-xl border border-white/10 shadow-sm ml-2 group cursor-pointer hover:bg-brand-5/90 transition-all active:scale-95 duration-200">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-brand-1 text-white font-bold shadow-sm overflow-hidden ring-2 ring-white/10 group-hover:ring-white/20 transition-all">
+                <img *ngIf="user().avatar && !imageError()" [src]="user().avatar" (error)="onImageError()" alt="" class="w-full h-full object-cover">
+                <span *ngIf="!user().avatar || imageError()" class="text-[12px] uppercase tracking-tighter">{{user().initials}}</span>
+            </div>
+            <div class="hidden sm:block">
+                <p class="text-[11px] font-bold text-white leading-tight truncate max-w-[120px]">{{user().name}}</p>
+                <p class="text-[9px] text-white/70 font-black uppercase tracking-widest mt-0.5">{{user().role}}</p>
             </div>
         </div>
+
     </div>
 </header>

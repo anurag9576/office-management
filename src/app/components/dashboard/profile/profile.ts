@@ -104,6 +104,15 @@ export class Profile implements OnInit {
         ]);
 
         this.isLoading.set(false);
+        
+        // Update localStorage to sync with navbar/sidebar
+        const updatedUser = {
+          ...user,
+          name: this.employee().name,
+          avatar: data.avatar,
+          initials: ((data.firstName?.[0] || '') + (data.lastName?.[0] || (data.firstName?.[1] || 'U'))).toUpperCase()
+        };
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       },
       error: (err) => {
         console.error('Error fetching profile:', err);
@@ -192,6 +201,15 @@ export class Profile implements OnInit {
           this.apiService.updateEmployee(userId, { avatar: avatarData }).subscribe({
             next: (res) => {
               this.employee.update(emp => ({ ...emp, avatar: avatarData }));
+              
+              // Update localStorage so Navbar/Sidebar sync
+              const userStr = localStorage.getItem('currentUser');
+              if (userStr) {
+                const user = JSON.parse(userStr);
+                user.avatar = avatarData;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+              }
+
               this.isLoading.set(false);
               this.showSuccess('Profile photo updated!');
             },
