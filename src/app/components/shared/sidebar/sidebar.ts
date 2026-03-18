@@ -120,13 +120,13 @@ export class Sidebar {
 
   private loadPermissions(role: string) {
     this.apiService.getRolePermissions(role).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res.success) {
           this.permissions.set(res.permissions);
           localStorage.setItem('userPermissions', JSON.stringify(res.permissions));
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error loading permissions:', err);
         this.permissions.set(['dashboard', 'profile', 'leaves', 'payroll', 'announcement', 'help']);
       }
@@ -203,14 +203,14 @@ export class Sidebar {
       const { newPassword } = this.changePasswordForm.value;
 
       this.apiService.changePassword({ newPassword }).subscribe({
-        next: (res) => {
+        next: (res: any) => {
           this.isPasswordLoading.set(false);
           this.passwordSuccess.set('Password updated successfully!');
           setTimeout(() => {
             this.closeChangePasswordModal();
           }, 2000);
         },
-        error: (err) => {
+        error: (err: any) => {
           this.isPasswordLoading.set(false);
           this.passwordError.set(err.error?.message || 'Failed to update password.');
         }
