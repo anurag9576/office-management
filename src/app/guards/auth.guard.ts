@@ -13,15 +13,30 @@ export const authGuard: CanActivateFn = (route, state) => {
   const user = JSON.parse(userJson);
   const role = (user.role || '').toLowerCase();
   const expectedRole = route.data['role'];
+  const requiredPermission = route.data['permission'];
 
-  console.log('AuthGuard checking path:', state.url, 'Role:', role, 'Expected:', expectedRole);
+  console.log('AuthGuard checking path:', state.url, 'Role:', role, 'Expected:', expectedRole, 'Permission:', requiredPermission);
 
-  // If a specific role is required for this route
+  // Admins have bypass for everything
+  if (role === 'admin') {
+    return true;
+  }
+
+  // If a specific permission is required
+  if (requiredPermission) {
+    const permissionsJson = localStorage.getItem('userPermissions');
+    const permissions: string[] = permissionsJson ? JSON.parse(permissionsJson) : [];
+    
+    if (permissions.includes(requiredPermission)) {
+      return true;
+    }
+  }
+
+  // Fallback to role check if no specific permission matched or if role is explicitly required
   if (expectedRole && role !== expectedRole.toLowerCase()) {
-    console.warn('Role Mismatch! User is:', role, 'but path requires:', expectedRole);
+    console.warn('Access Denied! User role:', role, 'Path requires role:', expectedRole, 'or permission:', requiredPermission);
     // Redirect based on their actual role
     const targetPath = role === 'admin' ? '/dashboard/admin-home' : '/dashboard';
-    console.log('Redirecting to:', targetPath);
     router.navigate([targetPath]);
     return false;
   }

@@ -1,0 +1,267 @@
+<div class="px-2 pt-1 pb-8 md:px-0 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <!-- Main Header -->
+    <div class="mb-5 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight">Work Timesheet</h1>
+            <p class="text-slate-500 text-sm mt-1 font-medium">Manage and track your daily productivity</p>
+        </div>
+
+        <!-- Filters & Add Button -->
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-slate-100 shadow-sm">
+                <select [ngModel]="selectedMonth()" (ngModelChange)="selectedMonth.set($event); currentPage.set(1)"
+                    class="bg-transparent border-none outline-none text-xs font-bold text-slate-700 px-3 cursor-pointer">
+                    <option *ngFor="let m of months; let i = index" [value]="i">{{m}}</option>
+                </select>
+                <div class="w-px h-4 bg-slate-200"></div>
+                <select [ngModel]="selectedYear()" (ngModelChange)="selectedYear.set($event); currentPage.set(1)"
+                    class="bg-transparent border-none outline-none text-xs font-bold text-slate-700 px-3 cursor-pointer">
+                    <option *ngFor="let y of years" [value]="y">{{y}}</option>
+                </select>
+            </div>
+
+            <button (click)="openAddModal()"
+                class="bg-brand-1 text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest flex items-center gap-2 shadow-lg shadow-brand-1/20 hover:scale-105 active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                Add Work Log
+            </button>
+        </div>
+    </div>
+
+    <!-- Full Width Table -->
+    <div class="bg-white rounded-[1.0rem] shadow-xl border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto overflow-y-auto max-h-[600px] text-center relative no-scrollbar">
+            <table class="w-full table-fixed border-collapse">
+                <thead>
+                    <tr class="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-200">
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-3 py-5 text-center w-[120px] border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            Date</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left w-[180px] border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            Project</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-3 py-5 text-center w-[130px] border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            Branch Name</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            Work Details</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-3 py-5 text-center w-[100px] border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            Minutes</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-3 py-5 text-center w-[140px] border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            Work Status</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-3 py-5 text-center w-[100px] shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    <tr *ngFor="let log of paginatedLogs()" class="group hover:bg-slate-50/30 transition-colors">
+                        <td class="px-6 py-6 text-center border-r border-slate-50">
+                            <div class="flex flex-col items-center">
+                                <span class="text-sm font-bold text-slate-800">{{log.date | date:'dd MMM'}}</span>
+                                <span class="text-[10px] text-slate-400 font-medium">{{log.date | date:'yyyy'}}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6 text-left overflow-hidden border-r border-slate-50">
+                            <span class="text-brand-1 text-xs font-semibold uppercase tracking-tight break-words">
+                                {{log.project}}
+                            </span>
+                        </td>
+                        <td class="px-6 py-6 text-center border-r border-slate-50">
+                            <span class="text-slate-600 text-xs font-medium uppercase tracking-tight break-words">
+                                {{log.branchName}}
+                            </span>
+                        </td>
+                        <td class="px-6 py-6 text-left overflow-hidden border-r border-slate-50">
+                            <p
+                                class="text-sm font-medium text-slate-600 leading-relaxed break-words whitespace-pre-wrap">
+                                {{log.task}}</p>
+                        </td>
+                        <td class="px-6 py-6 text-center border-r border-slate-50">
+                            <div class="flex flex-col items-center">
+                                <span class="text-lg font-black text-slate-800">{{log.minutes}}</span>
+                                <span
+                                    class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Minutes</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-6 text-center border-r border-slate-50">
+                            <span [ngClass]="{
+                                'bg-blue-100 text-blue-600': log.workStatus === 'Development',
+                                'bg-amber-100 text-amber-600': log.workStatus === 'In Process',
+                                'bg-red-100 text-red-600': log.workStatus === 'Bug Fixing',
+                                'bg-purple-100 text-purple-600': log.workStatus === 'Testing',
+                                'bg-green-100 text-green-600': log.workStatus === 'Completed',
+                                'bg-slate-100 text-slate-600': log.workStatus === 'Documentation',
+                                'bg-indigo-100 text-indigo-600': log.workStatus === 'Meeting'
+                            }"
+                                class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm inline-block">
+                                {{log.workStatus}}
+                            </span>
+                        </td>
+                        <td class="px-6 py-6 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button (click)="openEditModal(log)"
+                                    class="p-2 text-slate-400 hover:text-brand-1 rounded-xl transition-all"
+                                    title="Edit">
+                                    <span class="material-symbols-outlined text-[18px]">edit_square</span>
+                                </button>
+                                <button (click)="deleteLog(log)"
+                                    class="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                    title="Delete">
+                                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Footer -->
+        <div
+            class="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Showing <span class="text-slate-900">{{startRange()}}</span> – <span
+                    class="text-slate-900">{{endRange()}}</span> of <span
+                    class="text-slate-900">{{filteredLogs().length}}</span> records
+            </div>
+
+            <div class="flex items-center gap-2" *ngIf="totalPages() > 1">
+                <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1"
+                    class="p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all text-slate-600">
+                    <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                </button>
+
+                <div class="flex gap-1.5 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar py-1">
+                    <button *ngFor="let p of [].constructor(totalPages()); let i = index" (click)="goToPage(i + 1)"
+                        [class]="currentPage() === (i + 1) ? 'bg-brand-1 text-white shadow-xl shadow-brand-1/20 border-brand-1' : 'bg-white text-slate-600 border-slate-100 hover:border-slate-300'"
+                        class="w-10 h-10 rounded-xl text-xs font-black transition-all border flex items-center justify-center shrink-0 shadow-sm">
+                        {{i + 1}}
+                    </button>
+                </div>
+
+                <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()"
+                    class="p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all text-slate-600">
+                    <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="filteredLogs().length === 0" class="py-24 flex flex-col items-center justify-center">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                <span class="material-symbols-outlined text-4xl text-slate-200">history_edu</span>
+            </div>
+            <p class="text-slate-400 font-bold tracking-tight">No logs found for this period</p>
+            <button (click)="openAddModal()"
+                class="mt-4 text-brand-1 text-xs font-black uppercase tracking-widest hover:underline">
+                Create First Entry
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="showDeleteModal()"
+    class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/20 backdrop-blur-[2px] animate-in fade-in duration-300">
+    <div
+        class="bg-white w-full max-w-[300px] rounded-2xl shadow-xl border border-slate-50 animate-in zoom-in-95 duration-300 overflow-hidden">
+        <div class="p-5 text-center">
+            <p class="text-slate-700 text-[13px] font-bold mb-4">Are you sure you want to delete this log?</p>
+            <div class="flex gap-3">
+                <button (click)="closeDeleteModal()"
+                    class="flex-1 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:bg-slate-50 transition-all">
+                    No
+                </button>
+                <button (click)="confirmDelete()"
+                    class="flex-1 bg-brand-1 text-white py-2.5 rounded-xl text-xs font-bold shadow-lg shadow-brand-1/10 hover:bg-brand-2 transition-all active:scale-[0.98]">
+                    Yes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div *ngIf="showModal()"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+    <div
+        class="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-white animate-in zoom-in-95 duration-300">
+        <div class="px-6 py-5 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
+            <div>
+                <h3 class="text-xl font-bold text-slate-900">{{isEditing() ? 'Edit Work Log' : 'New Work Entry'}}</h3>
+                <p class="text-slate-500 text-xs font-medium mt-0.5">Fill in your task accomplishments</p>
+            </div>
+            <button (click)="closeModal()"
+                class="w-9 h-9 flex items-center justify-center rounded-full hover:bg-white text-slate-400 hover:text-slate-900 transition-all shadow-sm">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Assigned
+                    Project</label>
+                <input type="text" [(ngModel)]="newLog.project" placeholder="e.g. CRM System"
+                    class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm focus:ring-4 focus:ring-brand-1/10 focus:border-brand-1 outline-none transition-all font-medium text-slate-700">
+            </div>
+
+            <div class="grid grid-cols-2 gap-5">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Branch
+                        Name</label>
+                    <input type="text" [(ngModel)]="newLog.branchName" placeholder="e.g. git_branch_name"
+                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm focus:ring-4 focus:ring-brand-1/10 focus:border-brand-1 outline-none transition-all font-medium text-slate-700">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Work
+                        Status</label>
+                    <div class="relative">
+                        <select [(ngModel)]="newLog.workStatus"
+                            class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm focus:ring-4 focus:ring-brand-1/10 focus:border-brand-1 outline-none transition-all font-medium text-slate-700 appearance-none cursor-pointer">
+                            <option value="" disabled>Select Status</option>
+                            <option *ngFor="let s of workStatuses" [value]="s">{{s}}</option>
+                        </select>
+                        <span
+                            class="material-symbols-outlined absolute right-4 top-3 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Task
+                    Accomplished</label>
+                <textarea [(ngModel)]="newLog.task" rows="3" placeholder="Briefly describe what you worked on..."
+                    class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm focus:ring-4 focus:ring-brand-1/10 focus:border-brand-1 outline-none transition-all resize-none font-medium text-slate-600 leading-relaxed"></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-5">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Log Date</label>
+                    <input type="date" [(ngModel)]="newLog.date" [max]="maxDate"
+                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm focus:ring-4 focus:ring-brand-1/10 outline-none font-semibold text-slate-700">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Total
+                        Minutes</label>
+                    <input type="number" [(ngModel)]="newLog.minutes"
+                        class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3 text-sm focus:ring-4 focus:ring-brand-1/10 outline-none font-semibold text-slate-700 text-center">
+                </div>
+            </div>
+        </div>
+
+        <div class="px-6 py-5 bg-slate-50/50 border-t border-slate-50 flex gap-4">
+            <button (click)="closeModal()"
+                class="flex-1 px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-all">
+                Cancel
+            </button>
+            <button (click)="saveLog()"
+                class="flex-[2] bg-brand-1 text-white px-6 py-3 rounded-2xl text-[11px] font-bold uppercase tracking-widest shadow-lg shadow-brand-1/20 hover:bg-brand-2 transition-all active:scale-[0.98]">
+                {{isEditing() ? 'Update' : 'Post Work'}}
+            </button>
+        </div>
+    </div>
+</div>
