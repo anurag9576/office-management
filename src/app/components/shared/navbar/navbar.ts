@@ -7,11 +7,12 @@ import { ApiService } from '../../../services/api.service';
 import { Subscription, interval } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { HostListener } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
@@ -20,9 +21,19 @@ export class Navbar implements OnInit, OnDestroy {
   private router = inject(Router);
   public sidebarService = inject(SidebarService);
   private serverUrl = environment.serverUrl;
+  private fb = inject(FormBuilder);
 
   currentTime = new Date();
   showNotificationsDropdown = signal(false);
+
+  showLogoutModal = signal(false);
+  showPasswordModal = signal(false);
+  changePasswordForm: FormGroup;
+  isPasswordLoading = signal(false);
+  passwordError = signal<string | null>(null);
+  passwordSuccess = signal<string | null>(null);
+  passwordVisible = signal(false);
+  confirmPasswordVisible = signal(false);
   currentTitle = signal('Dashboard');
   unreadCount = signal(0);
   user = signal({
@@ -37,6 +48,11 @@ export class Navbar implements OnInit, OnDestroy {
   private timeInterval: any;
 
   constructor() {
+    this.changePasswordForm = this.fb.group({
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', [Validators.required]]
+    }, { validators: this.passwordMatchValidator });
+
     // Dynamic Title Logic
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -53,6 +69,10 @@ export class Navbar implements OnInit, OnDestroy {
     this.loadNotifications();
     // Poll every 30 seconds
     this.pollingSubscription = interval(30000).subscribe(() => {
+      this.loadNotifications();
+    });
+
+    this.apiService.notificationRefresh.subscribe(() => {
       this.loadNotifications();
     });
 
@@ -168,7 +188,9 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   navigateToProfile() {
-    this.router.navigate(['/dashboard/profile']);
+    if (this.user().role?.toLowerCase() !== 'admin') {
+      this.router.navigate(['/dashboard/profile']);
+    }
   }
 
   handleNotificationClick(note: any) {
@@ -187,5 +209,67 @@ export class Navbar implements OnInit, OnDestroy {
     if (note.route) {
         this.router.navigateByUrl(note.route);
     }
+  }
+
+  // Logout Methods
+  onLogout() {
+    this.showLogoutModal.set(true);
+  }
+
+  confirmLogout() {
+    this.showLogoutModal.set(false);
+    localStorage.removeItem('currentUser');
+    this.router.navigate(['/login']);
+  }
+
+  cancelLogout() {
+    this.showLogoutModal.set(false);
+  }
+
+  // Password Methods
+  openChangePasswordModal() {
+    this.changePasswordForm.reset();
+    this.passwordError.set(null);
+    this.passwordSuccess.set(null);
+    this.showPasswordModal.set(true);
+  }
+
+  closeChangePasswordModal() {
+    this.showPasswordModal.set(false);
+  }
+
+  passwordMatchValidator(g: FormGroup) {
+    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
+      ? null : { mismatch: true };
+  }
+
+  onSubmitPassword() {
+    if (this.changePasswordForm.valid) {
+      this.isPasswordLoading.set(true);
+      this.passwordError.set(null);
+
+      const { newPassword } = this.changePasswordForm.value;
+
+      this.apiService.changePassword({ newPassword }).subscribe({
+        next: (res: any) => {
+          this.isPasswordLoading.set(false);
+          this.passwordSuccess.set('Password updated successfully!');
+          setTimeout(() => {
+            this.closeChangePasswordModal();
+          }, 2000);
+        },
+        error: (err: any) => {
+          this.isPasswordLoading.set(false);
+          this.passwordError.set(err.error?.message || 'Failed to update password.');
+        }
+      });
+    } else {
+      this.changePasswordForm.markAllAsTouched();
+    }
+  }
+
+  togglePasswordVisibility(type: 'new' | 'confirm') {
+    if (type === 'new') this.passwordVisible.set(!this.passwordVisible());
+    else this.confirmPasswordVisible.set(!this.confirmPasswordVisible());
   }
 }
