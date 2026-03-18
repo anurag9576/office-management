@@ -44,6 +44,7 @@ export class Sidebar {
   // Employee Specific Tabs
   public employeeNavItems: NavItem[] = [
     { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard', permissionKey: 'dashboard' },
+    { label: 'Profile', icon: 'person', route: '/dashboard/profile', permissionKey: 'profile' },
     { label: 'Timesheet', icon: 'timer', route: '/dashboard/timesheet', permissionKey: 'timesheet' },
     { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves', permissionKey: 'leaves' },
     { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll', permissionKey: 'payroll' },
