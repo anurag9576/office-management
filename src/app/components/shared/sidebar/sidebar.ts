@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { SidebarService } from '../../../services/sidebar.service';
 import { filter } from 'rxjs/operators';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { environment } from '../../../../environments/environment';
 
@@ -17,24 +16,15 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, ReactiveFormsModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
 export class Sidebar {
   brandName = signal('hamsa hitech');
-  showLogoutModal = signal(false);
   private serverUrl = environment.serverUrl;
   isCollapsed = signal(window.innerWidth < 768);
   permissions = signal<string[]>([]);
-
-  showPasswordModal = signal(false);
-  changePasswordForm: FormGroup;
-  isPasswordLoading = signal(false);
-  passwordError = signal<string | null>(null);
-  passwordSuccess = signal<string | null>(null);
-  passwordVisible = signal(false);
-  confirmPasswordVisible = signal(false);
 
   // Admin Specific Tabs
   public adminNavItems: NavItem[] = [
@@ -54,7 +44,6 @@ export class Sidebar {
   // Employee Specific Tabs
   public employeeNavItems: NavItem[] = [
     { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard', permissionKey: 'dashboard' },
-    { label: 'Profile', icon: 'person', route: '/dashboard/profile', permissionKey: 'profile' },
     { label: 'Timesheet', icon: 'timer', route: '/dashboard/timesheet', permissionKey: 'timesheet' },
     { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves', permissionKey: 'leaves' },
     { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll', permissionKey: 'payroll' },
@@ -69,13 +58,8 @@ export class Sidebar {
   constructor(
     private router: Router,
     public sidebarService: SidebarService,
-    private apiService: ApiService,
-    private fb: FormBuilder
+    private apiService: ApiService
   ) {
-    this.changePasswordForm = this.fb.group({
-      newPassword: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator });
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
@@ -160,68 +144,4 @@ export class Sidebar {
   bottomNavItems = computed(() => {
     return this.navItems().filter(item => item.label === 'Help' || item.label === 'Settings');
   });
-
-  onLogout() {
-    this.showLogoutModal.set(true);
-  }
-
-  confirmLogout() {
-    this.showLogoutModal.set(false);
-    localStorage.removeItem('currentUser');
-    this.router.navigate(['/login']);
-  }
-
-  cancelLogout() {
-    this.showLogoutModal.set(false);
-  }
-
-  // Password Methods
-  openChangePasswordModal() {
-    this.changePasswordForm.reset();
-    this.passwordError.set(null);
-    this.passwordSuccess.set(null);
-    this.showPasswordModal.set(true);
-    if (this.sidebarService.isMobileOpen()) {
-        this.sidebarService.closeMobile();
-    }
-  }
-
-  closeChangePasswordModal() {
-    this.showPasswordModal.set(false);
-  }
-
-  passwordMatchValidator(g: FormGroup) {
-    return g.get('newPassword')?.value === g.get('confirmPassword')?.value
-      ? null : { mismatch: true };
-  }
-
-  onSubmitPassword() {
-    if (this.changePasswordForm.valid) {
-      this.isPasswordLoading.set(true);
-      this.passwordError.set(null);
-
-      const { newPassword } = this.changePasswordForm.value;
-
-      this.apiService.changePassword({ newPassword }).subscribe({
-        next: (res: any) => {
-          this.isPasswordLoading.set(false);
-          this.passwordSuccess.set('Password updated successfully!');
-          setTimeout(() => {
-            this.closeChangePasswordModal();
-          }, 2000);
-        },
-        error: (err: any) => {
-          this.isPasswordLoading.set(false);
-          this.passwordError.set(err.error?.message || 'Failed to update password.');
-        }
-      });
-    } else {
-      this.changePasswordForm.markAllAsTouched();
-    }
-  }
-
-  togglePasswordVisibility(type: 'new' | 'confirm') {
-    if (type === 'new') this.passwordVisible.set(!this.passwordVisible());
-    else this.confirmPasswordVisible.set(!this.confirmPasswordVisible());
-  }
 }

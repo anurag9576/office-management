@@ -216,6 +216,7 @@ export class Announcement implements OnInit {
       next: (res) => {
         if (res.success) {
           this.loadAnnouncements();
+          this.apiService.notificationRefresh.next();
         }
         this.isLoading.set(false);
       },

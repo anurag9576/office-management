@@ -139,19 +139,6 @@
             </a>
         }
 
-        <!-- Change Password Item (Inserted here to be above Help/Settings) -->
-        <button (click)="openChangePasswordModal()" [title]="isCollapsed() ? 'Change Password' : ''" [class.justify-center]="isCollapsed()"
-            [class.px-0]="isCollapsed()" [class.px-4]="!isCollapsed()"
-            class="group w-full flex items-center py-3 rounded-2xl transition-all duration-300 relative overflow-hidden text-white cursor-pointer">
-            <div class="absolute inset-0 bg-brand-1/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div class="icon-container p-2 rounded-xl transition-all duration-300 bg-white/5 border border-white/5 group-hover:bg-brand-1 group-hover:text-white group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-brand-1/20 shrink-0 text-white/70 group-hover:text-white"
-                [class.mr-4]="!isCollapsed()" [class.mx-auto]="isCollapsed()">
-                <span class="material-symbols-outlined text-[20px]">lock_reset</span>
-            </div>
-            @if (!isCollapsed()) {
-                <span class="font-semibold text-sm transition-all tracking-wide relative z-10 animate-fade-in">Change Password</span>
-            }
-        </button>
 
         @for (item of bottomNavItems(); track item.route) {
             <a [routerLink]="item.route" routerLinkActive="active-nav"
@@ -187,21 +174,6 @@
             </a>
         }
 
-        <!-- Logout Item -->
-        <button (click)="onLogout()" [title]="isCollapsed() ? 'Logout' : ''" [class.justify-center]="isCollapsed()"
-            [class.px-0]="isCollapsed()" [class.px-4]="!isCollapsed()"
-            class="group w-full flex items-center py-3 rounded-2xl transition-all duration-300 relative overflow-hidden text-white hover:text-red-400 cursor-pointer">
-            <div class="absolute inset-0 bg-red-400/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div class="icon-container p-2 rounded-xl transition-all duration-300 bg-white/5 border border-white/5 group-hover:bg-red-500 group-hover:text-white group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-red-500/20 shrink-0 text-red-400"
-                [class.mr-4]="!isCollapsed()" [class.mx-auto]="isCollapsed()">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-            </div>
-            @if (!isCollapsed()) {
-                <span class="font-semibold text-sm transition-all tracking-wide relative z-10 animate-fade-in">Logout</span>
-            }
-        </button>
     </nav>
 
     <!-- Support/Footer Section (Profile removed - now in Navbar) -->
@@ -211,115 +183,4 @@
         </div>
     </div>
 </aside>
-
-<!-- Logout Confirmation Modal -->
-@if (showLogoutModal()) {
-    <div class="fixed inset-0 z-[9999] flex items-center justify-center p-6 pl-12 sm:pl-6 bg-black/60 backdrop-blur-[3px]">
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300" (click)="cancelLogout()"></div>
-        <div class="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl relative z-10 w-full max-w-[420px] overflow-hidden transform transition-all animate-in zoom-in-95 duration-200 shadow-brand-3/30 border border-brand-2/10">
-            <div class="p-6 sm:p-8 text-center">
-                <div class="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center text-red-500 mx-auto mb-4 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-black text-slate-800 mb-2 tracking-tight">Logout?</h3>
-                <p class="text-slate-500 font-medium text-xs mb-6 leading-relaxed px-2">Are you sure you want to exit your session?</p>
-                <div class="flex gap-4">
-                    <button (click)="cancelLogout()" class="flex-1 py-3 bg-slate-100 hover:bg-brand-2 hover:text-brand-5 text-slate-500 font-bold rounded-xl transition-all active:scale-95 text-sm cursor-pointer border border-transparent hover:border-brand-2 shadow-sm">No</button>
-                    <button (click)="confirmLogout()" class="flex-1 py-3 bg-brand-5 hover:bg-brand-1 text-white font-black rounded-xl transition-all shadow-lg hover:shadow-brand-1/20 active:scale-95 text-sm cursor-pointer">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
-
-<!-- Change Password Modal -->
-<div *ngIf="showPasswordModal()" class="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-    <div (click)="$event.stopPropagation()" class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
-        <!-- Modal Header -->
-        <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-1/10 flex items-center justify-center text-brand-1">
-                    <span class="material-symbols-outlined">lock_reset</span>
-                </div>
-                <div>
-                    <h3 class="text-lg font-black text-slate-800 tracking-tight">Change Password</h3>
-                    <p class="text-xs text-slate-500 font-medium">Update your account security</p>
-                </div>
-            </div>
-            <button (click)="closeChangePasswordModal()" class="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-all">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
-
-        <!-- Modal Body -->
-        <form [formGroup]="changePasswordForm" (ngSubmit)="onSubmitPassword()" class="p-6 space-y-4">
-            <!-- New Password -->
-            <div class="space-y-1.5">
-                <label class="text-[11px] font-black text-slate-500 uppercase tracking-wider ml-1">New Password</label>
-                <div class="relative group">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-brand-1 transition-colors">
-                        <span class="material-symbols-outlined text-lg">lock</span>
-                    </span>
-                    <input [type]="passwordVisible() ? 'text' : 'password'" 
-                           formControlName="newPassword"
-                           placeholder="Enter new password"
-                           class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-16 py-3 text-sm outline-none focus:ring-4 focus:ring-brand-1/10 focus:border-brand-1 focus:bg-white transition-all font-medium" />
-                    
-                    <!-- Success Check Icon -->
-                    <span *ngIf="changePasswordForm.get('newPassword')?.valid" 
-                          class="absolute inset-y-0 right-10 flex items-center text-brand-1 animate-in zoom-in duration-300">
-                        <span class="material-symbols-outlined text-[20px] font-bold">check</span>
-                    </span>
-
-                    <button type="button" (click)="togglePasswordVisibility('new')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-brand-1 transition-colors">
-                        <span class="material-symbols-outlined text-lg">{{passwordVisible() ? 'visibility_off' : 'visibility'}}</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="space-y-1.5">
-                <label class="text-[11px] font-black text-slate-500 uppercase tracking-wider ml-1">Confirm Password</label>
-                <div class="relative group">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 group-focus-within:text-brand-1 transition-colors">
-                        <span class="material-symbols-outlined text-lg">lock</span>
-                    </span>
-                    <input [type]="confirmPasswordVisible() ? 'text' : 'password'" 
-                           formControlName="confirmPassword"
-                           placeholder="Confirm your password"
-                           class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-16 py-3 text-sm outline-none focus:ring-4 focus:ring-brand-1/10 focus:border-brand-1 focus:bg-white transition-all font-medium" />
-                    
-                    <!-- Success Check Icon -->
-                    <span *ngIf="changePasswordForm.get('confirmPassword')?.value && !changePasswordForm.hasError('mismatch')" 
-                          class="absolute inset-y-0 right-10 flex items-center text-brand-1 animate-in zoom-in duration-300">
-                        <span class="material-symbols-outlined text-[20px] font-bold">check</span>
-                    </span>
-
-                    <button type="button" (click)="togglePasswordVisibility('confirm')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-brand-1 transition-colors">
-                        <span class="material-symbols-outlined text-lg">{{confirmPasswordVisible() ? 'visibility_off' : 'visibility'}}</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Error/Success Messages -->
-            <div *ngIf="passwordError()" class="p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-3 text-red-600">
-                <span class="material-symbols-outlined">report</span>
-                <p class="text-[11px] font-bold">{{passwordError()}}</p>
-            </div>
-
-            <div *ngIf="passwordSuccess()" class="p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-3 text-emerald-600">
-                <span class="material-symbols-outlined">check_circle</span>
-                <p class="text-[11px] font-bold">{{passwordSuccess()}}</p>
-            </div>
-
-            <button type="submit" 
-                    [disabled]="isPasswordLoading() || passwordSuccess()"
-                    class="w-full bg-brand-1 text-white py-3.5 rounded-xl text-sm font-black uppercase tracking-widest hover:bg-brand-1/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                <span *ngIf="isPasswordLoading()" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                {{isPasswordLoading() ? 'Updating...' : 'Update Password'}}
-            </button>
-        </form>
-    </div>
-</div>
+
