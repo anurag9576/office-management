@@ -17,7 +17,7 @@
                 <div *ngFor="let item of roles()"
                     class="p-5 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-between group/item hover:border-brand-1 transition-all">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl bg-brand-1 text-white flex items-center justify-center font-bold">
+                        <div class="w-12 h-12 rounded-full bg-brand-1 text-white flex items-center justify-center font-black text-xl flex-shrink-0 shadow-md border-2 border-white/20">
                             {{item.name.charAt(0).toUpperCase()}}
                         </div>
                         <div>
@@ -36,7 +36,7 @@
                             title="Edit Role">
                             <span class="material-symbols-outlined text-sm">edit</span>
                         </button>
-                        <button *ngIf="!item.isSystemRole" (click)="deleteRole(item)"
+                        <button *ngIf="item.name !== 'Admin' && item.name !== 'Employee'" (click)="deleteRole(item)"
                             class="p-2 text-slate-400 hover:text-red-500 hover:bg-white rounded-lg transition-all"
                             title="Delete Role">
                             <span class="material-symbols-outlined text-sm">delete</span>

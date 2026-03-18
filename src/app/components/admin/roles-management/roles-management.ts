@@ -24,6 +24,8 @@ export class RolesMgmt {
     { label: 'System Reports', key: 'reports' },
     { label: 'Announcements', key: 'announcement' },
     { label: 'System Settings', key: 'settings' },
+    { label: 'Timesheet Log', key: 'timesheet' },
+    { label: 'Timesheet Admin', key: 'timesheet-admin' },
     { label: 'Employee Profile', key: 'profile' },
     { label: 'Apply Leaves', key: 'leaves' },
     { label: 'View Payroll', key: 'payroll' },
@@ -110,8 +112,8 @@ export class RolesMgmt {
   }
 
   deleteRole(role: any) {
-    if (role.isSystemRole) {
-      alert('System roles cannot be deleted.');
+    if (role.name === 'Admin' || role.name === 'Employee') {
+      alert('System roles (Admin & Employee) cannot be deleted.');
       return;
     }
 

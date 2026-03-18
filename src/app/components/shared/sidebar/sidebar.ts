@@ -36,6 +36,7 @@ export class Sidebar {
     { label: 'Tasks', icon: 'task', route: '/dashboard/tasks', permissionKey: 'tasks' },
     { label: 'Reports', icon: 'analytics', route: '/dashboard/reports', permissionKey: 'reports' },
     { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement', permissionKey: 'announcement' },
+    { label: 'Timesheet Reports', icon: 'pending_actions', route: '/dashboard/timesheet-admin', permissionKey: 'timesheet-admin' },
     { label: 'Settings', icon: 'settings', route: '/dashboard/settings', permissionKey: 'settings' },
   ];
 
@@ -43,6 +44,7 @@ export class Sidebar {
   public employeeNavItems: NavItem[] = [
     { label: 'Dashboard Home', icon: 'dashboard', route: '/dashboard', permissionKey: 'dashboard' },
     { label: 'Profile', icon: 'person', route: '/dashboard/profile', permissionKey: 'profile' },
+    { label: 'Timesheet', icon: 'timer', route: '/dashboard/timesheet', permissionKey: 'timesheet' },
     { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves', permissionKey: 'leaves' },
     { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll', permissionKey: 'payroll' },
     { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement', permissionKey: 'announcement' },
@@ -97,6 +99,7 @@ export class Sidebar {
       next: (res) => {
         if (res.success) {
           this.permissions.set(res.permissions);
+          localStorage.setItem('userPermissions', JSON.stringify(res.permissions));
         }
       },
       error: (err) => {

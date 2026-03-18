@@ -18,6 +18,8 @@ import { SettingsAdmin } from './components/admin/settings/settings';
 import { LeavesAdmin } from './components/admin/leaves-admin/leaves-admin';
 import { PayrollAdmin } from './components/admin/payroll-admin/payroll-admin';
 import { AdminHome } from './components/admin/admin-home/admin-home';
+import { Timesheet } from './components/dashboard/timesheet/timesheet';
+import { TimesheetAdmin } from './components/admin/timesheet-admin/timesheet-admin';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -29,19 +31,21 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', component: DashboardHome, data: { role: 'Employee' } },
-      { path: 'admin-home', component: AdminHome, data: { role: 'Admin' } },
-      { path: 'employees', component: EmployeesMgmt, data: { role: 'Admin' } },
-      { path: 'departments', component: DepartmentsMgmt, data: { role: 'Admin' } },
-      { path: 'roles', component: RolesMgmt, data: { role: 'Admin' } },
-      { path: 'attendance', component: AttendanceMgmt, data: { role: 'Admin' } },
-      { path: 'leaves', component: Leaves }, // Both can see their respective versions
-      { path: 'leaves-admin', component: LeavesAdmin, data: { role: 'Admin' } },
+      { path: 'admin-home', component: AdminHome, data: { role: 'Admin', permission: 'dashboard' } },
+      { path: 'employees', component: EmployeesMgmt, data: { role: 'Admin', permission: 'employees' } },
+      { path: 'departments', component: DepartmentsMgmt, data: { role: 'Admin', permission: 'employees' } },
+      { path: 'roles', component: RolesMgmt, data: { role: 'Admin', permission: 'roles' } },
+      { path: 'attendance', component: AttendanceMgmt, data: { role: 'Admin', permission: 'attendance' } },
+      { path: 'leaves', component: Leaves }, 
+      { path: 'timesheet', component: Timesheet, data: { permission: 'timesheet' } },
+      { path: 'timesheet-admin', component: TimesheetAdmin, data: { role: 'Admin', permission: 'timesheet-admin' } },
+      { path: 'leaves-admin', component: LeavesAdmin, data: { role: 'Admin', permission: 'leaves-admin' } },
       { path: 'announcement', component: Announcement },
       { path: 'payroll', component: Payroll, data: { role: 'Employee' } },
-      { path: 'payroll-admin', component: PayrollAdmin, data: { role: 'Admin' } },
+      { path: 'payroll-admin', component: PayrollAdmin, data: { role: 'Admin', permission: 'payroll-admin' } },
       { path: 'tasks', component: TaskMgmt },
-      { path: 'reports', component: Reports, data: { role: 'Admin' } },
-      { path: 'settings', component: SettingsAdmin, data: { role: 'Admin' } },
+      { path: 'reports', component: Reports, data: { role: 'Admin', permission: 'reports' } },
+      { path: 'settings', component: SettingsAdmin, data: { role: 'Admin', permission: 'settings' } },
       { path: 'profile', component: Profile },
       { path: 'help', component: Help },
     ]

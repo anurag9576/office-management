@@ -75,10 +75,25 @@ export class Login {
           if (token) localStorage.setItem('token', token);
           
           const role = (user.role || '').toLowerCase();
-          const targetPath = role === 'admin' ? '/dashboard/admin-home' : '/dashboard';
           
-          console.log('Navigating to:', targetPath, 'User Role is:', role);
-          this.router.navigateByUrl(targetPath);
+          // Fetch permissions and then navigate
+          this.apiService.getRolePermissions(user.role).subscribe({
+            next: (permRes) => {
+              if (permRes.success) {
+                localStorage.setItem('userPermissions', JSON.stringify(permRes.permissions));
+              }
+              const targetPath = role === 'admin' ? '/dashboard/admin-home' : '/dashboard';
+              console.log('Navigating to:', targetPath, 'User Role is:', role);
+              this.router.navigateByUrl(targetPath);
+            },
+            error: (err) => {
+              console.error('Error fetching permissions during login:', err);
+              // Store default permissions if failed
+              localStorage.setItem('userPermissions', JSON.stringify(['dashboard', 'profile', 'leaves', 'payroll', 'announcement', 'help']));
+              const targetPath = role === 'admin' ? '/dashboard/admin-home' : '/dashboard';
+              this.router.navigateByUrl(targetPath);
+            }
+          });
         },
         error: (err) => {
           this.isLoading = false;

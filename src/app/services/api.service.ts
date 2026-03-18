@@ -204,4 +204,28 @@ export class ApiService {
   getRolePermissions(roleName: string): Observable<any> {
     return this.http.get(`${this.baseUrl}/roles/${roleName}`, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 11. Timesheet Management
+  // ==========================================
+
+  getMyTimesheets(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/timesheets/my`, { headers: this.getHeaders() });
+  }
+
+  getAllTimesheets(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/timesheets/all`, { headers: this.getHeaders() });
+  }
+
+  createTimesheet(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/timesheets`, data, { headers: this.getHeaders() });
+  }
+
+  updateTimesheet(id: string, data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/timesheets/${id}`, data, { headers: this.getHeaders() });
+  }
+
+  deleteTimesheet(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/timesheets/${id}`, { headers: this.getHeaders() });
+  }
 }
