@@ -228,4 +228,12 @@ export class ApiService {
   deleteTimesheet(id: string): Observable<any> {
     return this.http.delete(`${this.baseUrl}/timesheets/${id}`, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 12. Password Management
+  // ==========================================
+
+  changePassword(data: any): Observable<any> {
+    return this.http.put(`${this.baseUrl}/auth/change-password`, data, { headers: this.getHeaders() });
+  }
 }
