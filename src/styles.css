@@ -11,20 +11,20 @@ h1, h2, h3, h4 {
 }
 
 @theme {
-  --color-primary: #3987b7;    /* Brand 1 */
-  --color-secondary: #a0c1d2;  /* Brand 2 */
-  --color-accent: #79a6c5;     /* Brand 3 */
-  --color-info: #6591b4;       /* Brand 4 */
-  --color-dark: #4880a5;       /* Brand 5 */
+  --color-primary: #1895de;    /* Brand 1 (Base) */
+  --color-secondary: #8acaf0;  /* Brand 2 (Light) */
+  --color-accent: #51b0e7;     /* Brand 3 (Medium Light) */
+  --color-info: #1271a6;       /* Brand 4 (Slightly Darker) */
+  --color-dark: #0d4e73;       /* Brand 5 (Darker) */
   
   --color-danger: #dc2626;
 
   /* Brand Colors from Image (Named explicitly) */
-  --color-brand-1: #3987b7;
-  --color-brand-2: #a0c1d2;
-  --color-brand-3: #79a6c5;
-  --color-brand-4: #6591b4;
-  --color-brand-5: #4880a5;
+  --color-brand-1: #1895de;
+  --color-brand-2: #8acaf0;
+  --color-brand-3: #51b0e7;
+  --color-brand-4: #1271a6;
+  --color-brand-5: #0d4e73;
 }
 
 /* Global Custom Scrollbar */

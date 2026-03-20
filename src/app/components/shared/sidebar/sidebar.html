@@ -14,12 +14,8 @@
         class="p-2 md:p-5 flex flex-col items-center justify-center border-b border-white/5 relative z-10 cursor-pointer hover:bg-white/5 transition-all">
 
         <div
-            class="brand-logo mb-0 md:mb-3 w-8 h-8 md:w-14 md:h-14 rounded-lg md:rounded-2xl flex items-center justify-center shadow-2xl transition-all hover:scale-110 duration-500 bg-gradient-to-br from-brand-1 to-brand-4 relative overflow-hidden ring-1 md:ring-4 ring-white/10">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 md:w-8 md:h-8 text-white relative z-10" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m4 0h4" />
-            </svg>
+            class="brand-logo mb-0 md:mb-3 w-8 h-8 md:w-18 md:h-14 flex items-center justify-center transition-all hover:scale-110 duration-500 relative">
+            <img src="/logo.png" alt="Logo" class="max-w-full max-h-full object-contain drop-shadow-md" />
         </div>
         <h1 *ngIf="!isCollapsed()"
             class="text-[14px] font-bold text-white tracking-[0.2em] uppercase text-center truncate w-full animate-fade-in">
@@ -183,4 +179,4 @@
         </div>
     </div>
 </aside>
-
+

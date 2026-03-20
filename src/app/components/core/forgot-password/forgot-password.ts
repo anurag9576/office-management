@@ -21,6 +21,45 @@ export class ForgotPassword {
     });
   }
 
+  removeWhiteBg(event: Event) {
+    const img = event.target as HTMLImageElement;
+    if (img.getAttribute('data-processed')) return;
+    
+    // Create a canvas to process the image
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) return;
+    
+    canvas.width = img.naturalWidth || img.width || 200;
+    canvas.height = img.naturalHeight || img.height || 200;
+    
+    try {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+      
+      for (let i = 0; i < data.length; i += 4) {
+        // The blue logo is roughly R:24, G:149, B:222
+        // Any pixel that is relatively light/grey (R, G, B > 150) is background
+        if (data[i] > 150 && data[i+1] > 150 && data[i+2] > 150) {
+          data[i+3] = 0; // completely transparent!
+        } else if (data[i] > 100 && data[i+1] > 100 && data[i+2] > 100) {
+            // Anti-aliasing edges - make them semi-transparent
+            data[i+3] = 100;
+        }
+      }
+      
+      ctx.putImageData(imgData, 0, 0);
+      img.setAttribute('data-processed', 'true');
+      img.src = canvas.toDataURL('image/png');
+    } catch (e) {
+      console.error('Canvas processing failed:', e);
+      // Fallback CSS trick if canvas is tainted
+      img.style.mixBlendMode = 'multiply';
+      img.style.filter = 'contrast(1.5) brightness(1.2)';
+    }
+  }
+
   onSubmit() {
     if (this.forgotPasswordForm.valid) {
       this.isLoading = true;

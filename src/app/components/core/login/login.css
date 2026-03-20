@@ -22,9 +22,7 @@
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
-.brand-logo {
-  box-shadow: 0 4px 15px rgba(57, 135, 183, 0.4);
-}
+
 
 .bg-pattern {
   transition: all 5s ease-in-out;

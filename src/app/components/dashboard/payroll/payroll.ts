@@ -59,6 +59,8 @@ export class Payroll implements OnInit {
         if (res.success) {
           const formattedData = res.data.map((p: any) => {
             const paymentDate = p.paymentDate ? new Date(p.paymentDate) : new Date();
+            const earnArr = p.earnings || [];
+            const calcG = earnArr.reduce((sum: number, e: any) => sum + (Number(e.amount) || 0), 0);
             return {
               ...p,
               month: p.month || paymentDate.toLocaleString('default', { month: 'long' }),
@@ -67,9 +69,9 @@ export class Payroll implements OnInit {
               status: p.status || 'Paid',
               date: paymentDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
               amount: `₹${(p.netAmount || 0).toLocaleString()}`,
-              gross: `₹${(p.grossAmount || 0).toLocaleString()}`,
+              gross: `₹${(p.grossAmount || calcG || 0).toLocaleString()}`,
               deductions: `₹${(p.totalDeductions || 0).toLocaleString()}`,
-              earnings: p.earnings ? p.earnings.map((e: any) => ({ label: e.label, amount: `₹${(e.amount || 0).toLocaleString()}` })) : [],
+              earnings: earnArr.map((e: any) => ({ label: e.label, amount: `₹${(e.amount || 0).toLocaleString()}` })),
               deductionsList: p.deductionsList ? p.deductionsList.map((d: any) => ({ label: d.label, amount: `₹${(d.amount || 0).toLocaleString()}` })) : []
             };
           });
@@ -136,35 +138,47 @@ export class Payroll implements OnInit {
     const doc = new jsPDF();
     const user = this.currentUser() || JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-    const logoUrl = '/logo-hamsa.png';
+    const logoUrl = '/logo.png';
     const img = new Image();
     img.src = logoUrl;
 
     img.onload = () => {
       // 1. Header & Company Branding
-      // Brand 5: #4880a5 (Dark Blue)
-      doc.setFillColor(72, 128, 165); 
+      // Brand 5: #2c9be6ff (Dark Blue)
+      // White Background for professional look
+      doc.setFillColor(255, 255, 255); 
       doc.rect(0, 0, 210, 45, 'F');
       
-      // Add White Background for Logo to make it visible
+      // Divider line using brand blue
+      doc.setDrawColor(72, 128, 165);
+      doc.setLineWidth(0.5);
+      doc.line(0, 45, 210, 45);
+      
       try {
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(12, 8, 36, 29, 3, 3, 'F');
-        doc.addImage(img, 'PNG', 15, 10, 30, 25);
+        // Logo without the white box background needed now
+        doc.addImage(img, 'PNG', 18, 10, 24, 20);
+        
+        // Tagline under logo (Larger & Black)
+        doc.setFontSize(9);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Passion for discover possibilities', 30, 40, { align: 'center' });
       } catch (e) {
         console.error("Logo failed to load", e);
       }
-
-      doc.setTextColor(255, 255, 255);
+      
+      // Header Text in Black
+      doc.setTextColor(0, 0, 0);
       doc.setFontSize(22);
       doc.setFont('helvetica', 'bold');
-      doc.text('HAMSA OFFICE MANAGEMENT', 115, 25, { align: 'center' });
+      doc.text('Hamsa Hitech Pvt. Ltd.', 115, 18, { align: 'center' });
       
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
-      doc.text('Official Monthly Salary Statement', 115, 33, { align: 'center' });
-      doc.setFontSize(8);
-      doc.text('Employee Excellence & Professional Growth', 115, 38, { align: 'center' });
+      doc.text([
+        '208, Shree residency, Near lakshmi mata mandir,',
+        'Balewadi, Pune-411045.',
+        'Website: www.hamsahitech.com'
+      ], 115, 26, { align: 'center' });
 
       // Continue with rest of the PDF
       this.generatePdfRest(doc, stub, user);
@@ -172,100 +186,198 @@ export class Payroll implements OnInit {
 
     img.onerror = () => {
       // Fallback if logo fails
-      doc.setFillColor(72, 128, 165); 
+      // Fallback: White Background Header
+      doc.setFillColor(255, 255, 255); 
       doc.rect(0, 0, 210, 45, 'F');
-      doc.setTextColor(255, 255, 255);
+      
+      // Divider line
+      doc.setDrawColor(72, 128, 165);
+      doc.setLineWidth(0.5);
+      doc.line(0, 45, 210, 45);
+      
+      doc.setTextColor(0, 0, 0);
       doc.setFontSize(24);
       doc.setFont('helvetica', 'bold');
-      doc.text('HAMSA OFFICE MANAGEMENT', 105, 25, { align: 'center' });
+      doc.text('Hamsa Hitech Pvt. Ltd.', 105, 18, { align: 'center' });
+      
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text([
+        '208, Shree residency, Near lakshmi mata mandir,',
+        'Balewadi, Pune-411045.',
+        'Website: www.hamsahitech.com'
+      ], 105, 26, { align: 'center' });
+      
+      // Tagline under logo area (Black)
+      doc.setFontSize(9);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Passion for discover possibilities', 30, 40, { align: 'center' });
+      
       this.generatePdfRest(doc, stub, user);
     };
   }
-
   generatePdfRest(doc: jsPDF, stub: any, user: any) {
-    const replaceRupee = (val: string) => val ? val.replace('₹', 'Rs. ') : val;
-    const earningsBody = stub.earnings.map((e: any) => [e.label, replaceRupee(e.amount)]);
-    const deductionsBody = stub.deductionsList.map((d: any) => [d.label, replaceRupee(d.amount)]);
+    const formatAmt = (val: any) => {
+      if (!val) return '0.00';
+      const num = Number(String(val).replace(/[^0-9.]/g,'')) || 0;
+      return num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+    const earningsBody = stub.earnings ? stub.earnings.map((e: any) => [
+      e.label, 
+      formatAmt(e.actualAmount || e.amount), 
+      formatAmt(e.amount)
+    ]) : [];
+    const deductionsBody = stub.deductionsList ? stub.deductionsList.map((d: any) => [d.label, formatAmt(d.amount)]) : [];
 
-    // 2. Employee & Payslip Info
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(14);
-    doc.text(`PAYSLIP: ${stub.month.toUpperCase()}`, 15, 55);
-    
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text('Employee Name:', 15, 65);
-    doc.text('Employee ID:', 15, 72);
-    doc.text('Designation:', 15, 79);
-    doc.text('Payment Date:', 15, 86);
+    // Helper to format date to 1-Oct-25
+    const formatDate = (date: any) => {
+      if (!date) return 'N/A';
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return 'N/A';
+      const day = d.getDate();
+      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const month = monthNames[d.getMonth()];
+      const year = d.getFullYear().toString().slice(-2);
+      return `${day}-${month}-${year}`;
+    };
 
-    doc.setTextColor(0, 0, 0);
-    // Prioritize name from the payroll data if it exists, otherwise use localized name
-    const fullName = stub.employeeName || user.name || (user.firstName + ' ' + (user.lastName || '')).trim();
-    doc.text(fullName, 50, 65);
-    doc.text(`${user.employeeId || stub.employeeId || 'N/A'}`, 50, 72);
-    doc.text(`${stub.designation || user.designation || 'Staff'}`, 50, 79);
-    doc.text(`${stub.date}`, 50, 86);
-
-    doc.setTextColor(100, 100, 100);
-    doc.text('Statement Period:', 120, 65);
-    doc.text('Status:', 120, 72);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`${stub.period}`, 155, 65);
+    // 2. Payslip header title bar
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(0);
+    doc.rect(10, 50, 190, 8); 
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(5, 150, 105); // Green for Paid status
-    doc.text(`${stub.status}`, 155, 72);
+    doc.setFontSize(10);
+    const displayMonth = (stub.month || new Date().toLocaleString('default', { month: 'long' })).toUpperCase();
+    const displayYear = stub.year || new Date().getFullYear();
+    const titleText = `SALARY SLIP FOR THE MONTH ${displayMonth} ${displayYear}`;
+    doc.text(titleText, 105, 55.5, { align: 'center' });
+    const lineXOffset = (doc as any).getTextWidth(titleText) / 2;
+    doc.line(105 - lineXOffset, 56.5, 105 + lineXOffset, 56.5); // Underline
+
+    // 3. Employee Info Grid Box
+    doc.rect(10, 58, 190, 50); 
+    const rowY = (index: number) => 68 + (index * 8);
+    const fullName = stub.employeeName || user.name || (user.firstName + ' ' + (user.lastName || '')).trim();
+
+    // Left Column
+    doc.setFont('helvetica', 'bold');
+    doc.text('Employee Code', 15, rowY(0));
+    doc.text('Joining Date', 15, rowY(1));
+    doc.text('Designation', 15, rowY(2));
+    doc.text('Day Present', 15, rowY(3));
+    doc.text('Total Days', 15, rowY(4));
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${user.employeeId || stub.employeeId || 'N/A'}`, 50, rowY(0));
+    doc.text(`${formatDate(user.joiningDate)}`, 50, rowY(1));
+    doc.text(`${stub.designation || user.designation || 'N/A'}`, 50, rowY(2));
+    // Automatic calendar day calculation for accurate monthly stats
+    const getActualDaysInMonth = (monthName: string, yearNum: number) => {
+      const monthList = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+      const upperName = (monthName || '').toUpperCase();
+      const mIndex = monthList.findIndex(m => upperName.startsWith(m) || upperName.includes(m));
+      return mIndex !== -1 ? new Date(yearNum, mIndex + 1, 0).getDate() : 30;
+    };
+
+    const monthStr = stub.month || 'January';
+    const yearNum = Number(stub.year || new Date().getFullYear());
+    
+    // Prioritize backend record for days, fallback to calendar calculation for missing data
+    const totalDaysNum = Number(stub.totalDays || stub.total_days || stub.days_in_month || getActualDaysInMonth(monthStr, yearNum));
+    const absentDaysNum = Number(stub.absentDays || stub.days_absent || stub.leaves || stub.leavesTaken || 0);
+    // Use specific backend present count if available, otherwise calculate (max out at total month days)
+    const rawPresent = stub.presentDays || stub.days_present || stub.workingDays || (totalDaysNum - absentDaysNum);
+    const presentDaysNum = Math.min(Number(rawPresent), totalDaysNum);
+
+    doc.text(`${presentDaysNum}`, 50, rowY(3));
+    doc.text(`${totalDaysNum}`, 50, rowY(4));
+
+    // Right Column
+    doc.setFont('helvetica', 'bold');
+    doc.text('Employee Name', 115, rowY(0));
+    doc.text('Confirmation Date', 115, rowY(1));
+    doc.text('Department', 115, rowY(2));
+    doc.text('Days Absent', 115, rowY(3));
+    doc.setFont('helvetica', 'normal');
+    doc.text(fullName, 155, rowY(0));
+    doc.text(`${formatDate(user.confirmationDate)}`, 155, rowY(1));
+    doc.text(`${user.role || user.department || 'N/A'}`, 155, rowY(2));
+    doc.text(`${absentDaysNum}`, 155, rowY(3));
     doc.setFont('helvetica', 'normal');
 
     // 3. Earnings & Deductions Tables
     // Variables already declared at top of function
     
+    // Total Earnings Calculation for Gross Salary display
+    const calcGrossVal = (eList: any[]) => {
+      const total = eList?.reduce((sum, e) => {
+        const val = Number(e.amount?.replace(/[^0-9.]/g,'') || 0);
+        return sum + val;
+      }, 0) || 0;
+      return formatAmt(total);
+    };
+
+    const finalGross = calcGrossVal(stub.earnings);
+
     // Earnings Table
     autoTable(doc, {
-      startY: 100,
-      head: [['Earnings Description', 'Amount']],
+      startY: 115,
+      head: [['Earnings Description', 'Actual', 'Earned']],
       body: [
-        ['Gross Salary', replaceRupee(stub.gross)],
-        ...earningsBody
+        ...earningsBody,
+        ['Gross Salary', finalGross, finalGross]
       ],
       theme: 'grid',
       headStyles: { fillColor: [72, 128, 165], textColor: 255, fontStyle: 'bold' }, 
       styles: { fontSize: 9, cellPadding: 3 },
-      margin: { left: 15, right: 110 }
+      columnStyles: { 1: { halign: 'right' }, 2: { halign: 'right' } },
+      margin: { left: 5, right: 108 }
     });
 
     // Deductions Table
     autoTable(doc, {
-      startY: 100,
+      startY: 115,
       head: [['Deductions Description', 'Amount']],
       body: [
-        ['Total Deductions', `- ${replaceRupee(stub.deductions)}`],
-        ...deductionsBody
+        ...deductionsBody,
+        ['Total Deductions', `- ${formatAmt(stub.deductions)}`]
       ],
       theme: 'grid',
       headStyles: { fillColor: [225, 29, 72], textColor: 255, fontStyle: 'bold' }, 
       styles: { fontSize: 9, cellPadding: 3 },
-      margin: { left: 110, right: 15 }
+      columnStyles: { 1: { halign: 'right' } },
+      margin: { left: 108, right: 5 }
     });
 
     // 4. Summary & Net Amount
-    const finalY = (doc as any).lastAutoTable.finalY + 20;
+    const finalY = (doc as any).lastAutoTable.finalY + 15;
     
-    doc.setDrawColor(200, 200, 200);
-    doc.line(15, finalY, 195, finalY);
-
-    doc.setFontSize(18);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.text('NET PAYABLE:', 15, finalY + 15);
-    doc.setTextColor(72, 128, 165); // Brand Dark Blue
-    doc.text(`${replaceRupee(stub.amount)}`, 65, finalY + 15);
+    doc.setTextColor(0, 0, 0);
+    const netLabel = 'Net Payable Salary:  ';
+    const netVal = `${formatAmt(stub.amount)}`;
+    const rightEdge = 200;
+    doc.text(netVal, rightEdge - 5, finalY, { align: 'right' });
+    doc.text(netLabel, rightEdge - 5 - doc.getTextWidth(netVal), finalY, { align: 'right' });
 
-    doc.setFontSize(9);
+    // 5. Signature Section
+    const sigY = finalY + 10;
+    doc.setLineWidth(0.5);
+    doc.setDrawColor(0);
+    doc.rect(10, sigY, 190, 20); // Signature box
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Head (Accounting)', 12, sigY + 8);
+    doc.text('(Signature & Company Seal)', 12, sigY + 15);
+
+    doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.setFont('helvetica', 'italic');
-    doc.text('* This is a computer-generated document and does not require a physical signature.', 105, finalY + 30, { align: 'center' });
+    doc.text('* This is a computer-generated document and does not require a physical signature.', 105, sigY + 28, { align: 'center' });
 
-    // 5. Save the PDF
+    // 6. Save the PDF
     doc.save(`Payslip_${stub.month.replace(' ', '_')}.pdf`);
   }
 }
