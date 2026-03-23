@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { environment } from '../../../../environments/environment';
+import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-profile',
@@ -42,17 +43,78 @@ export class Profile implements OnInit {
     }
   });
 
-  sharedDocuments = signal<any[]>([]);
+  myDocuments = signal<any[]>([]);
+  templates = signal<any[]>([]);
 
   showModal = signal(false);
+  showRequestModal = signal(false);
   editSection = signal<string>('');
   tempEmployee: any = {};
   isLoading = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
 
+  requestForm = {
+    documentName: '',
+    message: ''
+  };
+
   ngOnInit() {
     this.loadProfile();
+    this.loadTemplates();
+  }
+
+  loadTemplates() {
+    this.apiService.getDocumentTemplates().subscribe({
+      next: (res) => {
+        if (res.success) this.templates.set(res.data);
+      },
+      error: (err) => console.error('Error loading templates:', err)
+    });
+  }
+
+  openRequestModal() {
+    this.requestForm = { documentName: '', message: '' };
+    this.errorMessage.set('');
+    this.showRequestModal.set(true);
+  }
+
+  submitRequest() {
+    if (!this.requestForm.documentName?.trim()) {
+      this.errorMessage.set('Please provide a document type or name.');
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    const docName = this.requestForm.documentName.trim();
+    // Check if entered text matches a template exactly (case-insensitive)
+    const matchedTemplate = this.templates().find(
+      t => t.name.toLowerCase() === docName.toLowerCase()
+    );
+
+    const payload: any = { message: this.requestForm.message };
+    
+    if (matchedTemplate) {
+      payload.templateId = matchedTemplate._id;
+    } else {
+      payload.customDocumentName = docName;
+    }
+
+    this.apiService.requestDocument(payload).subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.showSuccess('Request submitted successfully!');
+          this.showRequestModal.set(false);
+          this.requestForm = { documentName: '', message: '' };
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        this.errorMessage.set(err.error?.message || 'Error submitting request');
+        this.isLoading.set(false);
+      }
+    });
   }
 
   loadProfile() {
@@ -83,25 +145,9 @@ export class Profile implements OnInit {
           joinDate: joinDateFormatted,
           location: data.location || 'Baner, Pune' // Default location
         });
-        // Set dummy documents that point to our real backend public folder
-        this.sharedDocuments.set([
-          { 
-            name: 'Joining_Letter.pdf', 
-            sender: 'HR Department',
-            size: '1.2 MB', 
-            icon: 'description',
-            date: '05 Jan 2025', 
-            url: `${this.serverUrl}/docs/Joining_Letter.pdf` 
-          },
-          { 
-            name: 'Code_of_Conduct.pdf', 
-            sender: 'Admin',
-            size: '2.4 MB', 
-            icon: 'policy',
-            date: '12 Feb 2025', 
-            url: `${this.serverUrl}/docs/Code_of_Conduct.pdf` 
-          }
-        ]);
+        
+        // Fetch real documents from API
+        this.loadMyDocuments();
 
         this.isLoading.set(false);
         
@@ -120,6 +166,108 @@ export class Profile implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  loadMyDocuments() {
+    this.apiService.getMyDocuments().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.myDocuments.set(res.data);
+        }
+      },
+      error: (err) => console.error('Error loading documents:', err)
+    });
+  }
+
+  async getBase64ImageFromUrl(imageUrl: string): Promise<string> {
+    const res = await fetch(imageUrl);
+    const blob = await res.blob();
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async downloadPDF(doc: any) {
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    
+    // Add border
+    pdf.setDrawColor(13, 78, 115); // Brand color 1
+    pdf.setLineWidth(1);
+    pdf.rect(5, 5, 200, 287);
+    
+    // Header - New Format
+    try {
+      const logoBase64 = await this.getBase64ImageFromUrl('/logo.png');
+      pdf.addImage(logoBase64, 'PNG', 24, 14, 22, 18); // Logo centered around X=35
+    } catch(e) {
+      console.error('Failed to load logo', e);
+      // Fallback
+      pdf.setFillColor(0, 133, 202); 
+      pdf.roundedRect(26, 14, 18, 18, 2, 2, 'F');
+      pdf.setFontSize(22);
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('H', 35, 27, { align: 'center' });
+    }
+
+    // Tagline under logo
+    pdf.setFontSize(8);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('Passion for discover possibilities', 35, 36, { align: 'center' });
+
+    // Company Name & Info (Centered safely on the right block)
+    const rightCenterX = 125;
+    
+    pdf.setFontSize(22);
+    pdf.setTextColor(0, 0, 0);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Hamsa Hitech Pvt. Ltd.', rightCenterX, 20, { align: 'center' });
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(20, 20, 20);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('208, Shree residency, Near lakshmi mata mandir,', rightCenterX, 26, { align: 'center' });
+    pdf.text('Balewadi, Pune-411045.', rightCenterX, 31, { align: 'center' });
+    pdf.text('Website: www.hamsahitech.com', rightCenterX, 36, { align: 'center' });
+    
+    // Bottom separator line
+    pdf.setDrawColor(200);
+    pdf.line(10, 42, 200, 42);
+    
+    // Document Title
+    pdf.setFontSize(16);
+    pdf.setTextColor(30);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text(doc.documentTitle.toUpperCase(), 105, 55, { align: 'center' });
+    
+    // Content
+    pdf.setFontSize(11);
+    pdf.setTextColor(60);
+    pdf.setFont('helvetica', 'normal');
+    
+    // Split text into lines for multi-line support
+    const splitText = pdf.splitTextToSize(doc.generatedContent, 170);
+    pdf.text(splitText, 20, 75);
+    
+    // Footer
+    const footerY = 250;
+    pdf.setDrawColor(200);
+    pdf.line(20, footerY - 5, 190, footerY - 5);
+    
+    pdf.setFontSize(9);
+    pdf.setTextColor(150);
+    pdf.text('Date of Issue: ' + new Date(doc.issuedDate).toLocaleDateString(), 20, footerY);
+    pdf.text('Issued by: Administrative Office', 190, footerY, { align: 'right' });
+    
+    pdf.setFontSize(8);
+    pdf.text('This is an electronically generated document. No signature required.', 105, footerY + 10, { align: 'center' });
+    
+    // Download
+    pdf.save(`${doc.documentTitle.replace(' ', '_')}.pdf`);
   }
 
   showSuccess(msg: string) {
@@ -222,23 +370,6 @@ export class Profile implements OnInit {
         }
       };
       reader.readAsDataURL(file);
-    }
-  }
-
-  downloadDoc(url: string) {
-    if (url) {
-      alert("Downloading document... " + url.split('/').pop());
-      // Primary method: Open in new tab
-      window.open(url, '_blank');
-      
-      // Fallback: Create a hidden link and click it
-      const link = document.createElement('a');
-      link.href = url;
-      link.target = '_blank';
-      link.download = url.split('/').pop() || 'document.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
     }
   }
 }

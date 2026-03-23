@@ -26,6 +26,7 @@ export class RolesMgmt {
     { label: 'System Settings', key: 'settings' },
     { label: 'Timesheet Log', key: 'timesheet' },
     { label: 'Timesheet Admin', key: 'timesheet-admin' },
+    { label: 'Documents Mgmt', key: 'documents' },
     { label: 'Employee Profile', key: 'profile' },
     { label: 'Apply Leaves', key: 'leaves' },
     { label: 'View Payroll', key: 'payroll' },

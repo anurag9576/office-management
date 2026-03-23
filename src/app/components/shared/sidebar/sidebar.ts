@@ -33,11 +33,12 @@ export class Sidebar {
     { label: 'Roles Mgmt', icon: 'manage_accounts', route: '/dashboard/roles', permissionKey: 'roles' },
     { label: 'Attendance', icon: 'event_available', route: '/dashboard/attendance', permissionKey: 'attendance' },
     { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin', permissionKey: 'leaves-admin' },
+    { label: 'Timesheet Reports', icon: 'pending_actions', route: '/dashboard/timesheet-admin', permissionKey: 'timesheet-admin' },
+    { label: 'Docs Mgmt', icon: 'content_paste', route: '/dashboard/documents-admin', permissionKey: 'documents' },
     { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll-admin', permissionKey: 'payroll-admin' },
     { label: 'Tasks', icon: 'task', route: '/dashboard/tasks', permissionKey: 'tasks' },
     { label: 'Reports', icon: 'analytics', route: '/dashboard/reports', permissionKey: 'reports' },
     { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement', permissionKey: 'announcement' },
-    { label: 'Timesheet Reports', icon: 'pending_actions', route: '/dashboard/timesheet-admin', permissionKey: 'timesheet-admin' },
     { label: 'Settings', icon: 'settings', route: '/dashboard/settings', permissionKey: 'settings' },
   ];
 

@@ -237,4 +237,45 @@ export class ApiService {
   changePassword(data: any): Observable<any> {
     return this.http.put(`${this.baseUrl}/auth/change-password`, data, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 13. Document Management
+  // ==========================================
+
+  getDocumentTemplates(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/documents/templates`, { headers: this.getHeaders() });
+  }
+
+  createDocumentTemplate(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/documents/templates`, data, { headers: this.getHeaders() });
+  }
+
+  issueDocument(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/documents/issue`, data, { headers: this.getHeaders() });
+  }
+
+  getMyDocuments(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/documents/my`, { headers: this.getHeaders() });
+  }
+
+  getAllIssuedDocuments(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/documents/issued-all`, { headers: this.getHeaders() });
+  }
+
+  // Document Requests
+  requestDocument(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/documents/request`, data, { headers: this.getHeaders() });
+  }
+
+  getMyRequests(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/documents/my-requests`, { headers: this.getHeaders() });
+  }
+
+  getAllRequests(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/documents/requests-all`, { headers: this.getHeaders() });
+  }
+
+  updateRequestStatus(id: string, status: string): Observable<any> {
+    return this.http.put(`${this.baseUrl}/documents/request/${id}`, { status }, { headers: this.getHeaders() });
+  }
 }
