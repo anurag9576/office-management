@@ -15,7 +15,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const expectedRole = route.data['role'];
   const requiredPermission = route.data['permission'];
 
-  console.log('AuthGuard checking path:', state.url, 'Role:', role, 'Expected:', expectedRole, 'Permission:', requiredPermission);
+  // console.log('AuthGuard checking path:', state.url, 'Role:', role, 'Expected:', expectedRole, 'Permission:', requiredPermission);
 
   // Admins have bypass for everything
   if (role === 'admin') {
