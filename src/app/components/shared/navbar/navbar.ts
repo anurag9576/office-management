@@ -11,7 +11,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 
 @Component({
   selector: 'app-navbar',
-  standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
@@ -67,8 +66,8 @@ export class Navbar implements OnInit, OnDestroy {
   ngOnInit() {
     this.loadUserInfo();
     this.loadNotifications();
-    // Poll every 30 seconds
-    this.pollingSubscription = interval(30000).subscribe(() => {
+    // Poll every 60 seconds
+    this.pollingSubscription = interval(60000).subscribe(() => {
       this.loadNotifications();
     });
 

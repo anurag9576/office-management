@@ -94,8 +94,6 @@ export class Sidebar {
         const avatar = parsedUser.avatar || null;
 
         this.user.set({ name, role, initials, avatar: this.getFullAvatarUrl(avatar) });
-        console.log('Sidebar loaded user:', name, 'Role:', role);
-        
         this.loadPermissions(role);
       } catch (e) {
         console.error('Error parsing user data', e);

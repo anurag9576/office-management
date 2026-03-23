@@ -1,4 +1,7 @@
-<div class="dashboard-layout h-screen flex overflow-hidden bg-brand-5">
+<div class="dashboard-layout h-screen flex overflow-hidden bg-brand-5 relative">
+    <!-- Blocking Modal (Full Screen) -->
+    <app-change-password-modal *ngIf="showChangePasswordModal()" (passwordChanged)="onPasswordChanged()"></app-change-password-modal>
+
     <!-- Sidebar -->
     <app-sidebar></app-sidebar>
 

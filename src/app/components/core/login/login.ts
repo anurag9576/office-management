@@ -104,6 +104,7 @@ export class Login {
             // Priority: existing name -> combined firstName+lastName -> email part
             name: userResponse.fullName || userResponse.name || (fName && lName ? `${fName} ${lName}` : (fName || lName || emailPart)),
             initials: ((fName[0] || '') + (lName[0] || emailPart[0] || 'U')).toUpperCase(),
+            passwordChanged: userResponse.passwordChanged ?? false,
             token: token 
           };
           
@@ -122,7 +123,7 @@ export class Login {
                 localStorage.setItem('userPermissions', JSON.stringify(permRes.permissions));
               }
               const targetPath = role === 'admin' ? '/dashboard/admin-home' : '/dashboard';
-              console.log('Navigating to:', targetPath, 'User Role is:', role);
+              // console.log('Navigating to:', targetPath, 'User Role is:', role);
               this.router.navigateByUrl(targetPath);
             },
             error: (err) => {
