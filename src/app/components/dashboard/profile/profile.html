@@ -175,52 +175,58 @@
             <!-- Column 2 & 3: Official Data & Shared Resources -->
             <div class="lg:col-span-2 space-y-8">
 
-                <!-- 📂 Shared Documents Section (Premium) -->
+                <!-- 📂 Official Documents Section (Dynamic) -->
                 <div
                     class="profile-card p-6 sm:p-10 rounded-[2.5rem] bg-white shadow-xl border border-slate-100 flex flex-col h-full">
-                    <div class="flex items-center justify-between mb-10">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
                         <div>
-                            <h3 class="text-2xl font-black text-slate-900 tracking-tighter">Official Resources</h3>
-                            <p
-                                class="text-[10px] font-normal text-slate-600 uppercase tracking-[0.2em] mt-1.5 opacity-70">
+                            <h3 class="text-2xl font-extrabold text-slate-900 tracking-tighter">Official Resources</h3>
+                            <p class="text-[10px] font-normal text-slate-600 uppercase tracking-[0.2em] mt-1.5 opacity-70">
                                 Protected documents from Authority</p>
                         </div>
-                        <div class="flex -space-x-3">
-                            <div
-                                class="w-10 h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-600 shadow-sm">
-                                HR</div>
-                            <div
-                                class="w-10 h-10 rounded-full border-2 border-white bg-purple-100 flex items-center justify-center text-[10px] font-black text-purple-600 shadow-sm">
-                                AD</div>
-                            <div
-                                class="w-10 h-10 rounded-full border-2 border-white bg-emerald-100 flex items-center justify-center text-[10px] font-black text-emerald-600 shadow-sm">
-                                MN</div>
+                        <div class="flex items-center gap-5">
+                            <div class="hidden sm:flex -space-x-3">
+                                <div
+                                    class="w-10 h-10 rounded-full border-2 border-white bg-blue-100 flex items-center justify-center text-[10px] font-black text-blue-600 shadow-sm">
+                                    HR</div>
+                                <div
+                                    class="w-10 h-10 rounded-full border-2 border-white bg-purple-100 flex items-center justify-center text-[10px] font-black text-purple-600 shadow-sm">
+                                    AD</div>
+                                <div
+                                    class="w-10 h-10 rounded-full border-2 border-white bg-emerald-100 flex items-center justify-center text-[10px] font-black text-emerald-600 shadow-sm">
+                                    MN</div>
+                            </div>
+                            <button (click)="openRequestModal()"
+                                class="px-4 py-2 bg-brand-1 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-brand-5 transition-all shadow-md shadow-brand-1/20 flex items-center gap-1.5 group whitespace-nowrap">
+                                <span class="material-symbols-outlined text-[14px] group-hover:rotate-12 transition-transform">add_circle</span>
+                                New Doc
+                            </button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div *ngFor="let doc of sharedDocuments()"
+                        <div *ngFor="let doc of myDocuments()"
                             class="group p-5 bg-slate-50/50 hover:bg-white hover:shadow-2xl hover:shadow-brand-1/10 rounded-3xl border border-slate-100 transition-all duration-500 flex flex-col justify-between min-h-[140px]">
                             <div class="flex items-start justify-between">
                                 <div
                                     class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-brand-1 group-hover:scale-110 transition-all shadow-sm">
-                                    <span class="material-symbols-outlined text-[32px]">{{doc.icon}}</span>
+                                    <span class="material-symbols-outlined text-[32px]">description</span>
                                 </div>
                                 <span
-                                    class="px-2 py-1 bg-white border border-slate-100 rounded-lg text-[8px] font-black text-slate-400 uppercase tracking-widest shadow-sm">{{doc.size}}</span>
+                                    class="px-2 py-1 bg-white border border-slate-100 rounded-lg text-[8px] font-black text-slate-400 uppercase tracking-widest shadow-sm">PDF</span>
                             </div>
 
                             <div class="mt-4">
                                 <h4
                                     class="text-sm font-black text-slate-800 line-clamp-1 group-hover:text-brand-1 transition-colors">
-                                    {{doc.name}}</h4>
+                                    {{doc.documentTitle}}</h4>
                                 <div class="flex items-center justify-between mt-3">
                                     <div class="flex flex-col">
                                         <span
-                                            class="text-[9px] font-black text-brand-3 uppercase tracking-wider">{{doc.sender}}</span>
-                                        <span class="text-[9px] font-bold text-slate-400 mt-0.5">{{doc.date}}</span>
+                                            class="text-[9px] font-black text-brand-3 uppercase tracking-wider">Admin Office</span>
+                                        <span class="text-[9px] font-bold text-slate-400 mt-0.5">{{doc.issuedDate | date:'mediumDate'}}</span>
                                     </div>
-                                    <button (click)="downloadDoc(doc.url)"
+                                    <button (click)="downloadPDF(doc)"
                                         class="w-9 h-9 bg-brand-5 text-white rounded-xl flex items-center justify-center hover:bg-brand-1 transition-all shadow-lg active:scale-90">
                                         <span class="material-symbols-outlined text-[18px]">download</span>
                                     </button>
@@ -229,7 +235,7 @@
                         </div>
                     </div>
 
-                    <div *ngIf="sharedDocuments().length === 0"
+                    <div *ngIf="myDocuments().length === 0"
                         class="flex-1 flex flex-col items-center justify-center py-20 grayscale opacity-40">
                         <span class="material-symbols-outlined text-6xl mb-4">folder_off</span>
                         <p class="text-xs font-black uppercase tracking-[0.3em]">Vault Empty</p>
@@ -383,3 +389,53 @@
             </div>
         </div>
     </div>
+
+    <!-- 📜 Document Request Modal -->
+    <div *ngIf="showRequestModal()"
+        class="fixed inset-0 z-[11000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
+        <div class="relative bg-white w-full max-w-[400px] rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            <!-- Close Button -->
+            <button (click)="showRequestModal.set(false)" 
+                class="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-slate-50 hover:bg-slate-200 text-slate-400 rounded-full transition-colors z-10 cursor-pointer text-sm">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+
+            <div class="p-7 space-y-5">
+                <div class="pr-8">
+                    <h2 class="text-xl font-extrabold text-slate-800 tracking-tight italic uppercase drop-shadow-sm leading-none">Request Document</h2>
+                    <p class="text-[9px] font-bold text-slate-400/80 uppercase tracking-widest mt-2 leading-relaxed">Select or type the document type you need.</p>
+                </div>
+
+                <!-- Error Message -->
+                <div *ngIf="errorMessage()" class="p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg text-red-600 text-[10px] font-bold">
+                    {{ errorMessage() }}
+                </div>
+
+                <div class="space-y-4">
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-black text-[#84a3b8] uppercase tracking-[0.1em] ml-1">Document Type</label>
+                        <input list="documentTemplates" [(ngModel)]="requestForm.documentName" placeholder="e.g. Experience Certificate"
+                            class="w-full px-5 py-3 bg-slate-50/50 border-2 border-slate-100 focus:border-[#38bdf8] rounded-2xl text-[11px] font-bold text-slate-700 outline-none transition-all cursor-text placeholder:text-slate-300">
+                        <datalist id="documentTemplates">
+                            <option *ngFor="let temp of templates()" [value]="temp.name"></option>
+                        </datalist>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-black text-[#84a3b8] uppercase tracking-[0.1em] ml-1">Reason (Optional)</label>
+                        <textarea [(ngModel)]="requestForm.message" rows="2" placeholder="I need this document for..."
+                            class="w-full px-5 py-3 bg-slate-50/50 border-2 border-slate-100 focus:border-[#38bdf8] rounded-2xl text-[11px] font-bold text-slate-700 outline-none transition-all resize-none placeholder:text-slate-300"></textarea>
+                    </div>
+
+                    <div class="pt-2">
+                        <button (click)="submitRequest()" [disabled]="isLoading()"
+                            class="w-full py-3.5 bg-[#1ea4ea] text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-lg shadow-[#1ea4ea]/20 hover:bg-[#198ecf] transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50">
+                            <span *ngIf="!isLoading()">Send Request</span>
+                            <div *ngIf="isLoading()" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

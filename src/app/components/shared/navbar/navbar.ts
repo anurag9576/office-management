@@ -206,7 +206,22 @@ export class Navbar implements OnInit, OnDestroy {
     }
 
     if (note.route) {
-        this.router.navigateByUrl(note.route);
+        // Fix for old notifications
+        let finalRoute = note.route;
+        if (finalRoute.includes('/admin/documents')) {
+           finalRoute = finalRoute.replace('/admin/documents', '/dashboard/documents-admin');
+        }
+        
+        // Force navigation if already on the same route to ensure query params correctly propagate to state
+        const currentUrl = this.router.url.split('?')[0];
+        const targetUrl = finalRoute.split('?')[0];
+        if (currentUrl === targetUrl) {
+           this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+               this.router.navigateByUrl(finalRoute);
+           });
+        } else {
+           this.router.navigateByUrl(finalRoute);
+        }
     }
   }
 

@@ -21,6 +21,7 @@ import { AdminHome } from './components/admin/admin-home/admin-home';
 import { Timesheet } from './components/dashboard/timesheet/timesheet';
 import { TimesheetAdmin } from './components/admin/timesheet-admin/timesheet-admin';
 import { authGuard } from './guards/auth.guard';
+import { DocumentsAdmin } from './components/admin/documents/documents-admin';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -46,6 +47,7 @@ export const routes: Routes = [
       { path: 'tasks', component: TaskMgmt },
       { path: 'reports', component: Reports, data: { role: 'Admin', permission: 'reports' } },
       { path: 'settings', component: SettingsAdmin, data: { role: 'Admin', permission: 'settings' } },
+      { path: 'documents-admin', component: DocumentsAdmin, data: { role: 'Admin', permission: 'documents' } },
       { path: 'profile', component: Profile },
       { path: 'help', component: Help },
     ]
