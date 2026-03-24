@@ -31,7 +31,7 @@ export class Sidebar {
     { label: 'Dashboard', icon: 'dashboard', route: '/dashboard/admin-home', permissionKey: 'dashboard' },
     { label: 'Employee Mgmt', icon: 'group', route: '/dashboard/employees', permissionKey: 'employees' },
     { label: 'Roles Mgmt', icon: 'manage_accounts', route: '/dashboard/roles', permissionKey: 'roles' },
-    { label: 'Attendance', icon: 'event_available', route: '/dashboard/attendance', permissionKey: 'attendance' },
+
     { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin', permissionKey: 'leaves-admin' },
     { label: 'Timesheet Reports', icon: 'pending_actions', route: '/dashboard/timesheet-admin', permissionKey: 'timesheet-admin' },
     { label: 'Docs Mgmt', icon: 'content_paste', route: '/dashboard/documents-admin', permissionKey: 'documents' },

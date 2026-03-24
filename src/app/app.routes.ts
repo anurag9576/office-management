@@ -11,7 +11,7 @@ import { Help } from './components/dashboard/help/help';
 import { EmployeesMgmt } from './components/admin/employees/employees';
 import { DepartmentsMgmt } from './components/admin/departments/departments';
 import { RolesMgmt } from './components/admin/roles-management/roles-management';
-import { AttendanceMgmt } from './components/admin/attendance/attendance';
+
 import { TaskMgmt } from './components/admin/tasks/tasks';
 import { Reports } from './components/admin/reports/reports';
 import { SettingsAdmin } from './components/admin/settings/settings';
@@ -36,7 +36,6 @@ export const routes: Routes = [
       { path: 'employees', component: EmployeesMgmt, data: { role: 'Admin', permission: 'employees' } },
       { path: 'departments', component: DepartmentsMgmt, data: { role: 'Admin', permission: 'employees' } },
       { path: 'roles', component: RolesMgmt, data: { role: 'Admin', permission: 'roles' } },
-      { path: 'attendance', component: AttendanceMgmt, data: { role: 'Admin', permission: 'attendance' } },
       { path: 'leaves', component: Leaves }, 
       { path: 'timesheet', component: Timesheet, data: { permission: 'timesheet' } },
       { path: 'timesheet-admin', component: TimesheetAdmin, data: { role: 'Admin', permission: 'timesheet-admin' } },

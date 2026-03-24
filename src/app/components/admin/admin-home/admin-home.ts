@@ -15,7 +15,7 @@ export class AdminHome implements OnInit {
 
   stats = signal([
     { label: 'Total Employees', value: '...', icon: 'group', color: 'bg-brand-1', bgOp5: 'bg-brand-1/5', bgOp10: 'bg-brand-1/10', textCls: 'text-brand-1', trend: 'Loading...' },
-    { label: 'Present Today', value: '142', icon: 'how_to_reg', color: 'bg-emerald-500', bgOp5: 'bg-emerald-500/5', bgOp10: 'bg-emerald-500/10', textCls: 'text-emerald-500', trend: '92% Attendance' },
+
     { label: 'Pending Leaves', value: '...', icon: 'event_busy', color: 'bg-amber-500', bgOp5: 'bg-amber-500/5', bgOp10: 'bg-amber-500/10', textCls: 'text-amber-500', trend: 'Loading...' },
     { label: 'Active Projects', value: '24', icon: 'rocket_launch', color: 'bg-brand-1', bgOp5: 'bg-brand-1/5', bgOp10: 'bg-brand-1/10', textCls: 'text-brand-1', trend: 'Across 4 Depts' }
   ]);
@@ -50,8 +50,8 @@ export class AdminHome implements OnInit {
           const pendingCount = res.data.filter((l: any) => l.status === 'Pending').length;
           this.stats.update(s => {
             const newStats = [...s];
-            newStats[2].value = pendingCount.toString();
-            newStats[2].trend = pendingCount > 0 ? 'Needs Action' : 'All Clear';
+            newStats[1].value = pendingCount.toString();
+            newStats[1].trend = pendingCount > 0 ? 'Needs Action' : 'All Clear';
             return newStats;
           });
         }

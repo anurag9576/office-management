@@ -18,11 +18,13 @@ export class Payroll implements OnInit {
   
   // Available Paystubs
   paystubs = signal<any[]>([]);
-
+  
   isLoading = signal(false);
   selectedMonthIndex = signal(0);
   filterValue = signal(new Date().toISOString().slice(0, 7));
   isFilterActive = signal(false);
+  successMessage = signal('');
+  errorMessage = signal('');
 
   ngOnInit() {
     this.loadUserInfo();
@@ -122,7 +124,7 @@ export class Payroll implements OnInit {
 
     // If a PDF was uploaded by Admin, download that instead of generating
     if (stub.pdfUrl) {
-      alert("Downloading your original salary slip...");
+      this.showSuccess("Downloading your original salary slip...");
       const link = document.createElement('a');
       link.href = stub.pdfUrl;
       link.download = `Payslip_${stub.month.replace(' ', '_')}.pdf`;
@@ -132,7 +134,7 @@ export class Payroll implements OnInit {
       return;
     }
 
-    alert("Generating your salary slip... Please wait.");
+    this.showSuccess("Generating your salary slip... Please wait.");
     console.log(`🚀 Starting generation for: ${stub.month}`);
 
     const doc = new jsPDF();
@@ -379,5 +381,10 @@ export class Payroll implements OnInit {
 
     // 6. Save the PDF
     doc.save(`Payslip_${stub.month.replace(' ', '_')}.pdf`);
+  }
+
+  showSuccess(msg: string) {
+    this.successMessage.set(msg);
+    setTimeout(() => this.successMessage.set(''), 3000);
   }
 }
