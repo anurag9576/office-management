@@ -55,7 +55,7 @@ export class Announcement implements OnInit {
               id: p._id,
               author: authorName,
               role: p.author?.role || 'Admin',
-              avatar: p.author?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&h=100&auto=format&fit=crop',
+              avatar: p.author?.avatar || null,
               time: this.formatTime(p.createdAt),
               type: p.type.toLowerCase(),
               image: p.imageUrl,

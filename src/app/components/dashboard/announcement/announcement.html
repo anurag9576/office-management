@@ -126,8 +126,11 @@
 
                 <!-- Post Header -->
                 <div class="p-6 md:p-8 flex items-center gap-4">
-                    <img [src]="post.avatar" class="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-50"
+                    <img *ngIf="post.avatar" [src]="post.avatar" class="w-12 h-12 rounded-full object-cover ring-2 ring-slate-50"
                         [alt]="post.author">
+                    <div *ngIf="!post.avatar" class="w-12 h-12 rounded-full bg-slate-100/50 flex items-center justify-center ring-2 ring-slate-50">
+                        <span class="material-symbols-outlined text-[32px] text-slate-300">person</span>
+                    </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2">
                             <h3 class="font-semibold text-slate-900 leading-none">{{post.author}}</h3>

@@ -1,4 +1,29 @@
 <div class="payroll-page px-1 py-4 sm:p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <!-- Success & Error Toast Layer -->
+    <div class="fixed top-6 right-6 z-[20000] space-y-3 pointer-events-none">
+        <!-- Error Message -->
+        <div *ngIf="errorMessage()" class="pointer-events-auto bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center justify-between gap-6 shadow-2xl animate-in fade-in slide-in-from-right-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-red-500">error</span>
+                <p class="text-xs font-bold text-red-700">{{errorMessage()}}</p>
+            </div>
+            <button (click)="errorMessage.set('')" class="text-red-400 hover:text-red-600">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+
+        <!-- Success Message -->
+        <div *ngIf="successMessage()" class="pointer-events-auto bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center justify-between gap-6 shadow-2xl animate-in fade-in slide-in-from-right-4">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-emerald-500">check_circle</span>
+                <p class="text-xs font-bold text-emerald-700">{{successMessage()}}</p>
+            </div>
+            <button (click)="successMessage.set('')" class="text-emerald-400 hover:text-emerald-600">
+                <span class="material-symbols-outlined text-sm">close</span>
+            </button>
+        </div>
+    </div>
+
     <div class="max-w-6xl mx-auto">
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Left Side: Month Selection -->

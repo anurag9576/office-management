@@ -17,7 +17,7 @@ export class RolesMgmt {
     { label: 'Dashboard Access', key: 'dashboard' },
     { label: 'Employee Mgmt', key: 'employees' },
     { label: 'Roles Mgmt', key: 'roles' },
-    { label: 'Attendance Logs', key: 'attendance' },
+
     { label: 'Leave Approvals', key: 'leaves-admin' },
     { label: 'Payroll Admin', key: 'payroll-admin' },
     { label: 'Task Distribution', key: 'tasks' },

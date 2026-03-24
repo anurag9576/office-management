@@ -67,23 +67,10 @@ export class ApiService {
     return this.http.post(`${this.baseUrl}/departments`, data, { headers: this.getHeaders() });
   }
 
-  // ==========================================
-  // 5. Attendance (Check-in/Out)
-  // ==========================================
-  checkIn(): Observable<any> {
-    return this.http.post(`${this.baseUrl}/attendance/check-in`, {}, { headers: this.getHeaders() });
-  }
 
-  checkOut(): Observable<any> {
-    return this.http.put(`${this.baseUrl}/attendance/check-out`, {}, { headers: this.getHeaders() });
-  }
-
-  getAttendanceReports(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/attendance/reports`, { headers: this.getHeaders() });
-  }
 
   // ==========================================
-  // 6. Leave Management
+  // 4. Leave Management
   // ==========================================
   
   // Apply for a new leave
@@ -107,7 +94,7 @@ export class ApiService {
   }
 
   // ==========================================
-  // 7. Payroll & Payslips
+  // 5. Payroll & Payslips
   // ==========================================
   
   getMyPayrolls(): Observable<any> {
@@ -131,7 +118,7 @@ export class ApiService {
   }
 
   // ==========================================
-  // 8. Announcements
+  // 6. Announcements
   // ==========================================
   
   getAnnouncements(): Observable<any> {
@@ -171,7 +158,7 @@ export class ApiService {
   }
 
   // ==========================================
-  // 9. Notifications
+  // 7. Notifications
   // ==========================================
 
   getMyNotifications(): Observable<any> {
@@ -187,7 +174,7 @@ export class ApiService {
   }
 
   // ==========================================
-  // 10. Roles & Permissions
+  // 8. Roles & Permissions
   // ==========================================
 
   getRoles(): Observable<any> {
@@ -207,7 +194,7 @@ export class ApiService {
   }
 
   // ==========================================
-  // 11. Timesheet Management
+  // 9. Timesheet Management
   // ==========================================
 
   getMyTimesheets(): Observable<any> {
@@ -231,7 +218,7 @@ export class ApiService {
   }
 
   // ==========================================
-  // 12. Password Management
+  // 10. Password Management
   // ==========================================
 
   changePassword(data: any): Observable<any> {
@@ -239,7 +226,7 @@ export class ApiService {
   }
 
   // ==========================================
-  // 13. Document Management
+  // 11. Document Management
   // ==========================================
 
   getDocumentTemplates(): Observable<any> {

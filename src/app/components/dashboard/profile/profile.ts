@@ -7,7 +7,6 @@ import { jsPDF } from 'jspdf';
 
 @Component({
   selector: 'app-profile',
-  standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
@@ -21,7 +20,7 @@ export class Profile implements OnInit {
     role: '',
     id: '',
     status: '',
-    avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=200&h=200',
+    avatar: null,
     email: '',
     officeEmail: '',
     phone: '',
@@ -104,7 +103,7 @@ export class Profile implements OnInit {
     this.apiService.requestDocument(payload).subscribe({
       next: (res) => {
         if (res.success) {
-          this.showSuccess('Request submitted successfully!');
+          this.showSuccess('Request send successfully!');
           this.showRequestModal.set(false);
           this.requestForm = { documentName: '', message: '' };
         }
@@ -312,7 +311,7 @@ export class Profile implements OnInit {
       next: (res) => {
         // Update the main signal with the confirmed data from backend
         const data = res.data || res;
-        this.loadProfile(); // Re-run load to get fresh formatted data
+        this.loadProfile(); 
         this.showModal.set(false);
         this.isLoading.set(false);
         this.showSuccess('Profile updated successfully!');

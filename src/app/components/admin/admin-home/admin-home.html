@@ -7,9 +7,9 @@
     </div>
 
     <!-- Top Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <div *ngFor="let stat of stats()"
-            class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-100 hover:border-brand-1 transition-all group overflow-hidden relative">
+            class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-100 hover:border-brand-1 transition-all group overflow-hidden relative max-w-[18rem]">
             <div
                 [class]="'absolute top-0 right-0 w-24 h-24 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-700 ' + stat.bgOp5">
             </div>
@@ -65,12 +65,7 @@
                         class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">analytics</span>
                     <span class="text-[10px] font-semibold uppercase tracking-widest">Reports</span>
                 </a>
-                <a routerLink="/dashboard/attendance"
-                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn">
-                    <span
-                        class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">event_available</span>
-                    <span class="text-[10px] font-semibold uppercase tracking-widest">Logs</span>
-                </a>
+
                 <a routerLink="/dashboard/settings"
                     class="p-6 bg-white/10 border border-white/20 rounded-[2rem] hover:bg-white hover:text-brand-5 transition-all text-center flex flex-col items-center group/btn shadow-lg shadow-black/10">
                     <span class="material-symbols-outlined mb-3 text-3xl">settings</span>
