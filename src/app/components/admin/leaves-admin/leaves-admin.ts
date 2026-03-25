@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../../services/api.service';
 
@@ -13,6 +13,34 @@ export class LeavesAdmin implements OnInit {
   private apiService = inject(ApiService);
   leaveRequests = signal<any[]>([]);
   isLoading = signal(false);
+
+  // Pagination
+  currentPage = signal(1);
+  itemsPerPage = 10;
+
+  paginatedRequests = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    return this.leaveRequests().slice(startIndex, startIndex + this.itemsPerPage);
+  });
+
+  totalPages = computed(() => {
+    return Math.ceil(this.leaveRequests().length / this.itemsPerPage) || 1;
+  });
+
+  startRange = computed(() => {
+    if (this.leaveRequests().length === 0) return 0;
+    return (this.currentPage() - 1) * this.itemsPerPage + 1;
+  });
+
+  endRange = computed(() => {
+    return Math.min(this.currentPage() * this.itemsPerPage, this.leaveRequests().length);
+  });
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
 
   ngOnInit() {
     this.loadAllLeaves();

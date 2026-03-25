@@ -83,7 +83,7 @@
                                 (item.day ? 'bg-brand-1/5 text-brand-4 hover:bg-brand-5 hover:text-white cursor-pointer' : 'opacity-0 pointer-events-none') +
                                 (item.isToday ? ' ring-2 ring-brand-1 ring-offset-2 !bg-brand-1 !text-white z-10' : '') +
                                 (item.isHoliday ? ' !bg-red-50 !text-red-500' : '') +
-                                (item.isLeave ? ' !bg-emerald-50 !text-emerald-600 !ring-2 !ring-emerald-200 !ring-inset' : '') +
+                                (item.isLeave ? ' !bg-rose-50 !text-rose-600 !ring-2 !ring-rose-200 !ring-inset' : '') +
                                 (item.isWeekend && !item.isHoliday && !item.isToday && !item.isLeave ? ' !bg-red-50/40 !text-red-400' : '')">
                         {{item.day}}
 
@@ -94,7 +94,7 @@
 
                         <!-- Leave Indicator dot (Subtle) -->
                         <div *ngIf="item.isLeave"
-                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-emerald-400 w-1.5 h-1.5 rounded-full ring-2 ring-white">
+                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-rose-400 w-1.5 h-1.5 rounded-full ring-2 ring-white">
                         </div>
 
                         <!-- Tooltip on hover -->
@@ -159,13 +159,27 @@
                     <div class="grid grid-cols-2 gap-2">
                         <div class="space-y-1">
                             <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-2">From</label>
-                            <input type="date" name="startDate" [(ngModel)]="leaveForm.startDate" [min]="minDate()"
-                                class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white font-semibold outline-none cursor-pointer text-xs">
+                            <div class="relative w-full">
+                                <input [matDatepicker]="startPicker" name="startDate" [(ngModel)]="leaveForm.startDate" [min]="minDate()"
+                                    (click)="startPicker.open()" readonly placeholder="Select Date..."
+                                    class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white placeholder-white/50 font-semibold outline-none cursor-pointer text-xs pr-10">
+                                <div class="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 scale-75 cursor-pointer">
+                                    <mat-datepicker-toggle [for]="startPicker"></mat-datepicker-toggle>
+                                </div>
+                                <mat-datepicker #startPicker></mat-datepicker>
+                            </div>
                         </div>
                         <div class="space-y-1">
                             <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-1">To</label>
-                            <input type="date" name="endDate" [(ngModel)]="leaveForm.endDate" [min]="minDate()"
-                                class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white font-semibold outline-none cursor-pointer text-xs">
+                            <div class="relative w-full">
+                                <input [matDatepicker]="endPicker" name="endDate" [(ngModel)]="leaveForm.endDate" [min]="minDate()"
+                                    (click)="endPicker.open()" readonly placeholder="Select Date..."
+                                    class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white placeholder-white/50 font-semibold outline-none cursor-pointer text-xs pr-10">
+                                <div class="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 scale-75 cursor-pointer">
+                                    <mat-datepicker-toggle [for]="endPicker"></mat-datepicker-toggle>
+                                </div>
+                                <mat-datepicker #endPicker></mat-datepicker>
+                            </div>
                         </div>
                     </div>
 

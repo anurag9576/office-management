@@ -21,13 +21,13 @@
 
     <!-- Tabs -->
     <div class="flex items-center gap-8 mb-6 border-b-2 border-slate-100 px-4">
-        <button (click)="activeTab.set('issued')" 
+        <button (click)="setTab('issued')" 
             [class.text-brand-1]="activeTab() === 'issued'" 
             [class.border-brand-1]="activeTab() === 'issued'" 
-            class="pb-4 relative -bottom-[2px] border-b-2 border-transparent text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors">
+            class="pb-4 relative -bottom-[2px] border-b-2 border-transparent text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
             Issued Documents
         </button>
-        <button (click)="activeTab.set('requests')" 
+        <button (click)="setTab('requests')" 
             [class.text-brand-1]="activeTab() === 'requests'" 
             [class.border-brand-1]="activeTab() === 'requests'" 
             class="pb-4 relative -bottom-[2px] border-b-2 border-transparent text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-2">
@@ -37,99 +37,128 @@
     </div>
 
     <!-- Table Section: List of issued documents -->
-    <div *ngIf="activeTab() === 'issued'" class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
-        <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">History of Documents Issued</h3>
-            <span class="px-3 py-1 bg-brand-1/10 text-brand-1 rounded-lg text-[10px] font-bold">{{ issuedDocuments().length }} Records</span>
+    <div *ngIf="activeTab() === 'issued'" class="bg-white rounded-[1.0rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">History of Documents Issued</h3>
         </div>  
         
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
+        <div class="overflow-x-auto overflow-y-auto max-h-[600px] relative no-scrollbar">
+            <table class="w-full border-collapse text-left">
                 <thead>
-                    <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Employee</th>
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Document Title</th>
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Issued Date</th>
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Issued By</th>
+                    <tr class="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-200">
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[300px]">Employee</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">Document Title</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[180px]">Issued Date</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[180px]">Issued By</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
-                    <tr *ngFor="let doc of issuedDocuments()" class="hover:bg-slate-50/50 transition-colors group">
-                        <td class="px-8 py-5">
+                <tbody class="divide-y divide-slate-50 relative">
+                    <tr *ngFor="let doc of paginatedList()" class="hover:bg-slate-50/30 transition-colors group">
+                        <td class="px-6 py-5 border-r border-slate-50">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-brand-1/10 text-brand-1 flex items-center justify-center font-bold text-xs">
+                                <div class="w-8 h-8 rounded-lg bg-brand-1/10 text-brand-1 flex items-center justify-center font-bold text-xs shadow-inner">
                                     {{ doc.employee?.firstName?.charAt(0) }}
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{ doc.employee?.firstName }} {{ doc.employee?.lastName }}</p>
-                                    <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">{{ doc.employee?.employeeId }}</p>
+                                    <p class="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{{ doc.employee?.employeeId }}</p>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-8 py-5">
-                            <span class="px-3 py-1 bg-brand-5/5 text-brand-5 rounded-lg border border-brand-5/10 text-[10px] font-bold uppercase">{{ doc.documentTitle }}</span>
+                        <td class="px-6 py-5 border-r border-slate-50">
+                            <span class="px-4 py-1.5 bg-brand-5/5 text-brand-5 rounded-lg border border-brand-5/10 text-[10px] font-black uppercase shadow-sm inline-block">{{ doc.documentTitle }}</span>
                         </td>
-                        <td class="px-8 py-5">
-                            <span class="text-[11px] font-medium text-slate-500">{{ doc.issuedDate | date:'mediumDate' }}</span>
+                        <td class="px-6 py-5 border-r border-slate-50 text-center">
+                            <span class="text-[11px] font-semibold text-slate-500">{{ doc.issuedDate | date:'mediumDate' }}</span>
                         </td>
-                        <td class="px-8 py-5">
-                            <span class="text-[11px] font-medium text-slate-500">Admin ({{ doc.issuedBy?.firstName }})</span>
+                        <td class="px-6 py-5 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg text-[9px] font-bold uppercase tracking-widest text-slate-400">Admin ({{ doc.issuedBy?.firstName }})</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="activeTabList().length === 0">
+                        <td colspan="4" class="p-20 text-center">
+                            <div class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                <span class="material-symbols-outlined text-slate-300 text-3xl">content_paste_off</span>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No documents issued yet.</p>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        
-        <!-- Empty State -->
-        <div *ngIf="issuedDocuments().length === 0" class="p-20 text-center">
-            <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span class="material-symbols-outlined text-slate-300 text-3xl">content_paste_off</span>
+
+        <!-- Pagination Footer -->
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Showing <span class="text-slate-900">{{startRange()}}</span> – <span class="text-slate-900">{{endRange()}}</span> of <span class="text-slate-900">{{activeTabList().length}}</span> records
             </div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No documents issued yet.</p>
+
+            <div class="flex items-center gap-2" *ngIf="totalPages() > 1">
+                <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1"
+                    class="p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all text-slate-600 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                </button>
+
+                <div class="flex gap-1.5 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar py-1">
+                    <button *ngFor="let p of [].constructor(totalPages()); let i = index" (click)="goToPage(i + 1)"
+                        [class]="currentPage() === (i + 1) ? 'bg-brand-1 text-white shadow-xl shadow-brand-1/20 border-brand-1' : 'bg-white text-slate-600 border-slate-100 hover:border-slate-300'"
+                        class="w-10 h-10 rounded-xl text-xs font-black transition-all border flex items-center justify-center shrink-0 shadow-sm cursor-pointer">
+                        {{i + 1}}
+                    </button>
+                </div>
+
+                <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()"
+                    class="p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all text-slate-600 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Table Section: Employee Requests -->
-    <div *ngIf="activeTab() === 'requests'" class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
-        <div class="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Pending Requests</h3>
-            <span class="px-3 py-1 bg-brand-1/10 text-brand-1 rounded-lg text-[10px] font-bold">{{ requests().length }} Records</span>
+    <div *ngIf="activeTab() === 'requests'" class="bg-white rounded-[1.0rem] shadow-xl border border-slate-100 overflow-hidden animate-in fade-in duration-300">
+        <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-white">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">Pending Requests</h3>
         </div>
         
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
+        <div class="overflow-x-auto overflow-y-auto max-h-[600px] relative no-scrollbar">
+            <table class="w-full border-collapse text-left">
                 <thead>
-                    <tr class="bg-slate-50/50 border-b border-slate-100">
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Employee</th>
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Requested Document</th>
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Reason / Message</th>
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest">Status</th>
-                        <th class="px-8 py-5 text-[10px] font-semibold text-slate-900 uppercase tracking-widest gap-2">Actions</th>
+                    <tr class="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-200">
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[250px]">Employee</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[200px]">Requested Document</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">Reason / Message</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[160px]">Status</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[140px]">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-50">
-                    <tr *ngFor="let req of requests()" class="hover:bg-slate-50/50 transition-colors group">
-                        <td class="px-8 py-5">
+                <tbody class="divide-y divide-slate-50 relative">
+                    <tr *ngFor="let req of paginatedList()" class="hover:bg-slate-50/30 transition-colors group">
+                        <td class="px-6 py-5 border-r border-slate-50">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shadow-inner">
                                     {{ req.employee?.firstName?.charAt(0) }}
                                 </div>
-                                <div>
+                                <div class="min-w-0">
                                     <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{ req.employee?.firstName }} {{ req.employee?.lastName }}</p>
-                                    <p class="text-[9px] font-medium text-slate-400 uppercase tracking-wider">{{ req.employee?.employeeId }}</p>
+                                    <p class="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{{ req.employee?.employeeId }}</p>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-8 py-5">
-                            <span class="cursor-help px-3 py-1 bg-brand-5/5 text-brand-5 rounded-lg border border-brand-5/10 text-[10px] font-bold uppercase" [title]="req.customDocumentName ? 'Custom Request' : 'Template Request'">
+                        <td class="px-6 py-5 border-r border-slate-50">
+                            <span class="cursor-help px-4 py-1.5 bg-brand-5/5 text-brand-5 rounded-lg border border-brand-5/10 text-[10px] font-black uppercase shadow-sm inline-block" [title]="req.customDocumentName ? 'Custom Request' : 'Template Request'">
                                 {{ req.template ? req.template.name : req.customDocumentName }}
                             </span>
                         </td>
-                        <td class="px-8 py-5">
-                            <p class="text-[11px] font-medium text-slate-500 max-w-[200px] truncate" [title]="req.message">{{ req.message || 'No reason provided' }}</p>
+                        <td class="px-6 py-5 border-r border-slate-50">
+                            <p class="text-[11px] font-medium text-slate-500 max-w-[250px] truncate" [title]="req.message">{{ req.message || 'No reason provided' }}</p>
                         </td>
-                        <td class="px-8 py-5">
-                            <span class="text-[10px] font-bold px-3 py-1 rounded-lg border inline-flex items-center gap-1.5"
+                        <td class="px-6 py-5 border-r border-slate-50 text-center">
+                            <span class="text-[10px] font-black px-4 py-1.5 rounded-full border shadow-sm inline-flex items-center gap-1.5"
                                 [ngClass]="{
                                     'bg-amber-50 text-amber-600 border-amber-200': req.status === 'Pending',
                                     'bg-emerald-50 text-emerald-600 border-emerald-200': req.status === 'Approved',
@@ -141,30 +170,62 @@
                                         'bg-emerald-500': req.status === 'Approved',
                                         'bg-red-500': req.status === 'Rejected'
                                     }"></span>
-                                {{ req.status }}
+                                {{ req.status | uppercase }}
                             </span>
                         </td>
-                        <td class="px-8 py-5">
-                            <div class="flex items-center gap-2" *ngIf="req.status === 'Pending'">
-                                <button (click)="approveRequest(req)" class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all shadow-sm" title="Approve & Issue">
+                        <td class="px-6 py-5 text-center">
+                            <div class="flex items-center justify-center gap-2" *ngIf="req.status === 'Pending'">
+                                <button (click)="approveRequest(req)" class="w-9 h-9 bg-slate-50 border border-slate-100 text-slate-400 rounded-xl flex items-center justify-center hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-100 transition-all shadow-sm" title="Approve & Issue">
                                     <span class="material-symbols-outlined text-sm">check</span>
                                 </button>
-                                <button (click)="rejectRequest(req)" class="w-8 h-8 bg-red-50 text-red-600 rounded-lg flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Reject Request">
+                                <button (click)="rejectRequest(req)" class="w-9 h-9 bg-slate-50 border border-slate-100 text-slate-400 rounded-xl flex items-center justify-center hover:bg-red-50 hover:text-red-600 hover:border-red-100 transition-all shadow-sm" title="Reject Request">
                                     <span class="material-symbols-outlined text-sm">close</span>
                                 </button>
                             </div>
+                            <div *ngIf="req.status !== 'Pending'" class="flex items-center justify-center">
+                                <span class="px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg text-[9px] font-black uppercase tracking-widest text-slate-400 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">Processed</span>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="activeTabList().length === 0">
+                        <td colspan="5" class="p-20 text-center">
+                            <div class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                                <span class="material-symbols-outlined text-slate-300 text-3xl">inbox</span>
+                            </div>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No pending document requests.</p>
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
-        <!-- Empty State -->
-        <div *ngIf="requests().length === 0" class="p-20 text-center">
-            <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span class="material-symbols-outlined text-slate-300 text-3xl">inbox</span>
+        <!-- Pagination Footer -->
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                Showing <span class="text-slate-900">{{startRange()}}</span> – <span class="text-slate-900">{{endRange()}}</span> of <span class="text-slate-900">{{activeTabList().length}}</span> records
             </div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No pending document requests.</p>
+
+            <div class="flex items-center gap-2" *ngIf="totalPages() > 1">
+                <button (click)="goToPage(currentPage() - 1)" [disabled]="currentPage() === 1"
+                    class="p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all text-slate-600 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                </button>
+
+                <div class="flex gap-1.5 overflow-x-auto max-w-[200px] md:max-w-none no-scrollbar py-1">
+                    <button *ngFor="let p of [].constructor(totalPages()); let i = index" (click)="goToPage(i + 1)"
+                        [class]="currentPage() === (i + 1) ? 'bg-brand-1 text-white shadow-xl shadow-brand-1/20 border-brand-1' : 'bg-white text-slate-600 border-slate-100 hover:border-slate-300'"
+                        class="w-10 h-10 rounded-xl text-xs font-black transition-all border flex items-center justify-center shrink-0 shadow-sm cursor-pointer">
+                        {{i + 1}}
+                    </button>
+                </div>
+
+                <button (click)="goToPage(currentPage() + 1)" [disabled]="currentPage() === totalPages()"
+                    class="p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all text-slate-600 cursor-pointer">
+                    <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+            </div>
         </div>
     </div>
 

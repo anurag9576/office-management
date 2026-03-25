@@ -22,8 +22,8 @@
     <div class="flex items-center space-x-4">
         <!-- Date/Time Display -->
         <div class="hidden md:flex flex-col items-end mr-4">
-            <span class="text-xs font-bold text-brand-5 tracking-wider">{{ currentTime | date:'EEEE, MMM d' }}</span>
-            <span class="text-[10px] text-brand-3 font-medium">{{ currentTime | date:'h:mm:ss a' }}</span>
+            <span class="text-xs font-bold text-brand-5 tracking-wider">{{ currentTime() | date:'EEEE, MMM d' }}</span>
+            <span class="text-[10px] text-brand-3 font-medium">{{ currentTime() | date:'h:mm:ss a' }}</span>
         </div>
 
         <!-- Notifications Dropdown -->
@@ -100,7 +100,10 @@
         <!-- User Profile Box -->
         <div class="relative group ml-2">
             <!-- Trigger -->
-            <div (click)="navigateToProfile()" class="flex items-center gap-3 px-3 py-1.5 bg-brand-5 rounded-xl border border-white/10 shadow-sm cursor-pointer hover:bg-brand-5/90 transition-all active:scale-95 duration-200">
+            <div (click)="navigateToProfile()" 
+                (mouseenter)="isDesktop && showProfileDropdown.set(true)"
+                (mouseleave)="isDesktop && showProfileDropdown.set(false)"
+                class="flex items-center gap-3 px-3 py-1.5 bg-brand-5 rounded-xl border border-white/10 shadow-sm cursor-pointer hover:bg-brand-5/90 transition-all active:scale-95 duration-200">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-brand-1 text-white font-bold shadow-sm overflow-hidden ring-2 ring-white/10 group-hover:ring-white/20 transition-all">
                     <img *ngIf="user().avatar && !imageError()" [src]="user().avatar" (error)="onImageError()" alt="" class="w-full h-full object-cover">
                     <span *ngIf="!user().avatar || imageError()" class="text-[12px] uppercase tracking-tighter">{{user().initials}}</span>
@@ -111,8 +114,11 @@
                 </div>
             </div>
 
-            <!-- Hover Dropdown Menu -->
-            <div class="absolute right-0 top-[110%] w-48 bg-white border border-slate-100 rounded-2xl shadow-xl py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[150] transform origin-top-right scale-95 group-hover:scale-100">
+            <!-- Profile Dropdown Menu (Click-Based for Mobile/iPad Pro, Hover-Based for PC) -->
+            <div *ngIf="showProfileDropdown()" 
+                (mouseenter)="isDesktop && showProfileDropdown.set(true)"
+                (mouseleave)="isDesktop && showProfileDropdown.set(false)"
+                class="absolute right-0 top-[120%] w-56 lg:w-48 bg-white border border-slate-100 rounded-2xl shadow-2xl py-2 z-[200] animate-in fade-in zoom-in-95 duration-200 transform origin-top-right">
                 <button (click)="openChangePasswordModal()" class="w-full text-left px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-1 flex items-center gap-3 transition-colors">
                     <span class="material-symbols-outlined text-[18px]">lock_reset</span>
                     Change Password

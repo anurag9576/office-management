@@ -22,8 +22,9 @@ export class Navbar implements OnInit, OnDestroy {
   private serverUrl = environment.serverUrl;
   private fb = inject(FormBuilder);
 
-  currentTime = new Date();
+  currentTime = signal(new Date());
   showNotificationsDropdown = signal(false);
+  showProfileDropdown = signal(false);
 
   showLogoutModal = signal(false);
   showPasswordModal = signal(false);
@@ -45,6 +46,14 @@ export class Navbar implements OnInit, OnDestroy {
   notifications: any[] = [];
   private pollingSubscription?: Subscription;
   private timeInterval: any;
+
+  get isDesktop(): boolean {
+    return window.innerWidth > 1024;
+  }
+
+  get innerWidth(): number {
+    return window.innerWidth;
+  }
 
   constructor() {
     this.changePasswordForm = this.fb.group({
@@ -76,7 +85,7 @@ export class Navbar implements OnInit, OnDestroy {
     });
 
     this.timeInterval = setInterval(() => {
-      this.currentTime = new Date();
+      this.currentTime.set(new Date());
     }, 1000);
   }
 
@@ -183,13 +192,26 @@ export class Navbar implements OnInit, OnDestroy {
   }
 
   toggleNotifications() {
+    this.showProfileDropdown.set(false);
     this.showNotificationsDropdown.set(!this.showNotificationsDropdown());
   }
 
+  toggleProfileDropdown() {
+    this.showNotificationsDropdown.set(false);
+    this.showProfileDropdown.set(!this.showProfileDropdown());
+  }
+
   navigateToProfile() {
-    if (this.user().role?.toLowerCase() !== 'admin') {
-      this.router.navigate(['/dashboard/profile']);
+    // On PC (>1024px), Clicking on profile navigates to internal profile page
+    if (this.isDesktop) {
+      if (this.user().role?.toLowerCase() !== 'admin') {
+        this.router.navigate(['/dashboard/profile']);
+      }
+      return;
     }
+    
+    // On Mobile/Tablet (including iPad Pro at 1024px), Clicking toggles the dropdown
+    this.toggleProfileDropdown();
   }
 
   handleNotificationClick(note: any) {

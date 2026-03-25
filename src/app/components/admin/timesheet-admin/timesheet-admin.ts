@@ -2,11 +2,12 @@ import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-timesheet-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatButtonModule],
   templateUrl: './timesheet-admin.html',
   styleUrl: './timesheet-admin.css'
 })

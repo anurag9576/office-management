@@ -1,12 +1,13 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-employees',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatButtonModule],
   templateUrl: './employees.html',
   styleUrl: './employees.css'
 })
@@ -32,6 +33,34 @@ export class EmployeesMgmt implements OnInit {
     designation: '',
     status: 'Active'
   };
+
+  // Pagination
+  currentPage = signal(1);
+  itemsPerPage = 10;
+
+  paginatedEmployees = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    return this.employees().slice(startIndex, startIndex + this.itemsPerPage);
+  });
+
+  totalPages = computed(() => {
+    return Math.ceil(this.employees().length / this.itemsPerPage) || 1;
+  });
+
+  startRange = computed(() => {
+    if (this.employees().length === 0) return 0;
+    return (this.currentPage() - 1) * this.itemsPerPage + 1;
+  });
+
+  endRange = computed(() => {
+    return Math.min(this.currentPage() * this.itemsPerPage, this.employees().length);
+  });
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
 
   ngOnInit() {
     this.loadEmployees();
@@ -162,6 +191,9 @@ export class EmployeesMgmt implements OnInit {
       next: (res) => {
         if (res.success) {
           this.loadEmployees();
+          if (this.paginatedEmployees().length === 1 && this.currentPage() > 1) {
+            this.currentPage.update(p => p - 1);
+          }
           this.cancelDelete();
         }
       },
