@@ -25,7 +25,12 @@
               }
             ],
             "styles": [
+              "src/material-theme.scss",
               "src/styles.css"
+            ],
+            "allowedCommonJsDependencies": [
+              "canvg",
+              "core-js"
             ]
           },
           "configurations": {

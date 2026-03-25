@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
@@ -25,6 +25,43 @@ export class DocumentsAdmin implements OnInit {
   isLoading = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
+  
+  // Pagination
+  currentPage = signal(1);
+  itemsPerPage = 10;
+
+  activeTabList = computed(() => {
+    return this.activeTab() === 'issued' ? this.issuedDocuments() : this.requests();
+  });
+
+  paginatedList = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    return this.activeTabList().slice(startIndex, startIndex + this.itemsPerPage);
+  });
+
+  totalPages = computed(() => {
+    return Math.ceil(this.activeTabList().length / this.itemsPerPage) || 1;
+  });
+
+  startRange = computed(() => {
+    if (this.activeTabList().length === 0) return 0;
+    return (this.currentPage() - 1) * this.itemsPerPage + 1;
+  });
+
+  endRange = computed(() => {
+    return Math.min(this.currentPage() * this.itemsPerPage, this.activeTabList().length);
+  });
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  setTab(tab: 'issued' | 'requests') {
+    this.activeTab.set(tab);
+    this.currentPage.set(1);
+  }
   
   issueForm: any = {
     employeeId: '',

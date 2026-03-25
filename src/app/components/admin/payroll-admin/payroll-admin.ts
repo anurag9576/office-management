@@ -16,6 +16,34 @@ export class PayrollAdmin implements OnInit {
   payrolls = signal<any[]>([]);
   employees = signal<any[]>([]);
   
+  // Pagination
+  currentPage = signal(1);
+  itemsPerPage = 10;
+
+  paginatedList = computed(() => {
+    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
+    return this.payrolls().slice(startIndex, startIndex + this.itemsPerPage);
+  });
+
+  totalPages = computed(() => {
+    return Math.ceil(this.payrolls().length / this.itemsPerPage) || 1;
+  });
+
+  startRange = computed(() => {
+    if (this.payrolls().length === 0) return 0;
+    return (this.currentPage() - 1) * this.itemsPerPage + 1;
+  });
+
+  endRange = computed(() => {
+    return Math.min(this.currentPage() * this.itemsPerPage, this.payrolls().length);
+  });
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+  
   // Search & Selection
   searchTerm = signal('');
   selectedEmployeeEmail = signal('');

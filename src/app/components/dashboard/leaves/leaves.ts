@@ -1,19 +1,37 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, Injectable } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule, MatDatepickerIntl } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { ApiService } from '../../../services/api.service';
+
+@Injectable()
+export class CustomDatepickerIntl extends MatDatepickerIntl {
+  override prevMonthLabel = '';
+  override nextMonthLabel = '';
+  override prevYearLabel = '';
+  override nextYearLabel = '';
+  override prevMultiYearLabel = '';
+  override nextMultiYearLabel = '';
+  override switchToMonthViewLabel = '';
+  override switchToMultiYearViewLabel = '';
+}
 
 @Component({
   selector: 'app-leaves',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatDatepickerModule],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MatDatepickerIntl, useClass: CustomDatepickerIntl }
+  ],
   templateUrl: './leaves.html',
   styleUrl: './leaves.css',
 })
 export class Leaves implements OnInit {
   private apiService = inject(ApiService);
   currentDate = signal(new Date());
-  minDate = signal(new Date().toISOString().split('T')[0]);
+  minDate = signal(new Date());
   calendarDays = signal<{ day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, isLeave: boolean, holidayName?: string }[]>([]);
   monthYearString = signal('');
   rawLeaves = signal<any[]>([]);

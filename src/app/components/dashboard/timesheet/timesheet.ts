@@ -1,19 +1,37 @@
-import { Component, signal, computed, OnInit } from '@angular/core';
+import { Component, signal, computed, OnInit, Injectable } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatDatepickerModule, MatDatepickerIntl } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { ApiService } from '../../../services/api.service';
+
+@Injectable()
+export class CustomDatepickerIntl extends MatDatepickerIntl {
+  override prevMonthLabel = '';
+  override nextMonthLabel = '';
+  override prevYearLabel = '';
+  override nextYearLabel = '';
+  override prevMultiYearLabel = '';
+  override nextMultiYearLabel = '';
+  override switchToMonthViewLabel = '';
+  override switchToMultiYearViewLabel = '';
+}
 
 @Component({
   selector: 'app-timesheet',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatDatepickerModule],
+  providers: [
+    provideNativeDateAdapter(),
+    { provide: MatDatepickerIntl, useClass: CustomDatepickerIntl }
+  ],
   templateUrl: './timesheet.html',
   styleUrl: './timesheet.css'
 })
 export class Timesheet implements OnInit {
   protected Math = Math;
   currentDate = new Date();
-  maxDate = new Date().toISOString().split('T')[0];
+  maxDate = new Date();
   showModal = signal(false);
   showDeleteModal = signal(false);
   isEditing = signal(false);
@@ -90,7 +108,7 @@ export class Timesheet implements OnInit {
 
   newLog: any = {
     id: 0,
-    date: new Date().toISOString().split('T')[0],
+    date: new Date(),
     project: '',
     branchName: '',
     workStatus: '',
@@ -101,7 +119,7 @@ export class Timesheet implements OnInit {
   openAddModal() {
     this.isEditing.set(false);
     this.newLog = {
-      date: new Date().toISOString().split('T')[0],
+      date: new Date(),
       project: '',
       branchName: '',
       workStatus: '',
@@ -115,9 +133,9 @@ export class Timesheet implements OnInit {
     this.isEditing.set(true);
     // Create a copy to avoid immediate UI update before saving
     this.newLog = { ...log };
-    // Format date for the input field if needed (YYYY-MM-DD)
+    // Format date for the input field
     if (this.newLog.date) {
-      this.newLog.date = new Date(this.newLog.date).toISOString().split('T')[0];
+      this.newLog.date = new Date(this.newLog.date);
     }
     this.showModal.set(true);
   }
@@ -132,11 +150,6 @@ export class Timesheet implements OnInit {
       return;
     }
 
-    if (this.newLog.date > this.maxDate) {
-      alert('You cannot log work for a future date!');
-      return;
-    }
-    
     if (this.isEditing()) {
       this.apiService.updateTimesheet(this.newLog._id, this.newLog).subscribe({
         next: (res) => {
