@@ -8,31 +8,9 @@
         </div>
     </div>
 
-    <!-- Error/Success Feedbacks -->
-    <div *ngIf="errorMessage()"
-        class="bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-red-500">error</span>
-            <p class="text-xs font-bold text-red-700">{{errorMessage()}}</p>
-        </div>
-        <button (click)="errorMessage.set('')" class="text-red-400 hover:text-red-600">
-            <span class="material-symbols-outlined text-sm">close</span>
-        </button>
-    </div>
-
-    <div *ngIf="successMessage()"
-        class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
-        <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-emerald-500">check_circle</span>
-            <p class="text-xs font-bold text-emerald-700">{{successMessage()}}</p>
-        </div>
-        <button (click)="successMessage.set('')" class="text-emerald-400 hover:text-emerald-600">
-            <span class="material-symbols-outlined text-sm">close</span>
-        </button>
-    </div>
 
     <!-- Header: Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
         <div *ngFor="let stat of leaveStats()"
             class="bg-white p-6 rounded-[2.5rem] shadow-sm border border-brand-2/10 hover:shadow-xl transition-all hover:scale-[1.02] group">
             <div class="flex items-center space-x-4">
@@ -147,12 +125,16 @@
 
                 <form (ngSubmit)="applyLeave()" #lForm="ngForm" class="space-y-2.5 relative z-10">
                     <div class="space-y-1">
-                        <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-2">Leave Type</label>
+                        <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-2">Leave
+                            Type</label>
                         <select name="type" [(ngModel)]="leaveForm.type"
                             class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white font-semibold outline-none ring-brand-1 focus:ring-2 appearance-none cursor-pointer text-xs">
                             <option class="text-brand-5" value="Sick Leave">Sick Leave</option>
                             <option class="text-brand-5" value="Casual Leave">Casual Leave</option>
-                            <option class="text-brand-5" value="Optional Leave">Optional Leave</option>
+                            <!-- Show "Loss of Pay" but only enable it when 18 leaves are reached -->
+                            <option [disabled]="availableLeaves() > 0" class="text-brand-5" value="Loss of Pay">
+                                Loss of Pay {{ availableLeaves() > 0 ? '(Locked)' : '' }}
+                            </option>
                         </select>
                     </div>
 
@@ -160,11 +142,13 @@
                         <div class="space-y-1">
                             <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-2">From</label>
                             <div class="relative w-full">
-                                <input [matDatepicker]="startPicker" name="startDate" [(ngModel)]="leaveForm.startDate" [min]="minDate()"
-                                    (click)="startPicker.open()" readonly placeholder="Select Date..."
+                                <input [matDatepicker]="startPicker" name="startDate" [(ngModel)]="leaveForm.startDate"
+                                    [min]="minDate()" (click)="startPicker.open()" readonly placeholder="Select Date..."
                                     class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white placeholder-white/50 font-semibold outline-none cursor-pointer text-xs pr-10">
-                                <div class="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 scale-75 cursor-pointer">
-                                    <mat-datepicker-toggle [for]="startPicker"></mat-datepicker-toggle>
+                                <div
+                                    class="absolute right-0 top-1/2 -translate-y-1/2 text-white scale-75 cursor-pointer">
+                                    <mat-datepicker-toggle class="!text-white"
+                                        [for]="startPicker"></mat-datepicker-toggle>
                                 </div>
                                 <mat-datepicker #startPicker></mat-datepicker>
                             </div>
@@ -172,11 +156,13 @@
                         <div class="space-y-1">
                             <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-1">To</label>
                             <div class="relative w-full">
-                                <input [matDatepicker]="endPicker" name="endDate" [(ngModel)]="leaveForm.endDate" [min]="minDate()"
-                                    (click)="endPicker.open()" readonly placeholder="Select Date..."
+                                <input [matDatepicker]="endPicker" name="endDate" [(ngModel)]="leaveForm.endDate"
+                                    [min]="minDate()" (click)="endPicker.open()" readonly placeholder="Select Date..."
                                     class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white placeholder-white/50 font-semibold outline-none cursor-pointer text-xs pr-10">
-                                <div class="absolute right-0 top-1/2 -translate-y-1/2 text-white/70 scale-75 cursor-pointer">
-                                    <mat-datepicker-toggle [for]="endPicker"></mat-datepicker-toggle>
+                                <div
+                                    class="absolute right-0 top-1/2 -translate-y-1/2 text-white scale-75 cursor-pointer">
+                                    <mat-datepicker-toggle class="!text-white"
+                                        [for]="endPicker"></mat-datepicker-toggle>
                                 </div>
                                 <mat-datepicker #endPicker></mat-datepicker>
                             </div>
@@ -217,13 +203,21 @@
                                 class="absolute top-0 w-full h-4 rounded-full bg-brand-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             </div>
                         </div>
-                        <div class="flex-1">
-                            <p class="text-[10px] font-semibold text-brand-3 uppercase tracking-widest">{{holiday.date}}
-                            </p>
-                            <h4 class="font-bold text-brand-5 text-[15px] group-hover:text-brand-1 transition-colors">
-                                {{holiday.name}}</h4>
-                            <p class="text-[9px] font-medium text-slate-400 uppercase tracking-tighter">{{holiday.type}}
-                                Day</p>
+                        <div class="flex-1 flex items-center justify-between">
+                            <div>
+                                <p class="text-[10px] font-semibold text-brand-3 uppercase tracking-widest">
+                                    {{holiday.date | date:'longDate'}}
+                                </p>
+                                <h4
+                                    class="font-bold text-brand-5 text-[15px] group-hover:text-brand-1 transition-colors">
+                                    {{holiday.name}}</h4>
+                                <p class="text-[9px] font-medium text-slate-400 uppercase tracking-tighter">
+                                    {{holiday.type}} Day</p>
+                            </div>
+                            <div
+                                class="text-[10px] font-black text-brand-1 bg-brand-1/5 px-3 py-1.5 rounded-lg border border-brand-1/10 shadow-sm uppercase tracking-widest hidden sm:block">
+                                {{holiday.date | date:'EEEE'}}
+                            </div>
                         </div>
                     </div>
                 </div>

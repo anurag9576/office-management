@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule, MatDatepickerIntl } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { ApiService } from '../../../services/api.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Injectable()
 export class CustomDatepickerIntl extends MatDatepickerIntl {
@@ -30,31 +31,23 @@ export class CustomDatepickerIntl extends MatDatepickerIntl {
 })
 export class Leaves implements OnInit {
   private apiService = inject(ApiService);
+  private toastService = inject(ToastService);
   currentDate = signal(new Date());
   minDate = signal(new Date());
   calendarDays = signal<{ day: number | null, isToday: boolean, isHoliday: boolean, isWeekend: boolean, isLeave: boolean, holidayName?: string }[]>([]);
   monthYearString = signal('');
   rawLeaves = signal<any[]>([]);
+  availableLeaves = signal(18);
 
   leaveStats = signal([
     { label: 'Total Leaves', value: 18, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
     { label: 'Taken', value: 0, icon: 'event_busy', color: 'bg-orange-50 text-orange-500' },
     { label: 'Available', value: 18, icon: 'today', color: 'bg-green-50 text-green-500' },
-    { label: 'Pending', value: 0, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' }
+    { label: 'Pending', value: 0, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' },
+    { label: 'Loss of Pay', value: 0, icon: 'money_off', color: 'bg-red-50 text-red-500' }
   ]);
 
-  holidays = signal([
-    { name: 'New Year Day', date: 'Jan 01, 2026', type: 'Mandatory', day: 1, month: 0, year: 2026 },
-    { name: 'Republic Day', date: 'Jan 26, 2026', type: 'Mandatory', day: 26, month: 0, year: 2026 },
-    { name: 'Holi', date: 'Mar 03, 2026', type: 'Mandatory', day: 3, month: 2, year: 2026 },
-    { name: 'Gudi Padwa', date: 'Mar 19, 2026', type: 'Mandatory', day: 19, month: 2, year: 2026 },
-    { name: 'May Day', date: 'May 01, 2026', type: 'Mandatory', day: 1, month: 4, year: 2026 },
-    { name: 'Ganesh Chaturthi', date: 'Sep 14, 2026', type: 'Mandatory', day: 14, month: 8, year: 2026 },
-    { name: 'Gandhi Jayanti', date: 'Oct 02, 2026', type: 'Mandatory', day: 2, month: 9, year: 2026 },
-    { name: 'Dussehra', date: 'Oct 20, 2026', type: 'Mandatory', day: 20, month: 9, year: 2026 },
-    { name: 'Diwali', date: 'Nov 06, 2026', type: 'Mandatory', day: 6, month: 10, year: 2026 },
-    { name: 'Christmas', date: 'Dec 25, 2026', type: 'Mandatory', day: 25, month: 11, year: 2026 }
-  ]);
+  holidays = signal<any[]>([]);
 
   recentLeaves = signal<any[]>([]);
 
@@ -66,8 +59,6 @@ export class Leaves implements OnInit {
   };
 
   isLoading = signal(false);
-  errorMessage = signal('');
-  successMessage = signal('');
 
   showAllHolidays = signal(false);
   displayedHolidays = computed(() => this.showAllHolidays() ? this.holidays() : this.holidays().slice(0, 3));
@@ -78,6 +69,18 @@ export class Leaves implements OnInit {
 
   ngOnInit() {
     this.loadMyLeaves();
+    this.loadHolidays();
+  }
+
+  loadHolidays() {
+    this.apiService.getHolidays().subscribe({
+        next: (res) => {
+            if (res.success) {
+                this.holidays.set(res.data);
+                this.generateCalendar();
+            }
+        }
+    });
   }
 
   loadMyLeaves() {
@@ -90,7 +93,8 @@ export class Leaves implements OnInit {
             { label: 'Total Leaves', value: stats.total, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
             { label: 'Taken', value: stats.taken, icon: 'event_busy', color: 'bg-orange-50 text-orange-500' },
             { label: 'Available', value: stats.available, icon: 'today', color: 'bg-green-50 text-green-500' },
-            { label: 'Pending', value: stats.pending, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' }
+            { label: 'Pending', value: stats.pending, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' },
+            { label: 'Loss of Pay', value: stats.lwp || 0, icon: 'money_off', color: 'bg-red-50 text-red-500' }
           ]);
 
           // Format recent leaves for display
@@ -103,6 +107,7 @@ export class Leaves implements OnInit {
           })));
 
           this.rawLeaves.set(res.data);
+          this.availableLeaves.set(stats.available);
           this.generateCalendar();
         }
         this.isLoading.set(false);
@@ -116,7 +121,7 @@ export class Leaves implements OnInit {
 
   applyLeave() {
     if (!this.leaveForm.startDate || !this.leaveForm.endDate || !this.leaveForm.reason) {
-      this.errorMessage.set('Please fill all fields');
+      this.toastService.show('Please fill all required fields', 'error');
       return;
     }
 
@@ -126,12 +131,12 @@ export class Leaves implements OnInit {
     const end = new Date(this.leaveForm.endDate);
 
     if (start < today) {
-      this.errorMessage.set('Cannot apply leave for past dates');
+      this.toastService.show('Cannot apply leave for past dates', 'error');
       return;
     }
 
     if (end < start) {
-      this.errorMessage.set('End date cannot be before start date');
+      this.toastService.show('End date cannot be before start date', 'error');
       return;
     }
     const diffTime = Math.abs(end.getTime() - start.getTime());
@@ -146,18 +151,16 @@ export class Leaves implements OnInit {
     this.apiService.applyLeave(leaveData).subscribe({
       next: (res) => {
         if (res.success) {
-          this.successMessage.set('Leave application submitted successfully!');
+          this.toastService.show('Leave application submitted successfully!', 'success');
           this.loadMyLeaves(); // Reload stats and list
           // Reset form
           this.leaveForm = { type: 'Casual Leave', startDate: '', endDate: '', reason: '' };
         }
         this.isLoading.set(false);
-        setTimeout(() => this.successMessage.set(''), 3000);
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'Failed to submit application');
+        this.toastService.show(err.error?.message || 'Failed to submit application', 'error');
         this.isLoading.set(false);
-        setTimeout(() => this.errorMessage.set(''), 3000);
       }
     });
   }
