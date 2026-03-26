@@ -23,6 +23,8 @@ import { TimesheetAdmin } from './components/admin/timesheet-admin/timesheet-adm
 import { authGuard } from './guards/auth.guard';
 import { DocumentsAdmin } from './components/admin/documents/documents-admin';
 
+import { NotFoundComponent } from './components/shared/not-found/not-found';
+
 export const routes: Routes = [
   { path: 'login', component: Login },
   { path: 'forgot-password', component: ForgotPassword },
@@ -51,5 +53,6 @@ export const routes: Routes = [
       { path: 'help', component: Help },
     ]
   },
-  { path: '', redirectTo: 'login', pathMatch: 'full' }
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
+  { path: '**', component: NotFoundComponent }
 ];

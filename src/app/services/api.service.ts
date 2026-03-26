@@ -93,6 +93,19 @@ export class ApiService {
     return this.http.put(`${this.baseUrl}/leaves/${id}`, { status }, { headers: this.getHeaders() });
   }
 
+  // Holiday Management
+  getHolidays(year?: number): Observable<any> {
+    return this.http.get(`${this.baseUrl}/holidays${year ? '?year=' + year : ''}`, { headers: this.getHeaders() });
+  }
+
+  addHoliday(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/holidays`, data, { headers: this.getHeaders() });
+  }
+
+  deleteHoliday(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/holidays/${id}`, { headers: this.getHeaders() });
+  }
+
   // ==========================================
   // 5. Payroll & Payslips
   // ==========================================

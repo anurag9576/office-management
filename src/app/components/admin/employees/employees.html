@@ -35,6 +35,12 @@
                         </th>
                         <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
                             <div class="flex items-center justify-center gap-1 cursor-pointer group/th">
+                                Role
+                                <span class="material-symbols-outlined text-[10px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
+                            </div>
+                        </th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">
+                            <div class="flex items-center justify-center gap-1 cursor-pointer group/th">
                                 Email
                                 <span class="material-symbols-outlined text-[10px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
                             </div>
@@ -63,12 +69,15 @@
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{emp.firstName}} {{emp.lastName}}</p>
                                     <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">
-                                        {{emp.designation || 'Staff'}} • {{emp.role}} • {{emp.employeeId}}</p>
+                                        {{emp.designation || 'Staff'}} • {{emp.employeeId}}</p>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-5 text-center border-r border-slate-50">
-                            <span class="text-[11px] font-medium text-slate-500 lowercase tracking-tight">{{emp.email}}</span>
+                            <span class="px-3 py-1 bg-slate-100 rounded-lg text-[10px] font-bold text-slate-500 uppercase tracking-wider inline-block">{{emp.role}}</span>
+                        </td>
+                        <td class="px-6 py-5 text-center border-r border-slate-50">
+                            <span class="text-xs font-semibold text-slate-600 lowercase tracking-tight">{{emp.email}}</span>
                         </td>
                         <td class="px-6 py-5 text-center border-r border-slate-50">
                             <span

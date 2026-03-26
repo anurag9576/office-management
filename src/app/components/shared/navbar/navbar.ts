@@ -191,27 +191,32 @@ export class Navbar implements OnInit, OnDestroy {
     return `${this.serverUrl}${url.startsWith('/') ? '' : '/'}${url}`;
   }
 
-  toggleNotifications() {
-    this.showProfileDropdown.set(false);
-    this.showNotificationsDropdown.set(!this.showNotificationsDropdown());
-  }
-
-  toggleProfileDropdown() {
-    this.showNotificationsDropdown.set(false);
-    this.showProfileDropdown.set(!this.showProfileDropdown());
-  }
-
-  navigateToProfile() {
-    // On PC (>1024px), Clicking on profile navigates to internal profile page
-    if (this.isDesktop) {
-      if (this.user().role?.toLowerCase() !== 'admin') {
-        this.router.navigate(['/dashboard/profile']);
-      }
-      return;
+  toggleNotifications(event?: Event) {
+    if (event) {
+      event.stopPropagation();
     }
-    
-    // On Mobile/Tablet (including iPad Pro at 1024px), Clicking toggles the dropdown
-    this.toggleProfileDropdown();
+    this.showProfileDropdown.set(false);
+    this.showNotificationsDropdown.update(v => !v);
+  }
+
+  toggleProfileDropdown(event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.showNotificationsDropdown.set(false);
+    this.showProfileDropdown.update(v => !v);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    // Close dropdowns when clicking outside
+    this.showProfileDropdown.set(false);
+    this.showNotificationsDropdown.set(false);
+  }
+
+  goToProfile() {
+    this.showProfileDropdown.set(false);
+    this.router.navigate(['/dashboard/profile']);
   }
 
   handleNotificationClick(note: any) {

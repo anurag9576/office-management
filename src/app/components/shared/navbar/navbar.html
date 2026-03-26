@@ -28,7 +28,7 @@
 
         <!-- Notifications Dropdown -->
         <div class="relative">
-            <button (click)="toggleNotifications()"
+            <button (click)="toggleNotifications($event)"
                 class="p-2 text-brand-3 hover:text-brand-1 hover:bg-brand-1/10 rounded-lg transition-all relative"
                 [class.bg-brand-1/10]="showNotificationsDropdown()" [class.text-brand-1]="showNotificationsDropdown()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
@@ -100,9 +100,7 @@
         <!-- User Profile Box -->
         <div class="relative group ml-2">
             <!-- Trigger -->
-            <div (click)="navigateToProfile()" 
-                (mouseenter)="isDesktop && showProfileDropdown.set(true)"
-                (mouseleave)="isDesktop && showProfileDropdown.set(false)"
+            <div (click)="toggleProfileDropdown($event)" 
                 class="flex items-center gap-3 px-3 py-1.5 bg-brand-5 rounded-xl border border-white/10 shadow-sm cursor-pointer hover:bg-brand-5/90 transition-all active:scale-95 duration-200">
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-brand-1 text-white font-bold shadow-sm overflow-hidden ring-2 ring-white/10 group-hover:ring-white/20 transition-all">
                     <img *ngIf="user().avatar && !imageError()" [src]="user().avatar" (error)="onImageError()" alt="" class="w-full h-full object-cover">
@@ -114,11 +112,18 @@
                 </div>
             </div>
 
-            <!-- Profile Dropdown Menu (Click-Based for Mobile/iPad Pro, Hover-Based for PC) -->
+            <!-- Profile Dropdown Menu -->
             <div *ngIf="showProfileDropdown()" 
-                (mouseenter)="isDesktop && showProfileDropdown.set(true)"
-                (mouseleave)="isDesktop && showProfileDropdown.set(false)"
+                (click)="$event.stopPropagation()"
                 class="absolute right-0 top-[120%] w-56 lg:w-48 bg-white border border-slate-100 rounded-2xl shadow-2xl py-2 z-[200] animate-in fade-in zoom-in-95 duration-200 transform origin-top-right">
+                
+                <!-- My Profile Link (Only for non-admins) -->
+                <button *ngIf="user().role.toLowerCase() !== 'admin'" (click)="goToProfile()" class="w-full text-left px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-1 flex items-center gap-3 transition-colors">
+                    <span class="material-symbols-outlined text-[18px]">person</span>
+                    My Profile
+                </button>
+                <div *ngIf="user().role.toLowerCase() !== 'admin'" class="h-px bg-slate-100 my-1 mx-3"></div>
+                
                 <button (click)="openChangePasswordModal()" class="w-full text-left px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 hover:text-brand-1 flex items-center gap-3 transition-colors">
                     <span class="material-symbols-outlined text-[18px]">lock_reset</span>
                     Change Password

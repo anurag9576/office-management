@@ -1,0 +1,19 @@
+<div *ngIf="toast.isVisible()" 
+     [class]="'fixed top-6 right-6 z-[99999] flex items-center gap-3 px-5 py-4 rounded-2xl shadow-2xl border-l-4 animate-in slide-in-from-right-10 fade-in duration-300 ' + bgColorClass()">
+  
+  <!-- Icon Container -->
+  <div [class]="'w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ' + iconBgClass()">
+    <span class="material-symbols-outlined text-[1.2rem]">{{ iconName() }}</span>
+  </div>
+
+  <!-- Message Container -->
+  <div class="flex flex-col pr-4 translate-y-[-1px]">
+    <h5 [class]="'text-[10px] font-black uppercase tracking-widest mb-0.5 ' + labelColorClass()">{{ labelText() }}</h5>
+    <p class="text-[13px] font-black text-slate-800 tracking-tight leading-tight">{{ toast.message() }}</p>
+  </div>
+
+  <!-- Close Button -->
+  <button (click)="toast.hide()" class="p-1 px-1.5 hover:bg-black/5 rounded-lg text-slate-400 absolute top-2 right-2 transition-all">
+    <span class="material-symbols-outlined text-sm">close</span>
+  </button>
+</div>
