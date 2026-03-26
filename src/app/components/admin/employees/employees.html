@@ -1,12 +1,4 @@
 <div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-500 relative">
-    <!-- Success Snackbar -->
-    <div *ngIf="successMessage()" 
-        class="fixed top-8 left-1/2 -translate-x-1/2 z-[11000] flex items-center justify-center gap-4 px-10 py-3 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-[2rem] shadow-2xl shadow-emerald-500/10 animate-in slide-in-from-top-full duration-500 min-w-[600px]">
-        <div class="w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center">
-            <span class="material-symbols-outlined text-sm">check_circle</span>
-        </div>
-        <p class="text-[11px] font-bold uppercase tracking-widest">{{ successMessage() }}</p>
-    </div>
 
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
@@ -161,12 +153,6 @@
                     </button>
                 </div>
 
-                <!-- Error Message -->
-                <div *ngIf="errorMessage()"
-                    class="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl flex items-center gap-2 text-red-600 animate-in slide-in-from-top-2 duration-300">
-                    <span class="material-symbols-outlined text-sm">error</span>
-                    <p class="text-[10px] font-semibold uppercase tracking-wider">{{ errorMessage() }}</p>
-                </div>
 
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-4">
@@ -187,7 +173,8 @@
                             <label
                                 class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Employee
                                 ID</label>
-                            <input [(ngModel)]="newEmployee.employeeId" type="text" placeholder="EMP123"
+                            <input [(ngModel)]="newEmployee.employeeId" type="text" 
+                                [placeholder]="isEditing() ? 'E.g. HHPL 01' : 'Leave empty for Auto-ID'"
                                 class="w-full px-5 py-5 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
                         </div>
                         <div class="space-y-1.5">

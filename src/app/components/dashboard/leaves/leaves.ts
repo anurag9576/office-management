@@ -152,8 +152,7 @@ export class Leaves implements OnInit {
       next: (res) => {
         if (res.success) {
           this.toastService.show('Leave application submitted successfully!', 'success');
-          this.loadMyLeaves(); // Reload stats and list
-          // Reset form
+          this.loadMyLeaves(); 
           this.leaveForm = { type: 'Casual Leave', startDate: '', endDate: '', reason: '' };
         }
         this.isLoading.set(false);

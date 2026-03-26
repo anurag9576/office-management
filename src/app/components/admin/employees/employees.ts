@@ -2,6 +2,7 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { ToastService } from '../../../services/toast.service';
 import { MatButtonModule } from '@angular/material/button';
 
 @Component({
@@ -13,12 +14,12 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class EmployeesMgmt implements OnInit {
   private apiService = inject(ApiService);
+  private toastService = inject(ToastService);
   
   employees = signal<any[]>([]);
   showModal = signal(false);
   showPassword = signal(false);
   isEditing = signal(false);
-  errorMessage = signal('');
   roles = signal<string[]>([]);
   statuses = ['Active', 'On Leave', 'Terminated'];
   
@@ -91,17 +92,31 @@ export class EmployeesMgmt implements OnInit {
       },
       error: (err) => {
         console.error('Error loading employees:', err);
-        this.errorMessage.set('Failed to load employees.');
+        this.toastService.show('Failed to load employees.', 'error');
       }
     });
   }
 
   showAddModal() {
     this.isEditing.set(false);
-    this.errorMessage.set('');
+    
+    // Calculate next HHPL ID instantly from local cache
+    const hhplIds = this.employees()
+      .map(e => e.employeeId)
+      .filter(id => id && id.startsWith('HHPL '))
+      .map(id => parseInt(id.replace('HHPL ', ''), 10))
+      .filter(num => !isNaN(num));
+    
+    let nextNum = 1;
+    if (hhplIds.length > 0) {
+      nextNum = Math.max(...hhplIds) + 1;
+    }
+    const formattedNum = nextNum < 10 ? `0${nextNum}` : nextNum;
+    const nextId = `HHPL ${formattedNum}`;
+
     this.newEmployee = {
       _id: '',
-      employeeId: 'EMP' + Math.floor(100 + Math.random() * 900),
+      employeeId: nextId,
       firstName: '',
       lastName: '',
       email: '',
@@ -110,13 +125,13 @@ export class EmployeesMgmt implements OnInit {
       designation: '',
       status: 'Active'
     };
+
     this.showPassword.set(false);
     this.showModal.set(true);
   }
 
   editEmployee(emp: any) {
     this.isEditing.set(true);
-    this.errorMessage.set('');
     this.newEmployee = { ...emp };
     this.showPassword.set(false);
     this.showModal.set(true);
@@ -126,18 +141,11 @@ export class EmployeesMgmt implements OnInit {
     this.showModal.set(false);
   }
 
-  successMessage = signal('');
-
-  showSuccess(msg: string) {
-    this.successMessage.set(msg);
-    setTimeout(() => this.successMessage.set(''), 1000);
-  }
 
   saveEmployee() {
     const emp = this.newEmployee;
-    if (!emp.firstName || !emp.lastName || !emp.email || !emp.employeeId || !emp.role || (!this.isEditing() && !emp.password)) {
-      this.errorMessage.set('Please fill all required fields before saving.');
-      setTimeout(() => this.errorMessage.set(''), 3000);
+    if (!emp.firstName || !emp.lastName || !emp.email || !emp.role || (!this.isEditing() && !emp.password)) {
+      this.toastService.show('Please fill all required fields before saving.', 'error');
       return;
     }
 
@@ -147,11 +155,11 @@ export class EmployeesMgmt implements OnInit {
           if (res.success) {
             this.loadEmployees();
             this.closeModal();
-            this.showSuccess('Employee data updated successfully!');
+            this.toastService.show('Employee data updated successfully!', 'success');
           }
         },
         error: (err) => {
-          this.errorMessage.set(err.error?.message || 'Error updating employee');
+          this.toastService.show(err.error?.message || 'Error updating employee', 'error');
         }
       });
     } else {
@@ -160,11 +168,11 @@ export class EmployeesMgmt implements OnInit {
           if (res.success) {
             this.loadEmployees();
             this.closeModal();
-            this.showSuccess('Successfull add employee!');
+            this.toastService.show('Employee added successfully!', 'success');
           }
         },
         error: (err) => {
-          this.errorMessage.set(err.error?.message || 'Error adding employee');
+          this.toastService.show(err.error?.message || 'Error adding employee', 'error');
         }
       });
     }
