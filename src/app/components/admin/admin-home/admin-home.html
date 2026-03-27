@@ -9,7 +9,7 @@
     <!-- Top Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <div *ngFor="let stat of stats()"
-            class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-100 hover:border-brand-1 transition-all group overflow-hidden relative max-w-[18rem]">
+            class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-slate-100 hover:border-brand-1 hover-float transition-all group overflow-hidden relative max-w-[18rem]">
             <div
                 [class]="'absolute top-0 right-0 w-24 h-24 rounded-full -mr-8 -mt-8 group-hover:scale-150 transition-transform duration-700 ' + stat.bgOp5">
             </div>
@@ -27,11 +27,42 @@
         </div>
     </div>
 
+    <!-- Data & Analytics Insights -->
+    <div class="w-full mb-12">
+        <!-- System Activity Trends -->
+        <div class="bg-white p-6 pb-0 md:p-8 md:pb-0 rounded-[1rem] shadow-xl border border-slate-100 hover-float transition-all duration-500 group">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">System Activity Analytics</h2>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Leaves, Docs & Announcements Trend</p>
+                </div>
+                <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500">
+                    <span class="material-symbols-outlined text-2xl">monitoring</span>
+                </div>
+            </div>
+            <div id="chart-activity" class="w-full -mb-4">
+                <apx-chart *ngIf="activityChartOptions().series"
+                    [series]="activityChartOptions().series!"
+                    [chart]="activityChartOptions().chart!"
+                    [xaxis]="activityChartOptions().xaxis!"
+                    [stroke]="activityChartOptions().stroke!"
+                    [colors]="activityChartOptions().colors!"
+                    [fill]="activityChartOptions().fill!"
+                    [dataLabels]="activityChartOptions().dataLabels!"
+                    [grid]="activityChartOptions().grid!"
+                    [yaxis]="activityChartOptions().yaxis!"
+                    [legend]="activityChartOptions().legend!"
+                    [tooltip]="activityChartOptions().tooltip!">
+                </apx-chart>
+            </div>
+        </div>
+    </div>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Action Control Center -->
         <div
-            class="lg:col-span-2 bg-brand-5 p-8 sm:p-10 rounded-[3rem] shadow-2xl text-white relative overflow-hidden group">
-            <div class="absolute inset-0 bg-gradient-to-br from-brand-1/40 to-transparent pointer-events-none"></div>
+            class="lg:col-span-2 bg-gradient-to-br from-brand-5 to-brand-1 p-8 sm:p-10 rounded-[3rem] shadow-2xl text-white relative overflow-hidden group hover-float">
+            <div class="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
 
             <div class="flex items-center justify-between mb-10 relative z-10">
                 <h2 class="text-2xl font-semibold tracking-tight">Administrative Hub</h2>
@@ -66,7 +97,8 @@
                     <span class="text-[10px] font-semibold uppercase tracking-widest">Reports</span>
                 </a>
                 <a routerLink="/dashboard/timesheet-admin"
-                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn">
+                    class="p-6 bg-white/5 border border-white/10 rounded-[2rem] hover:bg-white hover:text-slate-900 transition-all text-center flex flex-col items-center group/btn"
+                    title="Floating Effect (Hover)">
                     <span
                         class="material-symbols-outlined mb-3 text-3xl opacity-50 group-hover/btn:opacity-100">schedule</span>
                     <span class="text-[10px] font-semibold uppercase tracking-widest">Timesheet</span>
@@ -81,23 +113,25 @@
         </div>
 
         <!-- Recent Logs -->
-        <div class="bg-white p-6 sm:p-8 rounded-[3rem] shadow-xl border border-slate-100 flex flex-col h-full lg:max-h-[24rem]">
-            <h2 class="text-xl font-semibold text-slate-800 mb-6 flex items-center gap-2 shrink-0">
-                <span class="material-symbols-outlined text-brand-1">history</span>
+        <div class="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100 flex flex-col h-full lg:max-h-[29rem] hover:shadow-2xl transition-all duration-500">
+            <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2 shrink-0">
+                <div class="w-8 h-8 rounded-xl bg-brand-1/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-brand-1 text-lg">history</span>
+                </div>
                 Audit Logs
             </h2>
 
-            <div class="flex-1 overflow-y-auto pr-3 max-h-[255px] custom-scrollbar">
+            <div class="flex-1 overflow-y-auto pr-3 custom-scrollbar">
                 <div *ngIf="recentActions().length > 0" class="space-y-6 relative border-l-2 border-slate-50 ml-2 pl-6 pb-2">
-                    <div *ngFor="let log of recentActions()" class="relative">
-                        <div class="absolute -left-[31px] top-1 w-2 h-2 rounded-full bg-brand-1 ring-4 ring-white"></div>
-                        <p class="text-[10px] font-semibold text-brand-1 uppercase tracking-widest mb-1">{{log.time}}</p>
+                    <div *ngFor="let log of recentActions()" class="relative group/log">
+                        <div class="absolute -left-[31px] top-1 w-2 h-2 rounded-full bg-slate-200 group-hover/log:bg-brand-1 ring-4 ring-white transition-colors"></div>
+                        <p class="text-[10px] font-bold text-slate-400 group-hover/log:text-brand-1 uppercase tracking-widest mb-1 transition-colors">{{log.time}}</p>
                         <p class="text-sm font-semibold text-slate-800 leading-snug break-words pr-2 line-clamp-2">{{log.action}}</p>
-                        <p class="text-[10px] font-medium text-slate-400 mt-1">by {{log.admin}}</p>
+                        <p class="text-[10px] font-medium text-slate-400 mt-1">by <span class="text-slate-600 font-bold uppercase tracking-tighter">{{log.admin}}</span></p>
                     </div>
                 </div>
 
-                <div *ngIf="recentActions().length === 0" class="text-center py-10 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                <div *ngIf="recentActions().length === 0" class="text-center py-10 text-slate-400 text-xs font-bold uppercase tracking-widest italic">
                     No recent activity recorded.
                 </div>
             </div>
