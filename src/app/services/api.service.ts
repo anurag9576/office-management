@@ -283,4 +283,19 @@ export class ApiService {
   updateRequestStatus(id: string, status: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/documents/request/${id}`, { status }, { headers: this.getHeaders() });
   }
+
+  // ==========================================
+  // 12. File Upload (New backend endpoint)
+  // ==========================================
+  uploadFile(file: File, folder?: string): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (folder) {
+      formData.append('folder', folder);
+    }
+    
+    // For FormData, we must let the browser set the Content-Type with boundary
+    const headers = this.getHeaders().delete('Content-Type');
+    return this.http.post(`${this.baseUrl}/upload`, formData, { headers });
+  }
 }

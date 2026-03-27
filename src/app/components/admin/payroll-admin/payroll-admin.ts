@@ -2,6 +2,7 @@ import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-payroll-admin',
@@ -94,7 +95,7 @@ export class PayrollAdmin implements OnInit {
     ]
   });
 
-  onFileSelected(event: any) {
+  async onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       if (file.type !== 'application/pdf') {
@@ -102,11 +103,20 @@ export class PayrollAdmin implements OnInit {
         return;
       }
       
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.payrollForm.update(prev => ({ ...prev, pdfUrl: e.target.result }));
-      };
-      reader.readAsDataURL(file);
+      this.isLoading.set(true);
+      try {
+        const uploadRes = await firstValueFrom(this.apiService.uploadFile(file, 'office-management/payroll'));
+        if (uploadRes.success) {
+          const secureUrl = uploadRes.data.path || uploadRes.data.url;
+          this.payrollForm.update(prev => ({ ...prev, pdfUrl: secureUrl }));
+          this.showSuccess('PDF uploaded successfully!');
+        }
+      } catch (error) {
+        console.error('File upload failed:', error);
+        this.errorMessage.set('Failed to upload PDF to server.');
+      } finally {
+        this.isLoading.set(false);
+      }
     }
   }
 
