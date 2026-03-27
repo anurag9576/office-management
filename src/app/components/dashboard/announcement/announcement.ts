@@ -2,6 +2,8 @@ import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { firstValueFrom } from 'rxjs';
+import { resizeImage } from '../../../utils/image-utils';
 
 @Component({
   selector: 'app-announcement',
@@ -258,14 +260,25 @@ export class Announcement implements OnInit {
     this.editingAnnouncementId.set(null);
   }
 
-  onFileSelected(event: any) {
+  async onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.newPostImage.set(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      this.isLoading.set(true);
+      try {
+        // Resize image to 800px width before upload
+        const resizedFile = await resizeImage(file, 800);
+        
+        const uploadRes = await firstValueFrom(this.apiService.uploadFile(resizedFile, 'office-management/announcements'));
+        if (uploadRes.success) {
+          const secureUrl = uploadRes.data.path || uploadRes.data.url;
+          this.newPostImage.set(secureUrl);
+        }
+      } catch (error) {
+        console.error('Image upload failed:', error);
+        alert('Failed to upload image to server.');
+      } finally {
+        this.isLoading.set(false);
+      }
     }
   }
 

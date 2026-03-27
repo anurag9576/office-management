@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
 import { environment } from '../../../../environments/environment';
 import { jsPDF } from 'jspdf';
+import { firstValueFrom } from 'rxjs';
+import { resizeImage } from '../../../utils/image-utils';
 
 @Component({
   selector: 'app-profile',
@@ -328,47 +330,54 @@ export class Profile implements OnInit {
     this.showModal.set(false);
   }
 
-  onPhotoSelected(event: any) {
+  async onPhotoSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      // Validate file size (e.g., 5MB limit)
       if (file.size > 5 * 1024 * 1024) {
         this.errorMessage.set('Image size should be less than 5MB');
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const avatarData = e.target.result;
+      this.isLoading.set(true);
+      try {
+        // Resize image to 800px width before upload
+        const resizedFile = await resizeImage(file, 800);
         
-        // Optionally save to backend immediately
-        const userId = this.employee()._id || this.employee().id;
-        if (userId) {
-          this.isLoading.set(true);
-          this.apiService.updateEmployee(userId, { avatar: avatarData }).subscribe({
-            next: (res) => {
-              this.employee.update(emp => ({ ...emp, avatar: avatarData }));
-              
-              // Update localStorage so Navbar/Sidebar sync
-              const userStr = localStorage.getItem('currentUser');
-              if (userStr) {
-                const user = JSON.parse(userStr);
-                user.avatar = avatarData;
-                localStorage.setItem('currentUser', JSON.stringify(user));
+        // 1. Upload file using new backend endpoint
+        const uploadRes = await firstValueFrom(this.apiService.uploadFile(resizedFile, 'office-management/avatars'));
+        
+        if (uploadRes.success) {
+          const secureUrl = uploadRes.data.path || uploadRes.data.url;
+          
+          // 2. Update employee photo URL
+          const userId = this.employee()._id || this.employee().id;
+          if (userId) {
+            this.apiService.updateEmployee(userId, { avatar: secureUrl }).subscribe({
+              next: (res) => {
+                this.employee.update(emp => ({ ...emp, avatar: secureUrl }));
+                
+                const userStr = localStorage.getItem('currentUser');
+                if (userStr) {
+                  const user = JSON.parse(userStr);
+                  user.avatar = secureUrl;
+                  localStorage.setItem('currentUser', JSON.stringify(user));
+                }
+                this.isLoading.set(false);
+                this.showSuccess('Profile photo updated!');
+              },
+              error: (err) => {
+                console.error('Error updating profile avatar link:', err);
+                this.errorMessage.set('Photo uploaded, but profile sync failed.');
+                this.isLoading.set(false);
               }
-
-              this.isLoading.set(false);
-              this.showSuccess('Profile photo updated!');
-            },
-            error: (err) => {
-              console.error('Error uploading photo:', err);
-              this.errorMessage.set('Failed to upload photo.');
-              this.isLoading.set(false);
-            }
-          });
+            });
+          }
         }
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Backend upload failed:', error);
+        this.errorMessage.set('Failed to upload photo to server.');
+        this.isLoading.set(false);
+      }
     }
   }
 }
