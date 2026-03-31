@@ -32,25 +32,8 @@ export class EmployeesMgmt implements OnInit {
     password: '',
     role: '',
     designation: '',
-    status: 'Active',
-    salaryStructure: {
-      grossAmount: 0,
-      earnings: [
-        { label: 'Basic Salary', amount: 0 },
-        { label: 'House Rent Allowance', amount: 0 },
-        { label: 'City Compensatory Allowance', amount: 0 },
-        { label: 'Conveyance Allowance', amount: 0 },
-        { label: 'Medical Allowance', amount: 0 },
-        { label: 'Variable Pay', amount: 0 }
-      ],
-      deductionsList: [
-        { label: 'Provident Fund', amount: 0 },
-        { label: 'Professional Tax', amount: 200 },
-        { label: 'Income Tax', amount: 0 },
-        { label: 'Loan and Advance', amount: 0 }
-      ]
-    }
-  };
+    status: 'Active'
+  } as any;
 
   // Pagination
   currentPage = signal(1);
@@ -140,24 +123,7 @@ export class EmployeesMgmt implements OnInit {
       password: '',
       role: '',
       designation: '',
-      status: 'Active',
-      salaryStructure: {
-        grossAmount: 0,
-        earnings: [
-          { label: 'Basic Salary', amount: 0 },
-          { label: 'House Rent Allowance', amount: 0 },
-          { label: 'City Compensatory Allowance', amount: 0 },
-          { label: 'Conveyance Allowance', amount: 0 },
-          { label: 'Medical Allowance', amount: 0 },
-          { label: 'Variable Pay', amount: 0 }
-        ],
-        deductionsList: [
-          { label: 'Provident Fund', amount: 0 },
-          { label: 'Professional Tax', amount: 200 },
-          { label: 'Income Tax', amount: 0 },
-          { label: 'Loan and Advance', amount: 0 }
-        ]
-      }
+      status: 'Active'
     };
 
     this.showPassword.set(false);
@@ -168,27 +134,7 @@ export class EmployeesMgmt implements OnInit {
     this.isEditing.set(true);
     // Deep clone to avoid direct signal mutation and ensure structure
     this.newEmployee = JSON.parse(JSON.stringify(emp));
-    
-    // Ensure salaryStructure exists
-    if (!this.newEmployee.salaryStructure) {
-      this.newEmployee.salaryStructure = {
-        grossAmount: 0,
-        earnings: [
-          { label: 'Basic Salary', amount: 0 },
-          { label: 'House Rent Allowance', amount: 0 },
-          { label: 'City Compensatory Allowance', amount: 0 },
-          { label: 'Conveyance Allowance', amount: 0 },
-          { label: 'Medical Allowance', amount: 0 },
-          { label: 'Variable Pay', amount: 0 }
-        ],
-        deductionsList: [
-          { label: 'Provident Fund', amount: 0 },
-          { label: 'Professional Tax', amount: 200 },
-          { label: 'Income Tax', amount: 0 },
-          { label: 'Loan and Advance', amount: 0 }
-        ]
-      };
-    }
+
     
     this.showPassword.set(false);
     this.showModal.set(true);

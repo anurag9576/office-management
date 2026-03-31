@@ -134,9 +134,8 @@
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300"
             (click)="closeModal()"></div>
 
-        <!-- Modal Content -->
         <div
-            class="relative bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
+            class="relative bg-white w-full max-w-xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
             <div class="p-8 sm:p-10">
                 <div class="flex items-center justify-between mb-8">
                     <div>
@@ -241,33 +240,7 @@
                         </div>
                     </div>
 
-                    <!-- Salary Structure Section -->
-                    <div class="pt-6 border-t border-slate-100 mt-6">
-                        <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
-                            <span class="material-symbols-outlined text-sm">payments</span>
-                            Salary Structure (Defaults)
-                        </h3>
-                        
-                        <div class="space-y-6">
-                            <!-- Earnings -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Monthly Earnings</p>
-                                <div class="grid grid-cols-2 gap-3 mb-3" *ngFor="let item of newEmployee.salaryStructure.earnings; let i = index">
-                                    <input [(ngModel)]="item.label" class="bg-white px-3 py-2 rounded-lg text-[10px] font-bold border border-slate-200 outline-none" placeholder="Label">
-                                    <input [(ngModel)]="item.amount" type="number" class="bg-white px-3 py-2 rounded-lg text-[10px] font-black border border-slate-200 outline-none text-emerald-600" placeholder="Amount">
-                                </div>
-                            </div>
 
-                            <!-- Deductions -->
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">Monthly Deductions</p>
-                                <div class="grid grid-cols-2 gap-3 mb-3" *ngFor="let item of newEmployee.salaryStructure.deductionsList; let i = index">
-                                    <input [(ngModel)]="item.label" class="bg-white px-3 py-2 rounded-lg text-[10px] font-bold border border-slate-200 outline-none" placeholder="Label">
-                                    <input [(ngModel)]="item.amount" type="number" class="bg-white px-3 py-2 rounded-lg text-[10px] font-black border border-slate-200 outline-none text-red-600" placeholder="Amount">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <div class="pt-10">
                         <button (click)="saveEmployee()"
                             class="w-full py-5 bg-brand-5 text-white rounded-2xl font-semibold text-xs uppercase tracking-widest shadow-xl shadow-brand-5/20 hover:bg-brand-1 hover:-translate-y-1 transition-all active:scale-95">
