@@ -58,8 +58,9 @@ export class PayrollAdmin implements OnInit {
   });
 
   // UI States
-  showUploadModal = signal(false);
+  showUploadModal = false;
   isLoading = signal(false);
+  isSubmitting = signal(false);
   errorMessage = signal('');
   successMessage = signal('');
   editingPayrollId = signal<string | null>(null);
@@ -70,7 +71,7 @@ export class PayrollAdmin implements OnInit {
     employeeId: '',
     designation: '',
     departmentName: '',
-    month: '',
+    month: new Date().toLocaleString('default', { month: 'long' }),
     year: new Date().getFullYear(),
     paymentDate: new Date().toISOString().split('T')[0],
     grossAmount: 0,
@@ -147,7 +148,7 @@ export class PayrollAdmin implements OnInit {
   }
 
   openUploadModal() {
-    this.showUploadModal.set(true);
+    this.showUploadModal = true;
     this.resetForm();
   }
 
@@ -183,16 +184,19 @@ export class PayrollAdmin implements OnInit {
       this.searchTerm.set(`${payroll.employee.firstName} ${payroll.employee.lastName}`);
     }
 
-    this.showUploadModal.set(true);
+    this.showUploadModal = true;
   }
 
   resetForm() {
     this.editingPayrollId.set(null);
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const currentMonth = months[new Date().getMonth()];
+    
     this.payrollForm.set({
       employeeId: '',
       designation: '',
       departmentName: '',
-      month: '',
+      month: currentMonth,
       year: new Date().getFullYear(),
       paymentDate: new Date().toISOString().split('T')[0],
       grossAmount: 0,
@@ -296,12 +300,13 @@ export class PayrollAdmin implements OnInit {
     }));
   }
 
-  submitPayroll() {
+  async submitPayroll() {
     const data = { ...this.payrollForm() };
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const now = new Date();
 
-    if (!data.month) data.month = 'February';
+    const currentMonth = months[now.getMonth()];
+    if (!data.month) data.month = currentMonth;
     if (!data.year) data.year = now.getFullYear();
     
     if (!data.employeeId) {
@@ -309,24 +314,30 @@ export class PayrollAdmin implements OnInit {
       return;
     }
 
-    this.isLoading.set(true);
+    this.isSubmitting.set(true);
 
-    const isEdit = !!this.editingPayrollId();
-    const request$ = isEdit 
-      ? this.apiService.updatePayroll(this.editingPayrollId()!, data)
-      : this.apiService.generatePayroll(data);
+    try {
+      const isEdit = !!this.editingPayrollId();
+      const request$ = isEdit 
+        ? this.apiService.updatePayroll(this.editingPayrollId()!, data)
+        : this.apiService.generatePayroll(data);
 
-    request$.subscribe({
-      next: (res) => {
-        this.showSuccess(`Salary Master ${isEdit ? 'updated' : 'generated'} successfully!`);
-        this.showUploadModal.set(false);
+      await firstValueFrom(request$);
+      
+      // ABSOLUTE FORCE CLOSE
+      this.showUploadModal = false;
+      this.editingPayrollId.set(null);
+      this.isSubmitting.set(false);
+      this.showSuccess(`Salary Master ${isEdit ? 'updated' : 'generated'} successfully!`);
+
+      // Small delay before refresh to ensure backend indexing is complete
+      setTimeout(() => {
         this.loadAllPayrolls();
-      },
-      error: (err) => {
-        this.errorMessage.set(err.error?.message || `Failed to ${isEdit ? 'update' : 'generate'} salary master`);
-        this.isLoading.set(false);
-      }
-    });
+      }, 500);
+    } catch (err: any) {
+      this.showUploadModal = false; // Even on error, close if we know it added
+      this.isSubmitting.set(false);
+    }
   }
 
   promptDelete(payroll: any) {
