@@ -35,31 +35,66 @@ export class EmployeesMgmt implements OnInit {
     status: 'Active'
   } as any;
 
-  // Pagination
-  currentPage = signal(1);
-  itemsPerPage = 10;
+  // Pagination for Active Employees
+  currentPageActive = signal(1);
+  itemsPerPage = 5;
 
-  paginatedEmployees = computed(() => {
-    const startIndex = (this.currentPage() - 1) * this.itemsPerPage;
-    return this.employees().slice(startIndex, startIndex + this.itemsPerPage);
+  activeEmployees = computed(() => {
+    return this.employees().filter(e => e.status !== 'Terminated');
   });
 
-  totalPages = computed(() => {
-    return Math.ceil(this.employees().length / this.itemsPerPage) || 1;
+  paginatedActiveEmployees = computed(() => {
+    const startIndex = (this.currentPageActive() - 1) * this.itemsPerPage;
+    return this.activeEmployees().slice(startIndex, startIndex + this.itemsPerPage);
   });
 
-  startRange = computed(() => {
-    if (this.employees().length === 0) return 0;
-    return (this.currentPage() - 1) * this.itemsPerPage + 1;
+  totalActivePages = computed(() => {
+    return Math.ceil(this.activeEmployees().length / this.itemsPerPage) || 1;
   });
 
-  endRange = computed(() => {
-    return Math.min(this.currentPage() * this.itemsPerPage, this.employees().length);
+  startActiveRange = computed(() => {
+    if (this.activeEmployees().length === 0) return 0;
+    return (this.currentPageActive() - 1) * this.itemsPerPage + 1;
   });
 
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
+  endActiveRange = computed(() => {
+    return Math.min(this.currentPageActive() * this.itemsPerPage, this.activeEmployees().length);
+  });
+
+  // Pagination for Terminated Employees
+  currentPageTerminated = signal(1);
+  
+  terminatedEmployees = computed(() => {
+    return this.employees().filter(e => e.status === 'Terminated');
+  });
+
+  paginatedTerminatedEmployees = computed(() => {
+    const startIndex = (this.currentPageTerminated() - 1) * this.itemsPerPage;
+    return this.terminatedEmployees().slice(startIndex, startIndex + this.itemsPerPage);
+  });
+
+  totalTerminatedPages = computed(() => {
+    return Math.ceil(this.terminatedEmployees().length / this.itemsPerPage) || 1;
+  });
+
+  startTerminatedRange = computed(() => {
+    if (this.terminatedEmployees().length === 0) return 0;
+    return (this.currentPageTerminated() - 1) * this.itemsPerPage + 1;
+  });
+
+  endTerminatedRange = computed(() => {
+    return Math.min(this.currentPageTerminated() * this.itemsPerPage, this.terminatedEmployees().length);
+  });
+
+  goToActivePage(page: number) {
+    if (page >= 1 && page <= this.totalActivePages()) {
+      this.currentPageActive.set(page);
+    }
+  }
+
+  goToTerminatedPage(page: number) {
+    if (page >= 1 && page <= this.totalTerminatedPages()) {
+      this.currentPageTerminated.set(page);
     }
   }
 
@@ -202,8 +237,11 @@ export class EmployeesMgmt implements OnInit {
       next: (res) => {
         if (res.success) {
           this.loadEmployees();
-          if (this.paginatedEmployees().length === 1 && this.currentPage() > 1) {
-            this.currentPage.update(p => p - 1);
+          if (this.paginatedActiveEmployees().length === 1 && this.currentPageActive() > 1) {
+            this.currentPageActive.update(p => p - 1);
+          }
+          if (this.paginatedTerminatedEmployees().length === 1 && this.currentPageTerminated() > 1) {
+            this.currentPageTerminated.update(p => p - 1);
           }
           this.cancelDelete();
         }
