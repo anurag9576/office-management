@@ -51,11 +51,6 @@ export class ApiService {
     return this.http.put(`${this.baseUrl}/employees/${id}`, data, { headers: this.getHeaders() });
   }
 
-  // Delete an employee
-  deleteEmployee(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/employees/${id}`, { headers: this.getHeaders() });
-  }
-
   // Get next auto-generated employee ID
   getNextEmployeeId(): Observable<any> {
     return this.http.get(`${this.baseUrl}/employees/next-id`, { headers: this.getHeaders() });

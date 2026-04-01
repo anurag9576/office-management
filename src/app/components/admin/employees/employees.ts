@@ -21,7 +21,7 @@ export class EmployeesMgmt implements OnInit {
   showPassword = signal(false);
   isEditing = signal(false);
   roles = signal<string[]>([]);
-  statuses = ['Active', 'On Leave', 'Terminated'];
+  statuses = ['Active', 'On Leave'];
   
   newEmployee = {
     _id: '',
@@ -169,10 +169,13 @@ export class EmployeesMgmt implements OnInit {
     this.isEditing.set(true);
     // Deep clone to avoid direct signal mutation and ensure structure
     this.newEmployee = JSON.parse(JSON.stringify(emp));
-
     
     this.showPassword.set(false);
     this.showModal.set(true);
+  }
+
+  onStatusChange(newVal: string) {
+    this.newEmployee.status = newVal;
   }
 
   closeModal() {
@@ -219,6 +222,15 @@ export class EmployeesMgmt implements OnInit {
   showDeleteModal = signal(false);
   employeeToDeleteId = signal('');
 
+  deleteModalTitle = computed(() => {
+    const id = this.employeeToDeleteId();
+    if (!id) return 'Are you sure?';
+    const targetEmp = this.employees().find(e => e._id === id);
+    return targetEmp && targetEmp.status !== 'Terminated' 
+      ? 'Terminate this employee?' 
+      : 'Are you sure active this employ?';
+  });
+
   showDeleteConfirm(id: string) {
     this.employeeToDeleteId.set(id);
     this.showDeleteModal.set(true);
@@ -233,27 +245,35 @@ export class EmployeesMgmt implements OnInit {
     const id = this.employeeToDeleteId();
     if (!id) return;
 
-    this.apiService.deleteEmployee(id).subscribe({
+    const targetEmp = this.employees().find(e => e._id === id);
+    if (!targetEmp) return;
+
+    const isTerminated = targetEmp.status === 'Terminated';
+    const newStatus = isTerminated ? 'Active' : 'Terminated';
+
+    this.apiService.updateEmployee(id, { ...targetEmp, status: newStatus }).subscribe({
       next: (res) => {
         if (res.success) {
           this.loadEmployees();
-          if (this.paginatedActiveEmployees().length === 1 && this.currentPageActive() > 1) {
-            this.currentPageActive.update(p => p - 1);
-          }
-          if (this.paginatedTerminatedEmployees().length === 1 && this.currentPageTerminated() > 1) {
-            this.currentPageTerminated.update(p => p - 1);
-          }
+          this.toastService.show(
+            isTerminated ? 'Employee activated successfully!' : 'Employee has been moved to terminated records.', 
+            'success'
+          );
           this.cancelDelete();
         }
       },
       error: (err) => {
-        alert('Failed to delete employee');
+        this.toastService.show(err.error?.message || 'Error updating status', 'error');
         this.cancelDelete();
       }
     });
   }
 
-  deleteEmployee(id: string) {
-    // This method is now handled via showDeleteConfirm
+  isRestorable(emp: any): boolean {
+    if (emp.status !== 'Terminated' || !emp.terminationDate) return true;
+    const termDate = new Date(emp.terminationDate);
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    return termDate > oneMonthAgo;
   }
 }

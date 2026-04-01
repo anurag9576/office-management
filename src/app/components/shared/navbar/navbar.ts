@@ -34,7 +34,7 @@ export class Navbar implements OnInit, OnDestroy {
   passwordSuccess = signal<string | null>(null);
   passwordVisible = signal(false);
   confirmPasswordVisible = signal(false);
-  currentTitle = signal('Dashboard');
+
   unreadCount = signal(0);
   user = signal({
     name: 'User',
@@ -61,15 +61,8 @@ export class Navbar implements OnInit, OnDestroy {
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
 
-    // Dynamic Title Logic
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.updateTitle(event.urlAfterRedirects);
-    });
+    // Initial title (Logic removed as title is hidden)
 
-    // Initial title
-    this.updateTitle(this.router.url);
   }
 
   ngOnInit() {
@@ -133,24 +126,7 @@ export class Navbar implements OnInit, OnDestroy {
     });
   }
 
-  private updateTitle(url: string) {
-    if (url.includes('admin-home')) this.currentTitle.set('Admin Dashboard');
-    else if (url.includes('employees')) this.currentTitle.set('Employee Mgmt');
-    else if (url.includes('departments')) this.currentTitle.set('Dept Mgmt');
-    else if (url.includes('roles')) this.currentTitle.set('Roles Mgmt');
-    else if (url.includes('attendance')) this.currentTitle.set('Attendance');
-    else if (url.includes('leaves-admin')) this.currentTitle.set('Leave Mgmt');
-    else if (url.includes('payroll-admin')) this.currentTitle.set('Payroll');
-    else if (url.includes('tasks')) this.currentTitle.set('Tasks');
-    else if (url.includes('reports')) this.currentTitle.set('Reports');
-    else if (url.includes('announcement')) this.currentTitle.set('Announcement');
-    else if (url.includes('settings')) this.currentTitle.set('Settings');
-    else if (url.includes('profile')) this.currentTitle.set('Profile');
-    else if (url.includes('leaves')) this.currentTitle.set('Leaves');
-    else if (url.includes('payroll')) this.currentTitle.set('Payroll');
-    else if (url.includes('help')) this.currentTitle.set('Help');
-    else this.currentTitle.set('Dashboard');
-  }
+
 
   private loadUserInfo() {
     const savedUser = localStorage.getItem('currentUser');
