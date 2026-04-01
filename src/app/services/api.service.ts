@@ -131,6 +131,22 @@ export class ApiService {
   }
 
   // ==========================================
+  // 5.5 Salary Master Management
+  // ==========================================
+  
+  getSalaryMasters(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/salary-master`, { headers: this.getHeaders() });
+  }
+
+  saveSalaryMaster(data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/salary-master`, data, { headers: this.getHeaders() });
+  }
+
+  deleteSalaryMaster(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/salary-master/${id}`, { headers: this.getHeaders() });
+  }
+
+  // ==========================================
   // 6. Announcements
   // ==========================================
   
