@@ -38,6 +38,10 @@ export class Announcement implements OnInit {
   isEditingAnnouncement = signal(false);
   editingAnnouncementId = signal<string | null>(null);
 
+  // Deleting State
+  showDeleteConfirm = signal(false);
+  announcementToDeleteId = signal<string | null>(null);
+
   ngOnInit() {
     this.loadUser();
     this.loadAnnouncements();
@@ -155,7 +159,7 @@ export class Announcement implements OnInit {
     request.subscribe({
       next: (res) => {
         if (res.success) {
-          this.loadAnnouncements(); // Reload feed
+          this.loadAnnouncements(); 
           this.resetForm();
         }
         this.isLoading.set(false);
@@ -211,15 +215,29 @@ export class Announcement implements OnInit {
   }
 
   deleteAnnouncement(id: string) {
-    if (!confirm('Are you sure you want to delete this announcement?')) return;
+    this.announcementToDeleteId.set(id);
+    this.showDeleteConfirm.set(true);
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm.set(false);
+    this.announcementToDeleteId.set(null);
+  }
+
+  confirmDelete() {
+    const id = this.announcementToDeleteId();
+    if (!id) return;
 
     this.isLoading.set(true);
+    this.showDeleteConfirm.set(false);
+    
     this.apiService.deleteAnnouncement(id).subscribe({
       next: (res) => {
         if (res.success) {
           this.loadAnnouncements();
           this.apiService.notificationRefresh.next();
         }
+        this.isLoading.set(true);
         this.isLoading.set(false);
       },
       error: (err) => {

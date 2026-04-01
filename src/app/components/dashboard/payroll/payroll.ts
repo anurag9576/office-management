@@ -286,9 +286,9 @@ export class Payroll implements OnInit {
     
     // Prioritize backend record for days, fallback to calendar calculation for missing data
     const totalDaysNum = Number(stub.totalDays || stub.total_days || stub.days_in_month || getActualDaysInMonth(monthStr, yearNum));
-    const absentDaysNum = Number(stub.absentDays || stub.days_absent || stub.leaves || stub.leavesTaken || 0);
+    const absentDaysNum = Number(stub.daysAbsent || stub.absentDays || stub.days_absent || stub.leaves || stub.leavesTaken || 0);
     // Use specific backend present count if available, otherwise calculate (max out at total month days)
-    const rawPresent = stub.presentDays || stub.days_present || stub.workingDays || (totalDaysNum - absentDaysNum);
+    const rawPresent = stub.daysPresent || stub.presentDays || stub.days_present || stub.workingDays || (totalDaysNum - absentDaysNum);
     const presentDaysNum = Math.min(Number(rawPresent), totalDaysNum);
 
     doc.text(`${presentDaysNum}`, 50, rowY(3));
@@ -307,10 +307,7 @@ export class Payroll implements OnInit {
     doc.text(`${absentDaysNum}`, 155, rowY(3));
     doc.setFont('helvetica', 'normal');
 
-    // 3. Earnings & Deductions Tables
-    // Variables already declared at top of function
     
-    // Total Earnings Calculation for Gross Salary display
     const calcGrossVal = (eList: any[]) => {
       const total = eList?.reduce((sum, e) => {
         const val = Number(e.amount?.replace(/[^0-9.]/g,'') || 0);
