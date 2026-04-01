@@ -80,6 +80,7 @@ export class PayrollAdmin implements OnInit {
     daysAbsent: 0,
     totalDays: 30,
     pdfUrl: '',
+    isAutoGenerate: true,
     earnings: [
       { label: 'Basic Salary', actualAmount: 0, amount: 0 },
       { label: 'House Rent Allowance', actualAmount: 0, amount: 0 },
@@ -135,13 +136,15 @@ export class PayrollAdmin implements OnInit {
 
   loadAllPayrolls() {
     this.isLoading.set(true);
-    this.apiService.getAllPayrolls().subscribe({
+    // Now loading from Salary Master table
+    this.apiService.getSalaryMasters().subscribe({
       next: (res) => {
-        this.payrolls.set(res.data || []);
+        const data = res.data || [];
+        this.payrolls.set(data);
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error loading payrolls:', err);
+        console.error('Error loading salary masters:', err);
         this.isLoading.set(false);
       }
     });
@@ -152,36 +155,31 @@ export class PayrollAdmin implements OnInit {
     this.resetForm();
   }
 
-  openEditModal(payroll: any) {
+  openEditModal(master: any) {
     this.resetForm();
-    this.editingPayrollId.set(payroll._id);
+    this.editingPayrollId.set(master._id);
     
-    // Format date securely to YYYY-MM-DD
-    let formattedDate = new Date().toISOString().split('T')[0];
-    if (payroll.paymentDate) {
-      formattedDate = new Date(payroll.paymentDate).toISOString().split('T')[0];
-    }
-
     this.payrollForm.set({
-      employeeId: payroll.employee?._id || payroll.employee,
-      designation: payroll.designation || '',
-      departmentName: payroll.departmentName || '',
-      month: payroll.month || '',
-      year: payroll.year || new Date().getFullYear(),
-      paymentDate: formattedDate,
-      grossAmount: payroll.grossAmount || 0,
-      period: payroll.period || '',
-      daysPresent: payroll.daysPresent || 30,
-      daysAbsent: payroll.daysAbsent || 0,
-      totalDays: payroll.totalDays || 30,
-      pdfUrl: payroll.pdfUrl || '',
-      earnings: payroll.earnings?.length ? [...payroll.earnings] : [],
-      deductionsList: payroll.deductionsList?.length ? [...payroll.deductionsList] : []
+      employeeId: master.employee?._id || master.employee,
+      designation: master.designation || master.employee?.designation || '',
+      departmentName: master.departmentName || '',
+      month: '', // Not needed for Master
+      year: new Date().getFullYear(), // Not needed for Master
+      paymentDate: '', // Not needed for Master
+      grossAmount: master.grossAmount || 0,
+      period: '',
+      daysPresent: 30,
+      daysAbsent: 0,
+      totalDays: 30,
+      pdfUrl: '',
+      isAutoGenerate: master.isAutoGenerate !== false,
+      earnings: master.earnings?.length ? [...master.earnings] : [],
+      deductionsList: master.deductionsList?.length ? [...master.deductionsList] : []
     });
 
-    if (payroll.employee) {
-      this.selectedEmployeeEmail.set(payroll.employee.email || payroll.employee.employeeId || 'selected');
-      this.searchTerm.set(`${payroll.employee.firstName} ${payroll.employee.lastName}`);
+    if (master.employee) {
+      this.selectedEmployeeEmail.set(master.employee.email || 'selected');
+      this.searchTerm.set(`${master.employee.firstName} ${master.employee.lastName}`);
     }
 
     this.showUploadModal = true;
@@ -189,22 +187,20 @@ export class PayrollAdmin implements OnInit {
 
   resetForm() {
     this.editingPayrollId.set(null);
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const currentMonth = months[new Date().getMonth()];
-    
     this.payrollForm.set({
       employeeId: '',
       designation: '',
       departmentName: '',
-      month: currentMonth,
+      month: '',
       year: new Date().getFullYear(),
-      paymentDate: new Date().toISOString().split('T')[0],
+      paymentDate: '',
       grossAmount: 0,
       period: '',
       daysPresent: 30,
       daysAbsent: 0,
       totalDays: 30,
       pdfUrl: '',
+      isAutoGenerate: true,
       earnings: [
         { label: 'Basic Salary', actualAmount: 0, amount: 0 },
         { label: 'House Rent Allowance', actualAmount: 0, amount: 0 },
@@ -228,19 +224,10 @@ export class PayrollAdmin implements OnInit {
     this.payrollForm.update(prev => ({ ...prev, designation: val }));
   }
 
-  updateMonth(val: string) {
-    this.payrollForm.update(prev => ({ ...prev, month: val }));
-    this.updateAutoPeriod();
-  }
-
-  updateYear(val: number) {
-    this.payrollForm.update(prev => ({ ...prev, year: val }));
-    this.updateAutoPeriod();
-  }
-
-  updatePaymentDate(val: string) {
-    this.payrollForm.update(prev => ({ ...prev, paymentDate: val }));
-  }
+  // Monthly methods kept for compatibility but not used in master form
+  updateMonth(val: string) {}
+  updateYear(val: number) {}
+  updatePaymentDate(val: string) {}
 
   selectEmployee(emp: any) {
     this.payrollForm.update(prev => ({ 
@@ -248,28 +235,16 @@ export class PayrollAdmin implements OnInit {
       employeeId: emp._id,
       designation: emp.designation || '',
       departmentName: emp.department?.name || '',
-      // If employee has a saved salary structure, load it automatically
       earnings: emp.salaryStructure?.earnings?.length > 0 ? [...emp.salaryStructure.earnings] : prev.earnings,
       deductionsList: emp.salaryStructure?.deductionsList?.length > 0 ? [...emp.salaryStructure.deductionsList] : prev.deductionsList,
-      grossAmount: emp.salaryStructure?.grossAmount || 0
+      grossAmount: emp.salaryStructure?.grossAmount || 0,
+      isAutoGenerate: emp.salaryStructure?.isAutoGenerate !== undefined ? emp.salaryStructure.isAutoGenerate : true
     }));
     this.selectedEmployeeEmail.set(emp.email);
     this.searchTerm.set(`${emp.firstName} ${emp.lastName}`);
   }
 
-  updateAutoPeriod() {
-    const form = this.payrollForm();
-    if (!form.month || !form.year) return;
-
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const monthIndex = months.indexOf(form.month);
-    if (monthIndex === -1) return;
-
-    const lastDay = new Date(form.year, monthIndex + 1, 0).getDate();
-    const periodString = `${form.month} 01 - ${form.month} ${lastDay}, ${form.year}`;
-    
-    this.payrollForm.update(prev => ({ ...prev, period: periodString }));
-  }
+  updateAutoPeriod() {}
 
   // Row Management
   addEarning() {
@@ -302,12 +277,6 @@ export class PayrollAdmin implements OnInit {
 
   async submitPayroll() {
     const data = { ...this.payrollForm() };
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const now = new Date();
-
-    const currentMonth = months[now.getMonth()];
-    if (!data.month) data.month = currentMonth;
-    if (!data.year) data.year = now.getFullYear();
     
     if (!data.employeeId) {
       alert('Please select an employee');
@@ -317,26 +286,20 @@ export class PayrollAdmin implements OnInit {
     this.isSubmitting.set(true);
 
     try {
-      const isEdit = !!this.editingPayrollId();
-      const request$ = isEdit 
-        ? this.apiService.updatePayroll(this.editingPayrollId()!, data)
-        : this.apiService.generatePayroll(data);
-
-      await firstValueFrom(request$);
+      // Create or Update Salary Master
+      await firstValueFrom(this.apiService.saveSalaryMaster(data));
       
-      // ABSOLUTE FORCE CLOSE
       this.showUploadModal = false;
       this.editingPayrollId.set(null);
       this.isSubmitting.set(false);
-      this.showSuccess(`Salary Master ${isEdit ? 'updated' : 'generated'} successfully!`);
+      this.showSuccess(`Salary Master configuration saved successfully!`);
 
-      // Small delay before refresh to ensure backend indexing is complete
       setTimeout(() => {
         this.loadAllPayrolls();
       }, 500);
     } catch (err: any) {
-      this.showUploadModal = false; // Even on error, close if we know it added
       this.isSubmitting.set(false);
+      this.errorMessage.set(err.error?.message || 'Failed to save salary configuration');
     }
   }
 
@@ -349,18 +312,18 @@ export class PayrollAdmin implements OnInit {
   }
 
   confirmDelete() {
-    const payroll = this.payrollToDelete();
-    if (!payroll) return;
+    const master = this.payrollToDelete();
+    if (!master) return;
     
     this.isLoading.set(true);
-    this.apiService.deletePayroll(payroll._id).subscribe({
+    this.apiService.deleteSalaryMaster(master._id).subscribe({
       next: () => {
-        this.showSuccess('Payroll record deleted successfully!');
+        this.showSuccess('Salary Master configuration removed!');
         this.payrollToDelete.set(null);
         this.loadAllPayrolls();
       },
       error: (err) => {
-        this.errorMessage.set(err.error?.message || 'Failed to delete payroll record');
+        this.errorMessage.set(err.error?.message || 'Failed to remove salary configuration');
         this.isLoading.set(false);
       }
     });

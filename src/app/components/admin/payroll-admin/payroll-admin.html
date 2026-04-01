@@ -1,14 +1,13 @@
 <div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tighter">Payroll Management</h1>
-            <p class="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">Manage and disburse employee
-                salaries</p>
+            <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tighter">Salary Master Management</h1>
+            <p class="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">Configure permanent employee salary structures</p>
         </div>
         <button (click)="openUploadModal()"
             class="px-6 py-4 bg-brand-1 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-brand-1/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
-            <span class="material-symbols-outlined text-sm">add_card</span>
-            Generate New Payroll
+            <span class="material-symbols-outlined text-sm">settings</span>
+            Set Salary Master
         </button>
     </div>
 
@@ -22,49 +21,50 @@
     <!-- Main Table Section -->
     <div class="bg-white rounded-[1.0rem] shadow-xl border border-slate-100 overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-white">
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Recent Payrolls</h3>
-            <div *ngIf="isLoading()" class="w-5 h-5 border-2 border-brand-1 border-t-transparent rounded-full animate-spin"></div>
+            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Employee Salary Configurations</h3>
+            <div *ngIf="isLoading()"
+                class="w-5 h-5 border-2 border-brand-1 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
         <div class="overflow-x-auto overflow-y-auto max-h-[600px] relative no-scrollbar">
             <table class="w-full border-collapse text-left">
                 <thead>
                     <tr class="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-200">
-                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[250px]">Employee</th>
-                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[200px]">Salary Period</th>
-                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[180px]">Net Amount</th>
-                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[180px]">Payment Date</th>
-                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[160px]">Status</th>
-                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[140px]">Actions</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[250px]">
+                            Employee</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[200px]">
+                            Designation</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[250px]">
+                            Monthly Net Amount</th>
+                        <th
+                            class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[140px]">
+                            Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-50 relative">
                     <tr *ngFor="let p of paginatedList()" class="hover:bg-slate-50/30 transition-colors group">
                         <td class="px-6 py-5 border-r border-slate-50">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-brand-1/10 flex items-center justify-center text-brand-1 font-black text-xs shadow-inner">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-brand-1/10 flex items-center justify-center text-brand-1 font-black text-xs shadow-inner">
                                     {{ (p.employee?.firstName || 'U').charAt(0) }}
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{ p.employee?.firstName }} {{ p.employee?.lastName }}</p>
-                                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">{{ p.employee?.employeeId }}</p>
+                                    <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{
+                                        p.employee?.firstName }} {{ p.employee?.lastName }}</p>
+                                    <p class="text-[10px] text-slate-400 font-medium uppercase tracking-widest">{{
+                                        p.employee?.employeeId }}</p>
                                 </div>
                             </div>
                         </td>
                         <td class="px-6 py-5 border-r border-slate-50">
-                            <span class="text-sm font-semibold text-slate-600">{{p.period}}</span>
+                            <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{{p.designation || p.employee?.designation}}</span>
                         </td>
                         <td class="px-6 py-5 border-r border-slate-50">
                             <span class="text-sm font-black text-brand-1">{{formatCurrency(p.netAmount)}}</span>
-                        </td>
-                        <td class="px-6 py-5 border-r border-slate-50 text-center">
-                            <span class="text-[11px] font-semibold text-slate-500">{{p.paymentDate | date:'dd MMM yyyy'}}</span>
-                        </td>
-                        <td class="px-6 py-5 border-r border-slate-50 text-center">
-                            <span class="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100 shadow-sm inline-flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                {{p.status}}
-                            </span>
                         </td>
                         <td class="px-6 py-5 text-center">
                             <div class="flex items-center justify-center gap-2">
@@ -81,14 +81,16 @@
                             </div>
                         </td>
                     </tr>
-                    
+
                     <!-- Empty State -->
                     <tr *ngIf="payrolls().length === 0 && !isLoading()">
                         <td colspan="6" class="p-20 text-center">
-                            <div class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                            <div
+                                class="w-16 h-16 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
                                 <span class="material-symbols-outlined text-slate-300 text-3xl">payments</span>
                             </div>
-                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No payroll records found</p>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No payroll records
+                                found</p>
                         </td>
                     </tr>
                 </tbody>
@@ -96,9 +98,12 @@
         </div>
 
         <!-- Pagination Footer -->
-        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div
+            class="px-6 py-4 border-t border-slate-100 bg-slate-50/30 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                Showing <span class="text-slate-900">{{startRange()}}</span> – <span class="text-slate-900">{{endRange()}}</span> of <span class="text-slate-900">{{payrolls().length}}</span> records
+                Showing <span class="text-slate-900">{{startRange()}}</span> – <span
+                    class="text-slate-900">{{endRange()}}</span> of <span
+                    class="text-slate-900">{{payrolls().length}}</span> records
             </div>
 
             <div class="flex items-center gap-2" *ngIf="totalPages() > 1">
@@ -129,12 +134,13 @@
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-500"
         (click)="showUploadModal = false"></div>
 
-    <div class="relative bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 flex flex-col max-h-[96vh]">
+    <div
+        class="relative bg-white w-full max-w-5xl rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 flex flex-col max-h-[96vh]">
         <!-- Modal Header -->
         <div class="p-8 pb-4 border-b border-slate-100 flex items-center justify-between bg-white">
             <div>
-                <h2 class="text-2xl font-semibold text-slate-900 tracking-tighter uppercase italic">Detailed Salary Master</h2>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Configure full breakdown and attendance for employee record</p>
+                <h2 class="text-2xl font-semibold text-slate-900 tracking-tighter uppercase italic">Employee Salary Master</h2>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Configure the permanent base salary structure for this employee</p>
             </div>
             <button (click)="showUploadModal = false"
                 class="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-100 text-slate-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition-all flex items-center justify-center">
@@ -142,214 +148,166 @@
             </button>
         </div>
 
-            <!-- Modal Body (Scrollable) -->
-            <div class="p-8 space-y-8 overflow-y-auto custom-scrollbar">
+        <!-- Modal Body (Scrollable) -->
+        <div class="p-8 space-y-8 overflow-y-auto custom-scrollbar">
 
-                <!-- Safety Warning for Edits -->
-                <div *ngIf="editingPayrollId()" 
-                    class="bg-amber-50 border border-amber-200 p-6 rounded-[2rem] flex items-start gap-4 animate-in slide-in-from-top-4 shadow-sm">
-                    <span class="material-symbols-outlined text-amber-500 text-3xl">warning</span>
-                    <div>
-                        <p class="text-[11px] font-black text-amber-700 uppercase tracking-[0.1em] mb-1 leading-none">Security Notice: Editing Historical Record</p>
-                        <p class="text-[10px] font-bold text-amber-600 leading-relaxed italic">
-                            You are modifying an existing salary slip for <span class="text-slate-800">{{ payrollForm().month }} {{ payrollForm().year }}</span>. 
-                            If you want to update the salary for future months, please use the <b>Employee Management</b> screen instead.
-                        </p>
-                    </div>
-                </div>
+            <!-- Section 1: Employee & Context -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 bg-slate-50 border border-slate-100 rounded-[2.5rem]">
+                <!-- Employee Selector -->
+                <div class="space-y-4">
+                    <div class="relative">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Search
+                            Employee *</label>
+                        <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+                            placeholder="Name or Email..."
+                            class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-slate-800 font-bold focus:border-brand-1 outline-none transition-all">
 
-                <!-- Section 1: Employee & Context -->
-                <div
-                    class="grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 bg-slate-50 border border-slate-100 rounded-[2.5rem]">
-                    <!-- Employee Selector -->
-                    <div class="space-y-4">
-                        <div class="relative">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Search
-                                Employee *</label>
-                            <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
-                                placeholder="Name or Email..."
-                                class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-slate-800 font-bold focus:border-brand-1 outline-none transition-all">
-
-                            <div *ngIf="searchTerm() && !selectedEmployeeEmail()"
-                                class="absolute left-0 right-0 top-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[10001] max-h-[180px] overflow-y-auto p-2">
-                                <div *ngIf="filteredEmployees().length === 0" class="p-8 text-center">
-                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">No
-                                        matching employees</p>
-                                </div>
-                                <div *ngFor="let emp of filteredEmployees()" (click)="selectEmployee(emp)"
-                                    class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer flex items-center gap-3">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-brand-1/10 text-brand-1 flex items-center justify-center text-[10px] font-black">
-                                        {{ (emp.firstName || 'E').charAt(0) }}</div>
-                                    <div class="flex-1">
-                                        <p class="text-xs font-bold text-slate-800">{{ emp.firstName }} {{ emp.lastName
-                                            }}</p>
-                                        <p class="text-[9px] text-slate-400 font-bold uppercase">{{ emp.email }}</p>
-                                    </div>
-                                    <span
-                                        class="text-[9px] font-black text-brand-1 px-2 py-1 bg-brand-1/5 rounded-lg">{{
-                                        emp.employeeId }}</span>
+                        <div *ngIf="searchTerm() && !selectedEmployeeEmail()"
+                            class="absolute left-0 right-0 top-full mt-2 bg-white border border-slate-200 rounded-2xl shadow-2xl z-[10001] max-h-[180px] overflow-y-auto p-2">
+                            <div *ngFor="let emp of filteredEmployees()" (click)="selectEmployee(emp)"
+                                class="p-3 hover:bg-slate-50 rounded-xl cursor-pointer flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-brand-1/10 text-brand-1 flex items-center justify-center text-[10px] font-black">
+                                    {{ (emp.firstName || 'E').charAt(0) }}</div>
+                                <div class="flex-1">
+                                    <p class="text-xs font-bold text-slate-800">{{ emp.firstName }} {{ emp.lastName
+                                        }}</p>
+                                    <p class="text-[9px] text-slate-400 font-bold uppercase">{{ emp.email }}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Company Context Info (Auto-populated) -->
-                    <div class="space-y-4 pt-1 border-l border-slate-200 pl-8">
-                        <div class="grid grid-cols-1 gap-4">
-                            <div class="space-y-1">
-                                <label
-                                    class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Designation</label>
-                                <input type="text" [ngModel]="payrollForm().designation"
-                                    (ngModelChange)="updateDesignation($event)"
-                                    class="w-full px-4 py-3 bg-white/50 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-600 outline-none">
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Section 2: Earnings & Deductions -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-
-                    <!-- Earnings Table -->
-                    <div class="bg-white border border-slate-200 rounded-[1.5rem] overflow-hidden">
-                        <div
-                            class="px-8 py-5 bg-emerald-50 border-b border-emerald-100 flex items-center justify-between">
-                            <h3
-                                class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <span class="material-symbols-outlined text-base">payments</span> Earnings Breakdown
-                            </h3>
-                            <button (click)="addEarning()"
-                                class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase hover:scale-105 transition-all">+
-                                Add Item</button>
+                <!-- Company Context Info (Auto-populated) -->
+                <div class="space-y-4 pt-1 border-l border-slate-200 pl-8">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="space-y-1">
+                            <label
+                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Employee Designation</label>
+                            <input type="text" [ngModel]="payrollForm().designation"
+                                (ngModelChange)="updateDesignation($event)"
+                                class="w-full px-4 py-3 bg-white/50 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-600 outline-none">
                         </div>
-                        <div class="p-6">
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr
-                                        class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                                        <th class="pb-4 pl-2">Description</th>
-                                        <th class="pb-4 text-center">Actual Amount</th>
-                                        <th class="pb-4 text-center">Earned Amount</th>
-                                        <th class="pb-4 pr-2 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let item of payrollForm().earnings; let i = index"
-                                        class="group border-b border-slate-50 last:border-0">
-                                        <td class="py-3">
-                                            <input [(ngModel)]="item.label"
-                                                class="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none"
-                                                placeholder="Label">
-                                        </td>
-                                        <td class="py-3">
-                                            <input type="number" [(ngModel)]="item.actualAmount"
-                                                (input)="item.amount = item.actualAmount"
-                                                class="w-full bg-slate-50 px-3 py-2 rounded-lg text-[11px] font-black text-center outline-none focus:bg-white border border-transparent focus:border-emerald-200">
-                                        </td>
-                                        <td class="py-3">
-                                            <input type="number" [(ngModel)]="item.amount"
-                                                class="w-full bg-emerald-50/50 px-3 py-2 rounded-lg text-[11px] font-black text-center text-emerald-600 outline-none focus:bg-white border border-transparent focus:border-emerald-200">
-                                        </td>
-                                        <td class="py-3 text-right">
-                                            <button (click)="removeEarning(i)"
-                                                class="w-8 h-8 rounded-lg text-red-200 hover:text-red-500 hover:bg-red-50 transition-all">
-                                                <span class="material-symbols-outlined text-base">delete</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Deductions Table -->
-                    <div class="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden">
-                        <div class="px-8 py-5 bg-red-50 border-b border-red-100 flex items-center justify-between">
-                            <h3
-                                class="text-[11px] font-black text-red-600 uppercase tracking-[0.2em] flex items-center gap-2">
-                                <span class="material-symbols-outlined text-base">account_balance_wallet</span>
-                                Deductions Table
-                            </h3>
-                            <button (click)="addDeduction()"
-                                class="px-4 py-2 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase hover:scale-105 transition-all">+
-                                Add Item</button>
-                        </div>
-                        <div class="p-6">
-                            <table class="w-full text-left">
-                                <thead>
-                                    <tr
-                                        class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                                        <th class="pb-4 pl-2">Description</th>
-                                        <th class="pb-4 text-center">Amount (₹)</th>
-                                        <th class="pb-4 pr-2 text-right">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let item of payrollForm().deductionsList; let i = index"
-                                        class="group border-b border-slate-50 last:border-0">
-                                        <td class="py-3">
-                                            <input [(ngModel)]="item.label"
-                                                class="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none"
-                                                placeholder="Label">
-                                        </td>
-                                        <td class="py-3">
-                                            <input type="number" [(ngModel)]="item.amount"
-                                                class="w-full bg-red-50/50 px-3 py-2 rounded-lg text-[11px] font-black text-center text-red-600 outline-none focus:bg-white border border-transparent focus:border-red-200">
-                                        </td>
-                                        <td class="py-3 text-right">
-                                            <button (click)="removeDeduction(i)"
-                                                class="w-8 h-8 rounded-lg text-red-200 hover:text-red-500 hover:bg-red-50 transition-all">
-                                                <span class="material-symbols-outlined text-base">delete</span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-            <!-- Section 3: PDF Upload (Optional) -->
-            <div class="bg-brand-5/5 border border-brand-5/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="max-w-md">
-                    <p class="text-[11px] font-black text-brand-5 uppercase tracking-[0.2em] mb-2">Optional
-                        Document Upload</p>
-                    <p class="text-[10px] font-bold text-slate-400 italic">If you have a pre-generated company PDF
-                        slip, you can upload it here. It will override the data entered above for the employee's
-                        download view.</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button (click)="pdfInput.click()"
-                        class="px-8 py-4 bg-white border-2 border-dashed border-brand-1/30 rounded-2xl text-[10px] font-black text-brand-1 hover:bg-brand-5 hover:border-brand-5 hover:text-white transition-all flex items-center gap-3 shadow-sm">
-                        <span class="material-symbols-outlined text-lg">upload_file</span>
-                        {{ payrollForm().pdfUrl ? 'REPLACE PDF' : 'ATTACH PDF SLIP' }}
-                    </button>
-                    <input #pdfInput type="file" (change)="onFileSelected($event)" accept="application/pdf"
-                        class="hidden">
-
-                    <div *ngIf="payrollForm().pdfUrl"
-                        class="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-5 py-3 rounded-2xl border border-emerald-100 animate-in bounce-in">
-                        <span class="material-symbols-outlined text-base">verified</span>
-                        <span class="text-[10px] font-black uppercase tracking-widest">Document Attached</span>
-                        <button (click)="payrollForm.update(p => ({...p, pdfUrl: ''}))"
-                            class="ml-3 w-6 h-6 flex items-center justify-center text-red-400 bg-red-50 rounded-lg hover:text-red-600 transition-colors">
-                            <span class="material-symbols-outlined text-sm">close</span>
-                        </button>
                     </div>
                 </div>
             </div>
+
+
+
+            <!-- Section 2: Earnings & Deductions -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+
+                <!-- Earnings Table -->
+                <div class="bg-white border border-slate-200 rounded-[1.5rem] overflow-hidden">
+                    <div class="px-8 py-5 bg-emerald-50 border-b border-emerald-100 flex items-center justify-between">
+                        <h3
+                            class="text-[11px] font-black text-emerald-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base">payments</span> Earnings Breakdown
+                        </h3>
+                        <button (click)="addEarning()"
+                            class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-[9px] font-black uppercase hover:scale-105 transition-all">+
+                            Add Item</button>
+                    </div>
+                    <div class="p-6">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr
+                                    class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
+                                    <th class="pb-4 pl-2">Description</th>
+                                    <th class="pb-4 text-center">Actual Amount</th>
+                                    <th class="pb-4 text-center">Earned Amount</th>
+                                    <th class="pb-4 pr-2 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of payrollForm().earnings; let i = index"
+                                    class="group border-b border-slate-50 last:border-0">
+                                    <td class="py-3">
+                                        <input [(ngModel)]="item.label"
+                                            class="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none"
+                                            placeholder="Label">
+                                    </td>
+                                    <td class="py-3">
+                                        <input type="number" [(ngModel)]="item.actualAmount"
+                                            (input)="item.amount = item.actualAmount"
+                                            class="w-full bg-slate-50 px-3 py-2 rounded-lg text-[11px] font-black text-center outline-none focus:bg-white border border-transparent focus:border-emerald-200">
+                                    </td>
+                                    <td class="py-3">
+                                        <input type="number" [(ngModel)]="item.amount"
+                                            class="w-full bg-emerald-50/50 px-3 py-2 rounded-lg text-[11px] font-black text-center text-emerald-600 outline-none focus:bg-white border border-transparent focus:border-emerald-200">
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <button (click)="removeEarning(i)"
+                                            class="w-8 h-8 rounded-lg text-red-200 hover:text-red-500 hover:bg-red-50 transition-all">
+                                            <span class="material-symbols-outlined text-base">delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Deductions Table -->
+                <div class="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden">
+                    <div class="px-8 py-5 bg-red-50 border-b border-red-100 flex items-center justify-between">
+                        <h3
+                            class="text-[11px] font-black text-red-600 uppercase tracking-[0.2em] flex items-center gap-2">
+                            <span class="material-symbols-outlined text-base">account_balance_wallet</span>
+                            Deductions Table
+                        </h3>
+                        <button (click)="addDeduction()"
+                            class="px-4 py-2 bg-red-600 text-white rounded-xl text-[9px] font-black uppercase hover:scale-105 transition-all">+
+                            Add Item</button>
+                    </div>
+                    <div class="p-6">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr
+                                    class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
+                                    <th class="pb-4 pl-2">Description</th>
+                                    <th class="pb-4 text-center">Amount (₹)</th>
+                                    <th class="pb-4 pr-2 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of payrollForm().deductionsList; let i = index"
+                                    class="group border-b border-slate-50 last:border-0">
+                                    <td class="py-3">
+                                        <input [(ngModel)]="item.label"
+                                            class="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none"
+                                            placeholder="Label">
+                                    </td>
+                                    <td class="py-3">
+                                        <input type="number" [(ngModel)]="item.amount"
+                                            class="w-full bg-red-50/50 px-3 py-2 rounded-lg text-[11px] font-black text-center text-red-600 outline-none focus:bg-white border border-transparent focus:border-red-200">
+                                    </td>
+                                    <td class="py-3 text-right">
+                                        <button (click)="removeDeduction(i)"
+                                            class="w-8 h-8 rounded-lg text-red-200 hover:text-red-500 hover:bg-red-50 transition-all">
+                                            <span class="material-symbols-outlined text-base">delete</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+
         </div>
 
         <!-- Footer: Final Actions & Totals -->
-        <div class="p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div
+            class="p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-                <div class="flex items-baseline gap-6">
-                    <div>
-                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-1">Company Status</p>
-                        <span class="px-4 py-2 bg-brand-1/5 text-brand-1 rounded-xl text-[10px] font-black uppercase border border-brand-1/10 inline-block shadow-sm">{{ payrollForm().month }} {{ payrollForm().year }}</span>
-                    </div>
-                </div>
+                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 leading-none">Status Overview</p>
+                <span class="px-5 py-3 bg-brand-1/5 text-brand-1 rounded-2xl text-[11px] font-black uppercase border border-brand-1/10 inline-flex items-center gap-2 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Ready for Auto-Generation
+                </span>
             </div>
 
             <div class="flex flex-col items-end gap-3">
@@ -357,16 +315,15 @@
                     <button (click)="showUploadModal = false"
                         class="px-10 py-5 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all shadow-sm">Discard</button>
                     <button (click)="submitPayroll()" [disabled]="isSubmitting() || !payrollForm().employeeId"
-                        [class]="editingPayrollId() ? 'bg-amber-500' : 'bg-brand-5'"
-                        class="px-12 py-5 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-2xl flex items-center gap-3">
+                        class="px-12 py-5 bg-brand-1 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-2xl flex items-center gap-3">
                         <span *ngIf="isSubmitting()"
                             class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                        <span class="material-symbols-outlined text-sm">{{ editingPayrollId() ? 'save_as' : 'verified' }}</span>
-                        {{ isSubmitting() ? (editingPayrollId() ? 'Updating...' : 'Generating...') : (editingPayrollId() ? 'Apply Snapshot Edit' : 'Generate & Save Defaults') }}
+                        <span class="material-symbols-outlined text-sm">save_as</span>
+                        {{ isSubmitting() ? 'Saving Master...' : 'Save Salary Master' }}
                     </button>
                 </div>
                 <p class="text-[9px] font-bold text-slate-400 italic">
-                    {{ editingPayrollId() ? '* Changes here only apply to this month\'s slip.' : '* This will automatically update base salary for future months.' }}
+                    * This configuration will be used as the permanent template for all future auto-generated slips.
                 </p>
             </div>
         </div>
@@ -378,13 +335,15 @@
     <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-500"
         (click)="cancelDelete()"></div>
 
-    <div class="relative bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 p-8 text-center border border-slate-100">
+    <div
+        class="relative bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 p-8 text-center border border-slate-100">
         <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-6">
             <span class="material-symbols-outlined text-red-500 text-3xl">warning</span>
         </div>
-        <h3 class="text-xl font-black text-slate-900 mb-2 tracking-tight">Delete Payroll Record?</h3>
+        <h3 class="text-xl font-black text-slate-900 mb-2 tracking-tight">Remove Salary Master?</h3>
         <p class="text-xs font-bold text-slate-500 mb-8 leading-relaxed">
-            Are you sure you want to delete the payroll record for <span class="text-slate-800">{{ payrollToDelete()?.employee?.firstName }}</span>? This action cannot be undone.
+            Are you sure you want to remove the permanent salary configuration for <span class="text-slate-800">{{
+                payrollToDelete()?.employee?.firstName }}</span>? Future slips will stop generating for this employee.
         </p>
 
         <div class="flex gap-3">
