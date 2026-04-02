@@ -23,6 +23,13 @@ export class DocumentsAdmin implements OnInit {
   
   showModal = signal(false);
   isLoading = signal(false);
+  hasSeenRequests = signal(false);
+  lastRequestCount = 0;
+  
+  pendingCount = computed(() => {
+    const count = this.requests().filter(r => r.status === 'Pending').length;
+    return this.hasSeenRequests() ? 0 : count;
+  });
   errorMessage = signal('');
   successMessage = signal('');
   
@@ -61,6 +68,9 @@ export class DocumentsAdmin implements OnInit {
   setTab(tab: 'issued' | 'requests') {
     this.activeTab.set(tab);
     this.currentPage.set(1);
+    if (tab === 'requests') {
+       this.hasSeenRequests.set(true);
+    }
   }
   
   issueForm: any = {
@@ -118,7 +128,15 @@ export class DocumentsAdmin implements OnInit {
   loadRequests() {
     this.apiService.getAllRequests().subscribe({
       next: (res) => {
-        if (res.success) this.requests.set(res.data);
+        if (res.success) {
+          const newCount = res.data.filter((r: any) => r.status === 'Pending').length;
+          // If a new pending request arrived that wasn't there before, show badge again
+          if (newCount > this.lastRequestCount) {
+             this.hasSeenRequests.set(false);
+          }
+          this.requests.set(res.data);
+          this.lastRequestCount = newCount;
+        }
       },
       error: (err) => console.error('Error loading requests:', err)
     });

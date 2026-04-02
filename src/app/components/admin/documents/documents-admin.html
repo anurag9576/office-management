@@ -32,7 +32,7 @@
             [class.border-brand-1]="activeTab() === 'requests'" 
             class="pb-4 relative -bottom-[2px] border-b-2 border-transparent text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-2">
             Employee Requests
-            <span *ngIf="requests().length > 0" class="bg-red-500 text-white px-2 py-0.5 rounded-full text-[9px] min-w-[1.25rem] text-center shadow-lg shadow-red-500/30">{{ requests().length }}</span>
+            <span *ngIf="pendingCount() > 0" class="bg-red-500 text-white px-2 py-0.5 rounded-full text-[9px] min-w-[1.25rem] text-center shadow-lg shadow-red-500/30">{{ pendingCount() }}</span>
         </button>
     </div>
 
@@ -130,7 +130,7 @@
                 <thead>
                     <tr class="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-200">
                         <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[250px]">Employee</th>
-                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[200px]">Requested Document</th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[280px] whitespace-nowrap">Requested Document</th>
                         <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]">Reason / Message</th>
                         <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[160px]">Status</th>
                         <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[140px]">Actions</th>
@@ -249,7 +249,7 @@
                 <div class="space-y-5">
                     <!-- Select Employee -->
                     <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Select Employee</label>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Select Employee <span class="text-red-500">*</span></label>
                         <select [(ngModel)]="issueForm.employeeId" class="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 focus:border-brand-1 rounded-2xl text-xs font-bold text-slate-700 outline-none transition-all">
                             <option value="" disabled selected>-- Select an active employee --</option>
                             <option *ngFor="let emp of employees()" [value]="emp._id">{{ emp.firstName }} {{ emp.lastName }} ({{ emp.employeeId }})</option>
@@ -258,7 +258,7 @@
 
                     <!-- Select Template -->
                     <div class="space-y-2">
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Document Format</label>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Document Format <span class="text-red-500">*</span></label>
                         <select [(ngModel)]="issueForm.templateId" class="w-full px-6 py-4 bg-slate-50 border-2 border-slate-100 focus:border-brand-1 rounded-2xl text-xs font-bold text-slate-700 outline-none transition-all">
                             <option value="" disabled selected>-- Select pre-defined format --</option>
                             <option *ngFor="let temp of templates()" [value]="temp._id">{{ temp.name }}</option>
