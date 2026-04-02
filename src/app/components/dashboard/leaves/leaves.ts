@@ -87,30 +87,39 @@ export class Leaves implements OnInit {
     this.isLoading.set(true);
     this.apiService.getMyLeaves().subscribe({
       next: (res) => {
-        if (res.success) {
-          const stats = res.stats;
-          this.leaveStats.set([
-            { label: 'Total Leaves', value: stats.total, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
-            { label: 'Taken', value: stats.taken, icon: 'event_busy', color: 'bg-orange-50 text-orange-500' },
-            { label: 'Available', value: stats.available, icon: 'today', color: 'bg-green-50 text-green-500' },
-            { label: 'Pending', value: stats.pending, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' },
-            { label: 'Loss of Pay', value: stats.lwp || 0, icon: 'money_off', color: 'bg-red-50 text-red-500' }
-          ]);
+        console.log('Raw API Response:', res);
+        try {
+          console.log('Leaves API Response:', res);
+          const leavesArray = res.leaves || res.data || [];
+          const stats = res.stats || { total: 18, taken: 0, available: 18, pending: 0 };
+          
+          if (Array.isArray(leavesArray)) {
+            this.leaveStats.set([
+              { label: 'Total Leaves', value: stats.total, icon: 'assessment', color: 'bg-brand-1/10 text-brand-1' },
+              { label: 'Taken', value: stats.taken, icon: 'event_busy', color: 'bg-orange-50 text-orange-500' },
+              { label: 'Available', value: stats.available, icon: 'today', color: 'bg-green-50 text-green-500' },
+              { label: 'Pending', value: stats.pending, icon: 'pending_actions', color: 'bg-brand-4/10 text-brand-4' },
+              { label: 'Loss of Pay', value: stats.lwp || 0, icon: 'money_off', color: 'bg-red-50 text-red-500' }
+            ]);
 
-          // Format recent leaves for display
-          this.recentLeaves.set(res.data.map((l: any) => ({
-            type: l.type,
-            from: new Date(l.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-            to: new Date(l.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
-            days: l.days,
-            status: l.status
-          })));
+            // Map and format recent leaves
+            this.recentLeaves.set(leavesArray.map((l: any) => ({
+              type: l.type,
+              from: new Date(l.startDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+              to: new Date(l.endDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+              days: l.days,
+              status: l.status
+            })));
 
-          this.rawLeaves.set(res.data);
-          this.availableLeaves.set(stats.available);
-          this.generateCalendar();
+            this.rawLeaves.set(leavesArray);
+            this.availableLeaves.set(stats.available);
+            this.generateCalendar();
+          }
+        } catch (err) {
+            console.error('Error in processing leaves:', err);
+        } finally {
+            this.isLoading.set(false);
         }
-        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Error fetching leaves:', err);
@@ -199,7 +208,7 @@ export class Leaves implements OnInit {
             start.setHours(0,0,0,0);
             end.setHours(0,0,0,0);
             currentDateObj.setHours(0,0,0,0);
-            return l.status.toLowerCase() === 'approved' && currentDateObj >= start && currentDateObj <= end;
+            return l.status?.toLowerCase() === 'approved' && currentDateObj >= start && currentDateObj <= end;
         });
 
         days.push({ 
