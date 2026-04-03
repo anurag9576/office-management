@@ -56,9 +56,9 @@
                     <tr *ngFor="let doc of paginatedList()" class="hover:bg-slate-50/30 transition-colors group">
                         <td class="px-6 py-5 border-r border-slate-50">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-brand-1/10 text-brand-1 flex items-center justify-center font-bold text-xs shadow-inner">
+                                <!-- <div class="w-8 h-8 rounded-lg bg-brand-1/10 text-brand-1 flex items-center justify-center font-bold text-xs shadow-inner">
                                     {{ doc.employee?.firstName?.charAt(0) }}
-                                </div>
+                                </div> -->
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{ doc.employee?.firstName }} {{ doc.employee?.lastName }}</p>
                                     <p class="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{{ doc.employee?.employeeId }}</p>
@@ -140,9 +140,9 @@
                     <tr *ngFor="let req of paginatedList()" class="hover:bg-slate-50/30 transition-colors group">
                         <td class="px-6 py-5 border-r border-slate-50">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shadow-inner">
+                                <!-- <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs shadow-inner">
                                     {{ req.employee?.firstName?.charAt(0) }}
-                                </div>
+                                </div> -->
                                 <div class="min-w-0">
                                     <p class="text-sm font-semibold text-slate-800 leading-none mb-1">{{ req.employee?.firstName }} {{ req.employee?.lastName }}</p>
                                     <p class="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{{ req.employee?.employeeId }}</p>
