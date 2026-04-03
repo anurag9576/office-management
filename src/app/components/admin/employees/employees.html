@@ -227,12 +227,12 @@
                     <div class="grid grid-cols-2 gap-4">
                         <div class="space-y-1.5">
                             <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1">First Name <span class="text-red-500">*</span></label>
-                            <input [(ngModel)]="newEmployee.firstName" type="text" placeholder="John"
+                            <input [(ngModel)]="newEmployee.firstName" type="text"
                                 class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
                         </div>
                         <div class="space-y-1.5">
                             <label class="text-[10px] font-semibold text-slate-400 uppercase tracking-widest ml-1">Last Name <span class="text-red-500">*</span></label>
-                            <input [(ngModel)]="newEmployee.lastName" type="text" placeholder="Doe"
+                            <input [(ngModel)]="newEmployee.lastName" type="text"
                                 class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
                         </div>
                     </div>
@@ -249,7 +249,7 @@
                         <div class="space-y-1.5">
                             <label class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Email
                                 Address <span class="text-red-500">*</span></label>
-                            <input [(ngModel)]="newEmployee.email" type="email" placeholder="john@hamsa.com"
+                            <input [(ngModel)]="newEmployee.email" type="email"
                                 class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
                         </div>
                     </div>
@@ -260,7 +260,6 @@
                                 class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Password <span class="text-red-500">*</span></label>
                             <div class="relative">
                                 <input [(ngModel)]="newEmployee.password" [type]="showPassword() ? 'text' : 'password'"
-                                    placeholder="••••••••"
                                     class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all pr-12">
                                 <button (click)="showPassword.set(!showPassword())"
                                     class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-1 transition-colors">
@@ -291,7 +290,7 @@
                         <div class="space-y-1.5">
                             <label
                                 class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Designation <span class="text-red-500">*</span></label>
-                            <input [(ngModel)]="newEmployee.designation" type="text" placeholder="e.g. Senior Developer"
+                            <input [(ngModel)]="newEmployee.designation" type="text"
                                 class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
                         </div>
                         <div class="space-y-1.5">

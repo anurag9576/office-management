@@ -2,6 +2,7 @@ import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../services/api.service';
+import { ToastService } from '../../../services/toast.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -13,6 +14,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class PayrollAdmin implements OnInit {
   private apiService = inject(ApiService);
+  private toastService = inject(ToastService);
 
   payrolls = signal<any[]>([]);
   employees = signal<any[]>([]);
@@ -279,7 +281,7 @@ export class PayrollAdmin implements OnInit {
     const data = { ...this.payrollForm() };
     
     if (!data.employeeId) {
-      alert('Please select an employee');
+      this.toastService.show('Please select an employee', 'error');
       return;
     }
 
