@@ -1,37 +1,859 @@
 <div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <!-- Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter">Task Management</h1>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Assign and monitor office tasks
+            <h1 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tighter">Task Board</h1>
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Sprint: Oct 2026 • HHPL Project
             </p>
         </div>
-        <button
-            class="bg-brand-1 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-brand-1/20 hover:bg-brand-5 transition-all flex items-center gap-2 w-fit">
-            <span class="material-symbols-outlined text-sm">assignment_add</span>
-            Create Task
-        </button>
+        <div class="flex items-center gap-3">
+            <div class="flex -space-x-2 mr-4">
+                <img *ngFor="let t of tasks().slice(0,4)" [src]="t.avatar"
+                    class="w-8 h-8 rounded-full border-2 border-white object-cover">
+                <div
+                    class="w-8 h-8 rounded-full border-2 border-white bg-slate-100 flex items-center justify-center text-[10px] font-bold text-slate-400">
+                    +{{tasks().length - 4}}</div>
+            </div>
+            <button (click)="newTask().status = 'To-Do'; showCreateModal.set(true)"
+                class="flex items-center gap-2 px-6 py-2.5 bg-brand-5 text-white font-black text-[11px] uppercase tracking-widest rounded-xl shadow-xl shadow-brand-5/20 hover:-translate-y-0.5 hover:bg-brand-1 active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Create Task
+            </button>
+        </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div *ngFor="let task of tasks()"
-            class="bg-white p-6 rounded-[2rem] shadow-xl border border-slate-100 flex items-center justify-between group hover:border-brand-1 transition-all">
-            <div class="flex items-center gap-5">
-                <div
-                    class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-brand-1/10 group-hover:text-brand-1 transition-all">
-                    <span class="material-symbols-outlined text-[28px]">task</span>
+    <!-- Dynamic Kanban Board -->
+    <div class="flex flex-nowrap overflow-x-auto gap-4 pb-12 no-scrollbar scroll-smooth">
+
+        <div *ngFor="let col of columns()"
+            class="flex-shrink-0 w-[280px] md:w-[320px] bg-slate-100/50 rounded-2xl p-4 min-h-[500px]">
+            <!-- Column Header -->
+            <div class="flex items-center justify-between mb-4 px-2">
+                <div class="flex items-center gap-2">
+                    <span
+                        [class]="'material-symbols-outlined text-[18px] ' + (col.name === 'Done' ? 'text-emerald-500' : 'text-slate-400')">{{col.icon}}</span>
+                    <h3 class="text-[11px] font-black text-slate-500 uppercase tracking-widest">{{col.name}}</h3>
+                    <span
+                        class="ml-1 text-[10px] font-bold text-slate-300 bg-slate-200/50 px-1.5 py-0.5 rounded-md">{{getTasks(col.name).length}}</span>
                 </div>
-                <div>
-                    <h3 class="text-sm font-black text-slate-800 mb-1">{{task.title}}</h3>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Assigned:
-                        {{task.assignedTo}}</p>
+                <span
+                    class="material-symbols-outlined text-slate-300 text-sm hover:text-slate-500 cursor-pointer transition-colors">more_horiz</span>
+            </div>
+
+            <!-- Task List -->
+            <div class="space-y-3">
+                <div *ngFor="let task of getTasks(col.name)" (click)="openTaskDetail(task)"
+                    class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/60 hover:border-brand-5 hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group animate-in fade-in slide-in-from-bottom-2 duration-300">
+
+                    <p
+                        [class]="'text-[14px] font-bold leading-snug mb-5 transition-colors ' + (col.name === 'Done' ? 'text-slate-400 line-through' : 'text-slate-900 group-hover:text-brand-5')">
+                        {{task.title}}
+                    </p>
+
+                    <div class="flex items-center justify-between mt-auto">
+                        <div class="flex items-center gap-3">
+                            <span *ngIf="col.name !== 'Done'"
+                                [class]="'px-2.5 py-1 rounded-lg text-[10px] font-bold border-0 ' + getPriorityColor(task.priority)">
+                                {{task.priority}}
+                            </span>
+                            <span *ngIf="col.name === 'Done'"
+                                class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase tracking-wider">
+                                Done
+                            </span>
+                            <span class="text-[11px] font-bold text-slate-300 tracking-tight">{{task.id}}</span>
+                        </div>
+                        <div class="relative">
+                            <img [src]="task.avatar"
+                                class="w-7 h-7 rounded-full object-cover ring-2 ring-white shadow-md border border-slate-100">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task Creation Trigger (Jira Style) - Only for To-Do -->
+                <ng-container *ngIf="col.name === 'To-Do'">
+                    <button (click)="openCreateModal(col.name)"
+                        class="w-full py-2.5 flex items-center justify-center gap-2 text-[10px] font-black text-slate-400 hover:text-brand-1 hover:bg-white rounded-xl transition-all mt-2 border border-dashed border-transparent hover:border-slate-200 group">
+                        <span
+                            class="material-symbols-outlined text-sm group-hover:rotate-90 transition-transform">add</span>
+                        CREATE
+                    </button>
+                </ng-container>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Jira-style Create Story Modal (Light Theme) -->
+    <div *ngIf="showCreateModal()" class="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            (click)="showCreateModal.set(false)"></div>
+
+        <!-- Modal Card (Light Premium Theme) -->
+        <div
+            class="relative bg-white w-full max-w-2xl rounded-[1.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-slate-100">
+            <div class="flex flex-col h-full max-h-[90vh]">
+                <!-- Modal Header -->
+                <div class="p-6 border-b border-slate-50 flex items-center justify-between bg-slate-50/40">
+                    <h2 class="text-xl font-black text-slate-900 tracking-tighter">Create Issue</h2>
+                    <div class="flex items-center gap-4 text-slate-400 relative">
+
+                        <!-- More Menu Trigger -->
+                        <div class="relative">
+                            <button (click)="toggleMenu('more')"
+                                [class]="showMoreMenu() ? 'text-brand-5 bg-brand-5/5 ring-2 ring-brand-5/20' : ''"
+                                class="w-8 h-8 rounded-lg flex items-center justify-center hover:text-slate-900 hover:bg-slate-100 transition-all active:scale-95">
+                                <span class="material-symbols-outlined text-xl font-bold">more_horiz</span>
+                            </button>
+
+                            <!-- Jira Actions Dropdown -->
+                            <div *ngIf="showMoreMenu()"
+                                class="absolute right-0 top-full mt-2 w-[240px] bg-white rounded-xl shadow-2xl border border-slate-100 py-2 z-[10001] animate-in fade-in slide-in-from-top-2 duration-200">
+                                <button
+                                    class="w-full px-4 py-2 flex items-center gap-3 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors text-left">
+                                    <span class="material-symbols-outlined text-[18px]">folder_open</span>
+                                    Configure fields
+                                </button>
+                                <div
+                                    class="px-4 py-2 flex items-center justify-between text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-all cursor-pointer">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[18px]">visibility_off</span>
+                                        Hide unused fields
+                                    </div>
+                                    <!-- Toggle Switch -->
+                                    <div class="w-7 h-4 bg-emerald-500 rounded-full relative p-0.5 shadow-inner">
+                                        <div class="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full shadow-sm">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    class="w-full px-4 py-2 flex items-center justify-between gap-3 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors text-left">
+                                    <div class="flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-[18px]">visibility</span>
+                                        Stop watching
+                                    </div>
+                                    <span class="px-1.5 py-0.5 bg-slate-100 rounded text-[9px] text-slate-400">W</span>
+                                </button>
+
+                                <div class="h-[1px] bg-slate-50 my-2"></div>
+
+                                <div class="px-4 py-2">
+                                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-3">
+                                        Watching this Story</p>
+                                    <div class="flex items-center justify-between group/watcher">
+                                        <div class="flex items-center gap-2">
+                                            <div
+                                                class="w-5 h-5 rounded-full bg-brand-5 text-[9px] text-white font-bold flex items-center justify-center">
+                                                A</div>
+                                            <span class="text-[11px] font-bold text-slate-700">Admin</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="h-[1px] bg-slate-50 my-2"></div>
+
+                                <button
+                                    class="w-full px-4 py-2 flex items-center gap-3 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors text-left">
+                                    <span class="material-symbols-outlined text-[18px]">add</span>
+                                    Add watchers
+                                </button>
+                            </div>
+                        </div>
+
+                        <span (click)="showCreateModal.set(false)"
+                            class="material-symbols-outlined text-xl cursor-pointer hover:text-red-500 transition-colors ml-2">close</span>
+                    </div>
+                </div>
+
+                <!-- Modal Body (Scrollable) -->
+                <div class="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-5">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Required fields marked with
+                        <span class="text-red-500">*</span>
+                    </p>
+
+                    <!-- Space & Work Type Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5 relative">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Space
+                                <span class="text-red-500">*</span></label>
+                            <div class="relative group">
+                                <select
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-800 focus:outline-none focus:border-brand-5 focus:bg-white transition-all appearance-none cursor-pointer">
+                                    <option>Office Management System (OMS)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="space-y-1.5 relative">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Work type
+                                <span class="text-red-500">*</span></label>
+                            <div (click)="toggleMenu('workType')"
+                                class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-800 focus:outline-none focus:border-brand-5 transition-all cursor-pointer hover:bg-white flex items-center justify-between group">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        [class]="'material-symbols-outlined text-[16px] absolute left-3.5 ' + selectedWorkType().color">{{selectedWorkType().icon}}</span>
+                                    {{selectedWorkType().name}}
+                                </div>
+                                <span
+                                    class="material-symbols-outlined text-sm text-slate-300 group-hover:text-slate-500 transition-transform"
+                                    [class.rotate-180]="showWorkTypeMenu()">expand_more</span>
+                            </div>
+
+                            <!-- Custom Work Type Menu -->
+                            <div *ngIf="showWorkTypeMenu()"
+                                class="absolute left-0 top-full mt-0 w-full bg-white rounded-b-xl shadow-2xl border border-slate-100 border-t-0 py-2 z-[10002] animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div class="max-h-[250px] overflow-y-auto custom-scrollbar">
+                                    <button *ngFor="let type of workTypes"
+                                        (click)="selectedWorkType.set(type); showWorkTypeMenu.set(false)"
+                                        class="w-full px-4 py-2.5 flex items-center gap-3 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors text-left"
+                                        [class.bg-brand-5/5]="selectedWorkType().name === type.name">
+                                        <span
+                                            [class]="'material-symbols-outlined text-[16px] ' + type.color">{{type.icon}}</span>
+                                        {{type.name}}
+                                    </button>
+                                </div>
+                                <div class="h-[1px] bg-slate-50 my-1.5"></div>
+                                <button
+                                    class="w-full px-4 py-1.5 flex items-center gap-3 text-[10px] font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors text-left">Add
+                                    work type</button>
+                                <button
+                                    class="w-full px-4 py-1.5 flex items-center gap-3 text-[10px] font-black text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors text-left font-bold tracking-tight">Edit
+                                    work type</button>
+                                <button
+                                    class="w-full px-4 py-1.5 flex items-center gap-3 text-[10px] font-black text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors text-left font-bold tracking-tight">Manage
+                                    work types</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="h-[1px] bg-slate-50 my-3"></div>
+
+                    <!-- Status -->
+                    <div class="flex items-center gap-3 relative pt-1">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Status</label>
+                        <div (click)="toggleMenu('status')"
+                            class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 border border-slate-100 rounded-lg text-[10px] font-black text-slate-700 uppercase tracking-wide cursor-pointer transition-all active:scale-95 group shadow-sm">
+                            {{newTask().status || 'To-Do'}}
+                            <span
+                                class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-slate-600 transition-transform"
+                                [class.rotate-180]="showStatusMenu()">expand_more</span>
+                        </div>
+
+                        <!-- Status Menu (Seamless Light Theme) -->
+                        <div *ngIf="showStatusMenu()"
+                            class="absolute left-[54px] top-full mt-0 w-[240px] bg-white rounded-b-xl shadow-2xl border border-slate-100 border-t-0 py-3 z-[10003] animate-in fade-in slide-in-from-top-1 duration-200">
+                            <div class="max-h-[300px] overflow-y-auto custom-scrollbar px-3 space-y-2">
+                                <button *ngFor="let status of currentStatuses"
+                                    (click)="newTask().status = status; showStatusMenu.set(false)"
+                                    class="block w-fit px-2.5 py-1.5 rounded bg-slate-50 hover:bg-brand-5/10 transition-all group/item">
+                                    <span
+                                        class="text-[9px] font-black text-slate-600 uppercase tracking-widest group-hover/item:text-brand-5">
+                                        {{status}}
+                                    </span>
+                                </button>
+                            </div>
+                            <div class="h-[1px] bg-slate-50 my-2"></div>
+                            <button (click)="createStatus()"
+                                class="w-full px-5 py-2 flex items-center text-[10px] font-black text-slate-400 hover:text-brand-5 hover:bg-slate-50 transition-colors text-left uppercase tracking-widest">Create
+                                status</button>
+                            <button
+                                class="w-full px-5 py-2 flex items-center text-[10px] font-black text-slate-400 hover:text-brand-5 hover:bg-slate-50 transition-colors text-left uppercase tracking-widest font-bold">Edit
+                                status</button>
+                            <button
+                                class="w-full px-5 py-2 flex items-center text-[10px] font-black text-slate-400 hover:text-brand-5 hover:bg-slate-50 transition-colors text-left uppercase tracking-widest font-bold">Manage
+                                workflow</button>
+                        </div>
+                        <p class="text-[8px] font-black text-slate-300 uppercase tracking-widest ml-[58px]">This is the
+                            initial status upon creation</p>
+                    </div>
+
+
+                    <!-- Summary -->
+                    <div class="space-y-1.5">
+                        <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Summary <span
+                                class="text-red-500">*</span></label>
+                        <input [(ngModel)]="newTask().title" type="text" placeholder="What needs to be done?"
+                            class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-800 focus:outline-none focus:border-brand-5 focus:bg-white transition-all shadow-inner">
+                    </div>
+
+                    <!-- Dynamic Description Section -->
+                    <div class="space-y-1.5">
+                        <label
+                            class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Description</label>
+                        <div
+                            class="bg-white border border-slate-100 rounded-xl overflow-hidden shadow-sm ring-1 ring-slate-100/50">
+                            <!-- ToolBox -->
+                            <div class="flex items-center gap-3 px-3 py-2 border-b border-slate-50 bg-slate-50/30">
+                                <button type="button" (click)="formatText('heading')"
+                                    class="text-slate-400 hover:text-brand-5 hover:bg-slate-100 p-1 rounded transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">format_size</span>
+                                </button>
+                                <button type="button" (click)="formatText('bold')"
+                                    class="text-slate-400 hover:text-brand-5 hover:bg-slate-100 p-1 rounded transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">format_bold</span>
+                                </button>
+                                <button type="button" (click)="formatText('insertUnorderedList')"
+                                    class="text-slate-400 hover:text-brand-5 hover:bg-slate-100 p-1 rounded transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">format_list_bulleted</span>
+                                </button>
+                                <div class="w-[1px] h-4 bg-slate-200 mx-1"></div>
+                                <button type="button"
+                                    class="text-slate-400 hover:text-brand-5 hover:bg-slate-100 p-1 rounded transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">image</span>
+                                </button>
+                                <button type="button" (click)="formatText('createLink')"
+                                    class="text-slate-400 hover:text-brand-5 hover:bg-slate-100 p-1 rounded transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">link</span>
+                                </button>
+                            </div>
+
+                            <!-- Content Editable Canvas -->
+                            <div #editor contenteditable="true" (input)="updateDescription($event)"
+                                class="w-full min-h-[120px] px-4 py-3 text-[11px] font-bold text-slate-800 focus:outline-none placeholder:text-slate-200 empty:before:content-[attr(data-placeholder)] empty:before:text-slate-300 before:pointer-events-none before:absolute">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Priority -->
+                        <div class="space-y-1.5 relative">
+                            <label
+                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Priority</label>
+                            <div (click)="toggleMenu('priority')"
+                                class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-800 focus:outline-none focus:border-brand-5 transition-all cursor-pointer hover:bg-white flex items-center justify-between group">
+                                <div class="flex items-center gap-2">
+                                    <span
+                                        [class]="'material-symbols-outlined text-[18px] absolute left-3.5 ' + selectedPriority().color">{{selectedPriority().icon}}</span>
+                                    {{selectedPriority().name}}
+                                </div>
+                                <span
+                                    class="material-symbols-outlined text-sm text-slate-300 group-hover:text-slate-500 transition-transform"
+                                    [class.rotate-180]="showPriorityMenu()">expand_more</span>
+                            </div>
+
+                            <!-- Custom Priority Menu (Seamless) -->
+                            <div *ngIf="showPriorityMenu()"
+                                class="absolute left-0 top-full mt-0 w-full bg-white rounded-b-xl shadow-2xl border border-slate-100 border-t-0 py-2 z-[10002] animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div class="max-h-[250px] overflow-y-auto custom-scrollbar">
+                                    <button *ngFor="let p of priorities"
+                                        (click)="selectedPriority.set(p); showPriorityMenu.set(false)"
+                                        class="w-full px-4 py-2.5 flex items-center gap-3 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors text-left"
+                                        [class.bg-brand-5/5]="selectedPriority().name === p.name">
+                                        <span
+                                            [class]="'material-symbols-outlined text-[18px] ' + p.color">{{p.icon}}</span>
+                                        {{p.name}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Assignee -->
+                        <div class="space-y-1.5 relative">
+                            <div class="flex justify-between items-center ml-1">
+                                <label
+                                    class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Assignee</label>
+                                <button type="button" (click)="newTask().assignee = currentUser()"
+                                    class="text-[8px] font-black text-brand-5 hover:underline uppercase tracking-widest">Assign
+                                    to me</button>
+                            </div>
+
+                            <!-- Custom Menu Trigger -->
+                            <div (click)="toggleMenu('assignee')"
+                                class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-800 transition-all cursor-pointer hover:bg-white flex items-center relative group">
+                                <span
+                                    class="material-symbols-outlined absolute left-3.5 text-[18px] text-slate-400 group-hover:text-slate-600">account_circle</span>
+                                <span [class.text-slate-400]="!newTask().assignee">{{newTask().assignee ||
+                                    'Automatic'}}</span>
+                            </div>
+
+                            <!-- Custom Assignee Menu (Seamless Light) -->
+                            <div *ngIf="showAssigneeMenu()"
+                                class="absolute left-0 top-full mt-0 w-full bg-white rounded-b-xl shadow-2xl border border-slate-100 border-t-0 py-2 z-[10001] animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                    <!-- Automatic / Unassigned -->
+                                    <button (click)="newTask().assignee = null; showAssigneeMenu.set(false)"
+                                        class="w-full px-4 py-2.5 flex items-center gap-3 text-[11px] font-bold text-slate-400 hover:bg-slate-50 transition-all text-left group">
+                                        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-[18px]">account_circle</span>
+                                        </div>
+                                        <span>Automatic</span>
+                                    </button>
+
+                                    <div class="h-[1px] bg-slate-50 my-1"></div>
+
+                                    <!-- Members -->
+                                    <button *ngFor="let emp of employees()"
+                                        (click)="newTask().assignee = emp.firstName + ' ' + emp.lastName; showAssigneeMenu.set(false)"
+                                        class="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-50 transition-all group">
+                                        <!-- Avatar with Initials -->
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-brand-5 text-[9px] text-white font-black flex items-center justify-center shadow-sm">
+                                            {{emp.firstName.substring(0,1)}}{{emp.lastName.substring(0,1)}}
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span
+                                                class="text-[11px] font-bold text-slate-700 group-hover:text-brand-5">{{emp.firstName}}
+                                                {{emp.lastName}}
+                                                <span
+                                                    *ngIf="emp.firstName === currentUser() || (emp.firstName + ' ' + emp.lastName) === currentUser()"
+                                                    class="text-[9px] font-black text-slate-400 ml-1">(Assign to
+                                                    me)</span>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Story Point -->
+                        <div class="space-y-1.5">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Story
+                                point estimate</label>
+                            <input type="number"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-800 focus:outline-none focus:border-brand-5 focus:bg-white transition-all shadow-inner">
+                        </div>
+
+                        <!-- Reporter -->
+                        <div class="space-y-1.5 relative">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Reporter
+                                <span class="text-red-500">*</span></label>
+
+                            <!-- Custom Menu Trigger -->
+                            <div (click)="toggleMenu('reporter')"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-[11px] font-bold text-slate-800 transition-all cursor-pointer hover:bg-white flex items-center gap-2.5 group">
+                                <div
+                                    class="w-5 h-5 rounded-full bg-brand-5 text-[9px] text-white font-black flex items-center justify-center shadow-sm">
+                                    {{newTask().reporter.substring(0,1)}}
+                                </div>
+                                {{newTask().reporter}}
+                                <span
+                                    class="material-symbols-outlined text-sm text-slate-300 ml-auto group-hover:text-slate-500 transition-transform"
+                                    [class.rotate-180]="showReporterMenu()">expand_more</span>
+                            </div>
+
+                            <!-- Custom Reporter Menu (Seamless Light) -->
+                            <div *ngIf="showReporterMenu()"
+                                class="absolute right-0 top-full mt-0 w-full bg-white rounded-b-xl shadow-2xl border border-slate-100 border-t-0 py-2 z-[10001] animate-in fade-in slide-in-from-top-1 duration-200">
+                                <div class="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                    <!-- Logged in User -->
+                                    <button (click)="newTask().reporter = currentUser(); showReporterMenu.set(false)"
+                                        class="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-50 transition-all group">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-brand-5 text-[9px] text-white font-black flex items-center justify-center">
+                                            {{currentUser().substring(0,1)}}
+                                        </div>
+                                        <span class="text-[11px] font-bold text-slate-700">
+                                            {{currentUser()}} <span
+                                                class="text-[9px] font-black text-slate-400 ml-1">(You)</span>
+                                        </span>
+                                    </button>
+
+                                    <div class="h-[1px] bg-slate-50 my-1"></div>
+
+                                    <!-- Other Members -->
+                                    <button *ngFor="let emp of employees()"
+                                        (click)="newTask().reporter = emp.firstName + ' ' + emp.lastName; showReporterMenu.set(false)"
+                                        class="w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-slate-50 transition-all group">
+                                        <div
+                                            class="w-6 h-6 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center text-[9px] font-black uppercase ring-1 ring-orange-500/20">
+                                            {{emp.firstName.substring(0,1)}}
+                                        </div>
+                                        <span class="text-[11px] font-bold text-slate-700">{{emp.firstName}}
+                                            {{emp.lastName}}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attachment Area -->
+                    <div class="space-y-1.5">
+                        <label
+                            class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-1">Attachment</label>
+
+                        <!-- Upload Box -->
+                        <label
+                            class="border-2 border-dashed border-slate-100 rounded-xl p-4 flex flex-col items-center justify-center text-slate-400 hover:bg-slate-50/50 hover:border-slate-200 transition-all cursor-pointer group relative overflow-hidden">
+                            <input type="file" (change)="onFileSelected($event)" multiple
+                                class="absolute inset-0 opacity-0 cursor-pointer">
+                            <span
+                                class="material-symbols-outlined text-2xl mb-1 group-hover:text-brand-1 group-hover:-translate-y-0.5 transition-all">cloud_upload</span>
+                            <p class="text-[9px] font-bold">Drop files or <span
+                                    class="text-brand-5 underline font-black">Browse</span></p>
+                        </label>
+
+                        <!-- Selected Files Preview List -->
+                        <div *ngIf="newTask().attachments.length > 0"
+                            class="mt-3 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                            <div *ngFor="let file of newTask().attachments; let i = index"
+                                class="flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 rounded-lg group hover:border-brand-5/20 hover:bg-brand-5/5 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <!-- Dynamic Icons based on Type -->
+                                    <div
+                                        class="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                                        <span class="material-symbols-outlined text-[18px] text-brand-5"
+                                            *ngIf="file.type.includes('image')">image</span>
+                                        <span class="material-symbols-outlined text-[18px] text-blue-500"
+                                            *ngIf="file.type.includes('video')">movie</span>
+                                        <span class="material-symbols-outlined text-[18px] text-red-500"
+                                            *ngIf="file.type.includes('pdf') || file.name.endsWith('.pdf')">description</span>
+                                        <span class="material-symbols-outlined text-[18px] text-slate-400"
+                                            *ngIf="!file.type.includes('image') && !file.type.includes('video') && !file.type.includes('pdf') && !file.name.endsWith('.pdf')">attach_file</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-[10px] font-black text-slate-700 truncate max-w-[200px]">{{file.name}}</span>
+                                        <span class="text-[8px] font-bold text-slate-400 uppercase">{{file.size}} •
+                                            {{file.type.split('/')[1] || 'FILE'}}</span>
+                                    </div>
+                                </div>
+                                <button (click)="removeAttachment(i)"
+                                    class="w-6 h-6 rounded-md flex items-center justify-center text-slate-300 hover:bg-white hover:text-red-500 hover:shadow-sm transition-all group-hover:opacity-100">
+                                    <span class="material-symbols-outlined text-sm">close</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 border-t border-slate-50 bg-slate-50/20 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="createAnother"
+                            class="w-3.5 h-3.5 rounded border-slate-200 bg-white checked:bg-brand-5 focus:ring-0 cursor-pointer">
+                        <label for="createAnother"
+                            class="text-[9px] font-black text-slate-500 uppercase tracking-widest cursor-pointer">Create
+                            another</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button (click)="showCreateModal.set(false)"
+                            class="px-4 py-2.5 text-slate-400 font-black text-[9px] uppercase tracking-widest hover:text-slate-900 transition-colors">Cancel</button>
+                        <button (click)="saveTask()"
+                            class="px-8 py-2.5 bg-brand-5 text-white font-black text-[9px] uppercase tracking-widest rounded-lg shadow-xl shadow-brand-5/10 hover:-translate-y-0.5 hover:bg-brand-1 active:scale-95 transition-all">Create</button>
+                    </div>
                 </div>
             </div>
-            <div class="text-right">
-                <span [class]="'px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest block mb-2 ' + 
-                    (task.priority === 'High' ? 'bg-red-100 text-red-500' : 'bg-amber-100 text-amber-500')">
-                    {{task.priority}}
-                </span>
-                <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">{{task.status}}</p>
+        </div>
+    </div>
+    
+    <!-- TASK DETAIL VIEW (JIRA LIGHT THEME) -->
+    <div *ngIf="showDetailModal()" class="fixed inset-0 z-[10000] flex items-center justify-center p-4 md:p-10">
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300"
+            (click)="closeDetailModal()"></div>
+
+        <!-- Modal Content -->
+        <div
+            class="relative w-full max-w-[1280px] h-full bg-white rounded-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 border border-slate-200 overflow-hidden text-slate-700 font-sans">
+
+            <!-- Top Bar -->
+            <div
+                class="px-6 py-4 flex items-center justify-between text-slate-500 shrink-0 border-b border-slate-100">
+                <div class="flex items-center gap-3 text-[13px]">
+                    <div
+                        class="flex items-center gap-1.5 hover:bg-slate-100 px-2 py-1 rounded cursor-pointer transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">edit_square</span>
+                        <span>Add epic</span>
+                    </div>
+                    <span class="text-slate-400">/</span>
+                    <div
+                        class="flex items-center gap-1.5 hover:bg-slate-100 px-2 py-1 rounded cursor-pointer transition-colors text-brand-5">
+                        <span class="material-symbols-outlined text-[16px]">check_box</span>
+                        <span>{{selectedTask()?.key || 'SC-541'}}</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors"><span
+                            class="material-symbols-outlined text-[18px] text-[#A64D79]">lock</span></button>
+                    <button
+                        class="px-2 h-8 flex items-center gap-1.5 rounded hover:bg-slate-100 transition-colors"><span
+                            class="material-symbols-outlined text-[18px]">visibility</span><span
+                            class="text-[13px]">1</span></button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors"><span
+                            class="material-symbols-outlined text-[18px]">share</span></button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors"><span
+                            class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+                    <button
+                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-slate-100 transition-colors"><span
+                            class="material-symbols-outlined text-[18px]">close_fullscreen</span></button>
+                    <button (click)="closeDetailModal()"
+                        class="w-8 h-8 flex items-center justify-center rounded hover:bg-red-50 hover:text-red-500 transition-colors"><span
+                            class="material-symbols-outlined text-[18px]">close</span></button>
+                </div>
+            </div>
+
+            <!-- Content Area (Split) -->
+            <div class="flex-1 flex overflow-hidden">
+
+                <!-- Left Main Panel -->
+                <div class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8 space-y-8 pr-10">
+
+                    <!-- Title & Actions -->
+                    <div>
+                        <h1 class="text-[24px] font-semibold text-slate-900 tracking-tight mb-4">{{selectedTask()?.title
+                            || 'Networking groups API'}}</h1>
+                        <button
+                            class="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded transition-colors text-slate-700">
+                            <span class="material-symbols-outlined text-[18px]">add</span>
+                        </button>
+                    </div>
+
+                    <!-- Key details -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-1 group cursor-pointer w-fit">
+                            <span
+                                class="material-symbols-outlined text-[18px] text-slate-500 group-hover:text-slate-800">expand_more</span>
+                            <h3 class="text-[14px] font-semibold text-slate-900">Key details</h3>
+                        </div>
+
+                        <div class="pl-6 space-y-4">
+                            <!-- Description -->
+                            <div class="space-y-2">
+                                <p class="text-[12px] font-semibold text-slate-500">Description</p>
+                                <div
+                                    class="text-[14px] text-slate-700 hover:bg-slate-50 p-2 -ml-2 rounded cursor-pointer transition-colors leading-relaxed">
+                                    {{selectedTask()?.description || 'Need to implemement group APIs for networking'}}
+                                </div>
+                            </div>
+
+                            <!-- Metadata Grid -->
+                            <div
+                                class="grid grid-cols-[140px_1fr] md:grid-cols-[200px_1fr] gap-y-4 text-[13px] items-center">
+                                <span class="text-slate-500 font-semibold">Reporter</span>
+                                <div
+                                    class="flex items-center gap-2 hover:bg-slate-50 p-1 -ml-1 rounded cursor-pointer w-fit">
+                                    <div
+                                        class="w-5 h-5 rounded-full bg-[#E24A1F] flex items-center justify-center text-[9px] font-bold text-white uppercase">
+                                        {{(selectedTask()?.reporter || 'RC').substring(0,2)}}</div>
+                                    <span class="text-slate-800">{{selectedTask()?.reporter || 'Ramesh chukka'}}</span>
+                                </div>
+
+                                <span class="text-slate-500 font-semibold">Labels</span>
+                                <span
+                                    class="text-slate-500 hover:bg-slate-50 p-1 -ml-1 rounded cursor-pointer w-fit">None</span>
+
+                                <span class="text-slate-500 font-semibold">Sprint</span>
+                                <span class="text-brand-5 hover:underline cursor-pointer">{{selectedTask()?.sprint ||
+                                    'Candidate Sprint 6'}}</span>
+
+                                <span class="text-slate-500 font-semibold">Priority</span>
+                                <div
+                                    class="flex items-center gap-2 hover:bg-slate-50 p-1 -ml-1 rounded cursor-pointer w-fit">
+                                    <span class="material-symbols-outlined text-[16px] text-orange-500">equal</span>
+                                    <span class="text-slate-800">{{selectedTask()?.priority || 'Medium'}}</span>
+                                </div>
+
+                                <span class="text-slate-500 font-semibold self-start mt-2">Assignee</span>
+                                <div class="space-y-1">
+                                    <div
+                                        class="flex items-center gap-2 hover:bg-slate-50 p-1 -ml-1 rounded cursor-pointer w-fit mt-1">
+                                        <div
+                                            class="w-5 h-5 rounded-full bg-[#1F84EF] flex items-center justify-center text-[9px] font-bold text-white uppercase">
+                                            {{(selectedTask()?.assignedTo || 'SK').substring(0,2)}}</div>
+                                        <span class="text-slate-800">{{selectedTask()?.assignedTo || 'Swapnil
+                                            Kakulate'}}</span>
+                                    </div>
+                                    <span
+                                        class="text-brand-5 hover:underline cursor-pointer block text-[13px] font-semibold pt-1">Assign
+                                        to me</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subtasks -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-[14px] font-semibold text-slate-900">Subtasks</h3>
+                        </div>
+                        <div class="hover:bg-slate-50 p-2 rounded cursor-pointer transition-colors -ml-2 w-fit">
+                            <span class="text-[13px] font-semibold text-slate-500 flex items-center gap-2">Add
+                                subtask</span>
+                        </div>
+                    </div>
+
+                    <!-- Linked work items -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-[14px] font-semibold text-slate-900">Linked work items</h3>
+                        </div>
+                        <div class="hover:bg-slate-50 p-2 rounded cursor-pointer transition-colors -ml-2 w-fit">
+                            <span class="text-[13px] font-semibold text-slate-500 flex items-center gap-2">Add linked
+                                work item</span>
+                        </div>
+                    </div>
+
+                    <!-- Activity -->
+                    <div class="space-y-4 pt-6">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-[14px] font-semibold text-slate-900">Activity</h3>
+                            <button
+                                class="w-8 h-8 flex items-center justify-center hover:bg-slate-100 rounded transition-colors"><span
+                                    class="material-symbols-outlined text-[18px] text-slate-500">sort</span></button>
+                        </div>
+
+                        <!-- Tabs -->
+                        <div class="flex items-center gap-1 border-b border-slate-100 pb-1">
+                            <button
+                                class="px-3 py-1.5 text-[13px] font-semibold text-slate-500 hover:bg-slate-50 rounded transition-all">All</button>
+                            <button
+                                class="px-3 py-1.5 text-[13px] font-semibold text-slate-900 bg-white rounded border-b-2 border-brand-5 transition-all">Comments</button>
+                            <button
+                                class="px-3 py-1.5 text-[13px] font-semibold text-slate-500 hover:bg-slate-50 rounded transition-all">History</button>
+                            <button
+                                class="px-3 py-1.5 text-[13px] font-semibold text-slate-500 hover:bg-slate-50 rounded transition-all">Work
+                                log</button>
+                        </div>
+
+                        <!-- Comment Box -->
+                        <div class="flex gap-4 pt-4 pb-8">
+                            <div
+                                class="w-8 h-8 rounded-full bg-[#E24A1F] flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-white mt-1">
+                                AK</div>
+                            <div class="flex-1 space-y-2">
+                                <div
+                                    class="border border-slate-200 rounded-lg p-3 bg-white cursor-text hover:bg-slate-50 transition-colors focus-within:border-brand-5 focus-within:ring-1 focus-within:ring-brand-5">
+                                    <p class="text-[13px] text-slate-400 mb-4">Add a comment...</p>
+
+                                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+                                        <button
+                                            class="flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 rounded-full text-[12px] font-semibold text-slate-700 transition-colors border border-slate-200 whitespace-nowrap">
+                                            🎉 Looks good!
+                                        </button>
+                                        <button
+                                            class="flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 rounded-full text-[12px] font-semibold text-slate-700 transition-colors border border-slate-200 whitespace-nowrap">
+                                            👋 Need help?
+                                        </button>
+                                        <button
+                                            class="flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 rounded-full text-[12px] font-semibold text-slate-700 transition-colors border border-slate-200 whitespace-nowrap">
+                                            ⛔ This is blocked...
+                                        </button>
+                                        <button
+                                            class="flex items-center gap-1.5 px-3 py-1 bg-slate-50 hover:bg-slate-100 rounded-full text-[12px] font-semibold text-slate-700 transition-colors border border-slate-200 whitespace-nowrap">
+                                            🔍 Can you clarify...?
+                                        </button>
+                                        <button
+                                            class="w-7 h-7 flex items-center justify-center bg-slate-50 hover:bg-slate-100 rounded-full text-slate-500 transition-colors border border-slate-200 flex-shrink-0">
+                                            <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] text-slate-400 font-semibold pt-1">Pro tip: press <span
+                                        class="bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200 mx-0.5 font-bold">M</span>
+                                    to comment</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vertical Scroll track simulator -->
+                <div class="w-4 bg-white flex justify-center py-2 h-full shrink-0 border-l border-slate-100">
+                    <div class="w-1.5 h-32 bg-slate-200 rounded-full mt-10"></div>
+                </div>
+
+                <!-- Right Sidebar Panel -->
+                <div
+                    class="w-[360px] border-l border-slate-200 p-6 space-y-6 overflow-y-auto custom-scrollbar shrink-0 bg-slate-50/50">
+
+                    <!-- Actions -->
+                    <div class="flex items-center gap-2 relative">
+                        <!-- Status Dropdown Trigger -->
+                        <div class="relative">
+                            <button (click)="toggleMenu('detailStatus')"
+                                [class]="showDetailStatusMenu() ? 'bg-brand-5/10 text-brand-5 ring-2 ring-brand-5/20' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'"
+                                class="flex flex-shrink-0 items-center gap-2 px-3 py-1.5 rounded transition-all text-[13px] font-semibold">
+                                {{selectedTask()?.status || 'To-Do'}} 
+                                <span class="material-symbols-outlined text-[16px] transition-transform duration-200"
+                                    [class.rotate-180]="showDetailStatusMenu()">expand_more</span>
+                            </button>
+
+                            <!-- Status Menu (Jira Style) -->
+                            <div *ngIf="showDetailStatusMenu()"
+                                class="absolute left-0 top-full mt-1.5 w-[220px] bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-slate-100 py-2 z-[10005] animate-in fade-in slide-in-from-top-2 duration-200">
+                                <div class="px-2 pb-1">
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-2 py-1">Workflow</p>
+                                </div>
+                                <div class="max-h-[280px] overflow-y-auto custom-scrollbar px-2 space-y-0.5">
+                                    <button *ngFor="let status of currentStatuses"
+                                        (click)="updateTaskStatus(selectedTask()?.id, status)"
+                                        class="w-full flex flex-shrink-0 items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-semibold hover:bg-slate-50 transition-colors text-left"
+                                        [class.bg-brand-5/5]="selectedTask()?.status === status"
+                                        [class.text-brand-5]="selectedTask()?.status === status"
+                                        [class.text-slate-700]="selectedTask()?.status !== status">
+                                        <div class="w-2 h-2 rounded-full"
+                                            [class.bg-brand-5]="selectedTask()?.status === status"
+                                            [class.bg-slate-300]="selectedTask()?.status !== status"></div>
+                                        {{status}}
+                                    </button>
+                                </div>
+                                <div class="h-[1px] bg-slate-100 my-2"></div>
+                                <div class="px-2">
+                                    <button
+                                        class="w-full px-3 py-1.5 flex flex-shrink-0 items-center text-[11px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors text-left rounded">
+                                        View workflow
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button
+                            class="w-8 h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 rounded transition-colors text-slate-500">
+                            <span class="material-symbols-outlined text-[16px]">bolt</span>
+                        </button>
+                    </div>
+
+                    <!-- Details Section -->
+                    <div class="border border-slate-200 bg-white rounded-lg shadow-sm">
+                        <div
+                            class="flex items-center justify-between p-3 hover:bg-slate-50 cursor-pointer transition-colors rounded-t-lg">
+                            <div class="flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px] text-slate-500">expand_more</span>
+                                <span class="text-[13px] font-semibold text-slate-800">Details</span>
+                            </div>
+                            <span class="material-symbols-outlined text-[16px] text-slate-400">page_info</span>
+                        </div>
+                        <div class="p-4 border-t border-slate-100">
+                            <div class="grid grid-cols-[1fr_1fr] gap-4 items-center text-[13px]">
+                                <span class="text-slate-500 font-semibold leading-tight">Story point<br>estimate</span>
+                                <div class="hover:bg-slate-50 p-1.5 rounded cursor-pointer -ml-1.5">
+                                    <span class="text-slate-700">None</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Development Section -->
+                    <div
+                        class="border border-slate-200 bg-white rounded-lg shadow-sm hover:bg-slate-50 cursor-pointer transition-colors p-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px] text-slate-400">chevron_right</span>
+                        <span class="text-[13px] font-semibold text-slate-800">Development</span>
+                    </div>
+
+                    <!-- Automation Section -->
+                    <div
+                        class="border border-slate-200 bg-white rounded-lg shadow-sm hover:bg-slate-50 cursor-pointer transition-colors p-3 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px] text-slate-400">chevron_right</span>
+                        <span class="text-[13px] font-semibold text-slate-800">Automation</span>
+                        <span
+                            class="material-symbols-outlined text-[14px] text-slate-400 ml-1 border border-slate-200 rounded px-0.5">bolt</span>
+                        <span class="text-[11px] font-semibold text-slate-500 ml-auto">Rule executions</span>
+                    </div>
+
+                    <!-- Meta -->
+                    <div
+                        class="text-[11px] font-medium text-slate-500 space-y-1 pt-4 flex flex-col items-start relative pb-8">
+                        <p>Created {{selectedTask()?.createdDate || 'February 10, 2026 at 3:04 PM'}}</p>
+                        <p>Updated {{selectedTask()?.updatedDate || 'February 10, 2026 at 3:04 PM'}}</p>
+                        <button
+                            class="absolute top-[14px] right-0 gap-1 flex items-center hover:text-slate-800 transition-colors">
+                            <span class="material-symbols-outlined text-[14px]">settings</span>
+                            <span>Configure</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
