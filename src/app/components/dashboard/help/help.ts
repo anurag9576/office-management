@@ -1,4 +1,4 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,14 +9,32 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './help.html',
   styleUrl: './help.css',
 })
-export class Help {
+export class Help implements OnInit {
   searchQuery = signal('');
   activeCategoryId = signal<string | null>(null);
   showSupportForm = signal(false);
+
+  ngOnInit() {
+    this.loadUserData();
+  }
+
+  loadUserData() {
+    const userStr = localStorage.getItem('currentUser');
+    if (userStr) {
+      const user = JSON.parse(userStr);
+      this.supportForm.set({
+        ...this.supportForm(),
+        name: user.name || '',
+        email: user.email || '',
+        employeeId: user.employeeId || user.id || ''
+      });
+    }
+  }
   
   supportForm = signal({
     name: '',
     email: '',
+    employeeId: '',
     category: 'tech',
     title: '',
     description: ''
@@ -157,7 +175,7 @@ export class Help {
       // Reset form after 2 seconds and close
       setTimeout(() => {
         this.closeSupportForm();
-        this.supportForm.set({ name: '', email: '', category: 'tech', title: '', description: '' });
+        this.supportForm.set({ name: '', email: '', employeeId: '', category: 'tech', title: '', description: '' });
       }, 2000);
     }, 1500);
   }

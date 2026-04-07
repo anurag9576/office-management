@@ -34,6 +34,10 @@ export class Announcement implements OnInit {
   newPollContent = signal('');
   pollOptions = signal([{ label: '' }, { label: '' }]);
 
+  // Validation State
+  showPostErrors = signal(false);
+  showPollErrors = signal(false);
+
   // Editing State
   isEditingAnnouncement = signal(false);
   editingAnnouncementId = signal<string | null>(null);
@@ -140,7 +144,7 @@ export class Announcement implements OnInit {
 
   createPost() {
     if (!this.newPostTitle().trim() || !this.newPostContent().trim()) {
-      alert('Please fill in both title and content.');
+      this.showPostErrors.set(true);
       return;
     }
 
@@ -182,7 +186,7 @@ export class Announcement implements OnInit {
 
   createPoll() {
     if (!this.newPollTitle().trim() || this.pollOptions().some(o => !o.label.trim())) {
-      alert('Please fill in the question and all options.');
+      this.showPollErrors.set(true);
       return;
     }
 
@@ -276,6 +280,8 @@ export class Announcement implements OnInit {
     this.pollOptions.set([{ label: '' }, { label: '' }]);
     this.isEditingAnnouncement.set(false);
     this.editingAnnouncementId.set(null);
+    this.showPostErrors.set(false);
+    this.showPollErrors.set(false);
   }
 
   async onFileSelected(event: any) {

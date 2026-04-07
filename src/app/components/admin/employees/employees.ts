@@ -34,10 +34,7 @@ export class EmployeesMgmt implements OnInit {
     password: '',
     role: '',
     designation: '',
-    status: 'Active',
-    emergencyContact: '',
-    personalEmail: '',
-    phone: ''
+    status: 'Active'
   } as any;
 
   // Pagination for Active Employees
@@ -163,10 +160,7 @@ export class EmployeesMgmt implements OnInit {
       password: '',
       role: '',
       designation: '',
-      status: 'Active',
-      emergencyContact: '',
-      personalEmail: '',
-      phone: ''
+      status: 'Active'
     };
 
     this.showPassword.set(false);
@@ -199,7 +193,7 @@ export class EmployeesMgmt implements OnInit {
 
   saveEmployee() {
     const emp = this.newEmployee;
-    if (!emp.firstName || !emp.lastName || !emp.email || !emp.role || !emp.emergencyContact || (!this.isEditing() && !emp.password)) {
+    if (!emp.firstName || !emp.lastName || !emp.email || !emp.role || (!this.isEditing() && !emp.password)) {
       this.toastService.show('Please fill all required fields before saving.', 'error');
       return;
     }
