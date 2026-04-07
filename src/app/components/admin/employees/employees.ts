@@ -18,6 +18,8 @@ export class EmployeesMgmt implements OnInit {
   
   employees = signal<any[]>([]);
   showModal = signal(false);
+  showProfileModal = signal(false);
+  selectedEmployeeProfile = signal<any>(null);
   showPassword = signal(false);
   isEditing = signal(false);
   roles = signal<string[]>([]);
@@ -32,7 +34,10 @@ export class EmployeesMgmt implements OnInit {
     password: '',
     role: '',
     designation: '',
-    status: 'Active'
+    status: 'Active',
+    emergencyContact: '',
+    personalEmail: '',
+    phone: ''
   } as any;
 
   // Pagination for Active Employees
@@ -158,7 +163,10 @@ export class EmployeesMgmt implements OnInit {
       password: '',
       role: '',
       designation: '',
-      status: 'Active'
+      status: 'Active',
+      emergencyContact: '',
+      personalEmail: '',
+      phone: ''
     };
 
     this.showPassword.set(false);
@@ -180,12 +188,18 @@ export class EmployeesMgmt implements OnInit {
 
   closeModal() {
     this.showModal.set(false);
+    this.showProfileModal.set(false);
+  }
+
+  viewProfile(emp: any) {
+    this.selectedEmployeeProfile.set(emp);
+    this.showProfileModal.set(true);
   }
 
 
   saveEmployee() {
     const emp = this.newEmployee;
-    if (!emp.firstName || !emp.lastName || !emp.email || !emp.role || (!this.isEditing() && !emp.password)) {
+    if (!emp.firstName || !emp.lastName || !emp.email || !emp.role || !emp.emergencyContact || (!this.isEditing() && !emp.password)) {
       this.toastService.show('Please fill all required fields before saving.', 'error');
       return;
     }

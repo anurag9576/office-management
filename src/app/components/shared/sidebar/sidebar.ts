@@ -35,10 +35,17 @@ export class Sidebar {
     { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin', permissionKey: 'leaves-admin' },
     { label: 'Timesheet Reports', icon: 'pending_actions', route: '/dashboard/timesheet-admin', permissionKey: 'timesheet-admin' },
     { label: 'Docs Mgmt', icon: 'content_paste', route: '/dashboard/documents-admin', permissionKey: 'documents' },
-    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll-admin', permissionKey: 'payroll-admin' },
+    { label: 'Payroll Admin', icon: 'payments', route: '/dashboard/payroll-admin', permissionKey: 'payroll-admin' },
     { label: 'Tasks', icon: 'task', route: '/dashboard/tasks', permissionKey: 'tasks' },
     { label: 'Reports', icon: 'analytics', route: '/dashboard/reports', permissionKey: 'reports' },
     { label: 'Settings', icon: 'settings', route: '/dashboard/settings', permissionKey: 'settings' },
+    
+    // Personal Items for Admin
+    { label: 'Profile', icon: 'person', route: '/dashboard/profile', permissionKey: 'profile' },
+    { label: 'Timesheet', icon: 'timer', route: '/dashboard/timesheet', permissionKey: 'timesheet' },
+    { label: 'Leaves', icon: 'vacation', route: '/dashboard/leaves', permissionKey: 'leaves' },
+    { label: 'Payroll', icon: 'payments', route: '/dashboard/payroll', permissionKey: 'payroll' },
+    { label: 'Help', icon: 'help_outline', route: '/dashboard/help', permissionKey: 'help' },
   ];
 
   // Employee Specific Tabs
