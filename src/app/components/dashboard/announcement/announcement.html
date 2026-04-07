@@ -12,111 +12,141 @@
             </div>
         </div>
 
-        <!-- Management: Create Post/Poll -->
-        <div *ngIf="canManage()"
-            class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 p-6 sm:p-8 animate-in slide-in-from-top-4 duration-500">
-            <div class="flex items-center gap-4 mb-6 border-b border-slate-50 pb-4">
+        <!-- Management: Create Post/Poll (Redesigned & Compact) -->
+        <div *ngIf="canManage()" 
+            class="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-100/50 p-1.5 overflow-hidden animate-in slide-in-from-top-6 duration-500">
+            
+            <!-- Quick Tab Switcher (Compact) -->
+            <div class="flex items-center p-1 bg-slate-50/80 rounded-[2rem] mb-1">
                 <button (click)="activeTab.set('post')"
-                    [class]="'flex-1 py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition-all ' + (activeTab() === 'post' ? 'bg-brand-1 text-white shadow-lg shadow-brand-1/20' : 'bg-slate-50 text-slate-400')">
+                    [class]="'flex-1 flex items-center justify-center gap-2 py-3 rounded-[1.8rem] text-[9px] font-black uppercase tracking-[0.15em] transition-all duration-300 ' + (activeTab() === 'post' ? 'bg-white text-brand-1 shadow-lg shadow-slate-200/50 scale-100' : 'text-slate-400 hover:text-brand-1/70 scale-95 opacity-60')">
+                    <span class="material-symbols-outlined text-base">edit_note</span>
                     Create Post
                 </button>
                 <button (click)="activeTab.set('poll')"
-                    [class]="'flex-1 py-3 rounded-xl font-semibold text-[10px] uppercase tracking-widest transition-all ' + (activeTab() === 'poll' ? 'bg-brand-1 text-white shadow-lg shadow-brand-1/20' : 'bg-slate-50 text-slate-400')">
+                    [class]="'flex-1 flex items-center justify-center gap-2 py-3 rounded-[1.8rem] text-[9px] font-black uppercase tracking-[0.15em] transition-all duration-300 ' + (activeTab() === 'poll' ? 'bg-brand-1 text-white shadow-lg shadow-brand-1/30 scale-100' : 'text-slate-400 hover:text-brand-1/70 scale-95 opacity-60')">
+                    <span class="material-symbols-outlined text-base">poll</span>
                     Create Poll
                 </button>
             </div>
 
-            <!-- Post Form -->
-            <div *ngIf="activeTab() === 'post'" class="space-y-3">
-                <input [ngModel]="newPostTitle()" (ngModelChange)="newPostTitle.set($event)"
-                    placeholder="Announcement Title"
-                    class="w-full bg-slate-50 border border-slate-100 rounded-xl px-5 py-3 text-xs font-semibold text-slate-800 outline-none focus:bg-white focus:border-brand-1 transition-all">
+            <div class="p-4 sm:p-6 space-y-4">
+                <!-- Post Form (Refined & Compact) -->
+                <div *ngIf="activeTab() === 'post'" class="space-y-3 animate-in fade-in slide-in-from-left-4 duration-300">
+                    <div class="space-y-1 px-1">
+                        <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Headline</label>
+                        <input [ngModel]="newPostTitle()" (ngModelChange)="newPostTitle.set($event)"
+                            placeholder="Announcement Headline"
+                            [class]="'w-full border rounded-xl px-4 py-2.5 text-xs font-bold transition-all ' + 
+                                     (showPostErrors() && !newPostTitle().trim() ? 'bg-rose-50 border-rose-400 text-rose-900 placeholder-rose-300' : 'bg-slate-50/50 border-slate-100 text-slate-800 outline-none focus:bg-white focus:border-brand-1')">
+                    </div>
 
-                <div
-                    class="relative bg-slate-50 border border-slate-100 rounded-2xl overflow-hidden focus-within:border-brand-1 focus-within:bg-white transition-all">
-                    <textarea [ngModel]="newPostContent()" (ngModelChange)="newPostContent.set($event)"
-                        placeholder="Write your message here..."
-                        class="w-full bg-transparent px-5 py-4 text-sm font-medium text-slate-600 outline-none resize-none"
-                        rows="3"></textarea>
+                    <div class="space-y-1 px-1">
+                        <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Message</label>
+                        <div [class]="'relative border rounded-2xl overflow-hidden transition-all ' + 
+                                     (showPostErrors() && !newPostContent().trim() ? 'bg-rose-50 border-rose-400' : 'bg-slate-50/50 border-slate-100 focus-within:border-brand-1 focus-within:bg-white')">
+                            <textarea [ngModel]="newPostContent()" (ngModelChange)="newPostContent.set($event)"
+                                placeholder="Describe the announcement..."
+                                [class]="'w-full bg-transparent px-4 py-3 text-sm font-medium outline-none resize-none min-h-[90px] ' + 
+                                         (showPostErrors() && !newPostContent().trim() ? 'text-rose-900 placeholder-rose-300' : 'text-slate-600')"></textarea>
 
-                    <!-- Integrated Image Preview -->
-                    <div *ngIf="newPostImage()"
-                        class="px-5 pb-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                        <div class="relative w-24 h-24 group/preview">
-                            <img [src]="newPostImage()"
-                                class="w-full h-full object-cover rounded-xl shadow-md border border-white">
-                            <button (click)="removeSelectedImage()"
-                                class="absolute -top-2 -right-2 bg-slate-900/80 text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-red-500 transition-all shadow-lg">
-                                <span class="material-symbols-outlined text-[12px]">close</span>
-                            </button>
+                            <!-- Integrated Image Preview (Compact) -->
+                            <div *ngIf="newPostImage()" class="px-4 pb-4 animate-in zoom-in-95">
+                                <div class="relative w-20 h-20 group/preview">
+                                    <img [src]="newPostImage()" class="w-full h-full object-cover rounded-xl shadow-md border-2 border-white">
+                                    <button (click)="removeSelectedImage()"
+                                        class="absolute -top-2 -right-2 bg-slate-900 text-white w-6 h-6 rounded-full flex items-center justify-center hover:bg-rose-500 transition-all shadow-lg">
+                                        <span class="material-symbols-outlined text-xs">close</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Integrated Action Bar (Compact) -->
+                            <div class="px-4 py-2 bg-white/50 border-t border-slate-50 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <button class="flex items-center gap-2 pl-1.5 pr-3 py-1.5 bg-brand-1 text-white rounded-lg text-[8px] font-black uppercase tracking-widest hover:bg-brand-1/90 transition-all relative group shadow-lg shadow-brand-1/20 active:scale-95">
+                                        <span class="material-symbols-outlined text-sm">add_photo_alternate</span>
+                                        Add Visuals
+                                        <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                                    </button>
+                                    <span *ngIf="newPostImage()" class="text-[8px] font-bold text-emerald-500 flex items-center gap-1 uppercase tracking-widest">
+                                        <span class="material-symbols-outlined text-xs">check_circle</span>
+                                        Attached
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Action Bar inside Textarea -->
-                    <div class="px-4 py-2 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <button
-                                class="p-2 text-slate-400 hover:text-brand-1 hover:bg-white rounded-lg transition-all relative group/photo"
-                                title="Upload Photo">
-                                <span class="material-symbols-outlined text-[22px]">image</span>
-                                <input type="file" (change)="onFileSelected($event)"
-                                    class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
-                            </button>
-                            <span class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">{{
-                                newPostImage() ? '1 Image attached' : 'Attach image' }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex items-center justify-between gap-4 pt-1">
-                    <p class="text-[10px] font-medium text-slate-400 italic font-medium">Add images or polls to engage
-                        more staff.</p>
-                    <div class="flex items-center gap-2">
+                    <!-- Post Footer (Compact) -->
+                    <div class="flex items-center justify-end gap-4 pt-1 border-t border-slate-50 px-1">
                         <button *ngIf="isEditingAnnouncement()" (click)="resetForm()"
-                            class="text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all">
-                            Cancel Edit
+                            class="text-[9px] font-black uppercase text-slate-400 hover:text-red-500 transition-all tracking-widest">
+                            Cancel
                         </button>
                         <button (click)="createPost()"
-                            class="bg-brand-5 text-white px-10 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-widest hover:bg-brand-1 shadow-lg transition-all active:scale-95 disabled:opacity-50"
-                            [disabled]="!newPostTitle().trim() || !newPostContent().trim() || isLoading()">
+                            class="bg-brand-1 text-white px-8 py-3.5 rounded-xl font-bold text-[9px] uppercase tracking-[0.15em] hover:bg-brand-1/90 shadow-xl shadow-brand-1/20 hover:shadow-brand-1/40 hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-30 flex items-center gap-3"
+                            [disabled]="isLoading()">
+                            <span *ngIf="!isLoading()" class="material-symbols-outlined text-base">send</span>
+                            <span *ngIf="isLoading()" class="material-symbols-outlined text-base animate-spin">progress_activity</span>
                             {{ isEditingAnnouncement() ? 'Update Post' : 'Post Now' }}
                         </button>
                     </div>
                 </div>
-            </div>
 
-            <!-- Poll Form -->
-            <div *ngIf="activeTab() === 'poll'" class="space-y-4">
-                <input [ngModel]="newPollTitle()" (ngModelChange)="newPollTitle.set($event)" placeholder="Poll Question"
-                    class="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-xs font-semibold text-slate-800 outline-none focus:bg-white focus:border-brand-1 transition-all">
+                <!-- Poll Form (Compact) -->
+                <div *ngIf="activeTab() === 'poll'" class="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div class="space-y-1 px-1">
+                        <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Question</label>
+                        <input [ngModel]="newPollTitle()" (ngModelChange)="newPollTitle.set($event)" 
+                            placeholder="Type your question..."
+                            [class]="'w-full border rounded-xl px-4 py-3 text-xs font-bold transition-all ' + 
+                                     (showPollErrors() && !newPollTitle().trim() ? 'bg-rose-50 border-rose-400 text-rose-900 placeholder-rose-300' : 'bg-slate-50/50 border-slate-100 text-slate-800 outline-none focus:bg-white focus:border-brand-1')">
+                    </div>
 
-                <div class="space-y-2">
-                    <p class="text-[9px] font-semibold text-slate-400 uppercase tracking-widest ml-2 mb-2">Options</p>
-                    <div *ngFor="let opt of pollOptions(); let i = index" class="flex items-center gap-2">
-                        <input [(ngModel)]="opt.label" [placeholder]="'Option ' + (i+1)"
-                            class="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs font-bold text-slate-600 outline-none">
-                        <button *ngIf="pollOptions().length > 2" (click)="removePollOption(i)"
-                            class="text-red-300 hover:text-red-500 transition-colors">
-                            <span class="material-symbols-outlined text-sm">remove_circle</span>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between px-1 mb-1">
+                            <label class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">Options</label>
+                            <span class="text-[8px] font-semibold text-brand-1">{{pollOptions().length}} / 5</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 gap-2.5 px-1">
+                            <div *ngFor="let opt of pollOptions(); let i = index" class="flex items-center gap-2 group/opt">
+                                <div [class]="'w-6 h-6 rounded-md flex items-center justify-center text-[9px] font-black ' + 
+                                            (showPollErrors() && !opt.label.trim() ? 'bg-rose-500 text-white' : 'bg-slate-100 text-slate-400')">
+                                    {{i + 1}}
+                                </div>
+                                <input [(ngModel)]="opt.label" [placeholder]="'Option ' + (i+1)"
+                                    [class]="'flex-1 border rounded-lg px-3.5 py-2 text-xs font-bold transition-all ' + 
+                                             (showPollErrors() && !opt.label.trim() ? 'bg-rose-50 border-rose-300 text-rose-900 placeholder-rose-300' : 'bg-slate-50 border-slate-100 text-slate-600 outline-none focus:bg-white focus:border-brand-1')">
+                                <button *ngIf="pollOptions().length > 2" (click)="removePollOption(i)"
+                                    class="w-8 h-8 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition-all flex items-center justify-center">
+                                    <span class="material-symbols-outlined text-base">delete</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button *ngIf="pollOptions().length < 5" (click)="addPollOption()"
+                            class="w-full py-2.5 border border-dashed border-slate-200 rounded-xl text-[8px] font-black text-slate-400 uppercase tracking-widest hover:border-brand-1 hover:text-brand-1 transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-base">add_circle</span>
+                            Add Option
                         </button>
                     </div>
-                    <button *ngIf="pollOptions().length < 5" (click)="addPollOption()"
-                        class="text-brand-1 text-[10px] font-semibold uppercase tracking-widest flex items-center gap-1 hover:underline mt-2">
-                        <span class="material-symbols-outlined text-sm">add</span>
-                        Add Option
-                    </button>
-                </div>
 
-                <div class="pt-4 flex items-center gap-4">
-                    <button *ngIf="isEditingAnnouncement()" (click)="resetForm()"
-                        class="flex-1 text-[10px] font-black uppercase text-slate-400 hover:text-slate-600 transition-all">
-                        Cancel Edit
-                    </button>
-                    <button (click)="createPoll()"
-                        class="flex-[2] bg-brand-5 text-white py-4 rounded-1xl font-semibold text-[10px] uppercase tracking-widest hover:bg-brand-1 shadow-lg transition-all disabled:opacity-50"
-                        [disabled]="isLoading()">
-                        {{ isEditingAnnouncement() ? 'Update Poll' : 'Launch Poll' }}
-                    </button>
+                    <!-- Poll Footer (Compact) -->
+                    <div class="flex items-center justify-end gap-4 pt-1 border-t border-slate-50 px-1">
+                        <button *ngIf="isEditingAnnouncement()" (click)="resetForm()"
+                            class="text-[9px] font-black uppercase text-slate-400 hover:text-red-500 transition-all tracking-widest">
+                            Cancel
+                        </button>
+                        <button (click)="createPoll()"
+                            class="bg-brand-1 text-white px-8 py-3.5 rounded-xl font-bold text-[9px] uppercase tracking-[0.15em] shadow-xl shadow-brand-1/20 hover:shadow-brand-1/40 hover:-translate-y-0.5 transition-all active:scale-95 disabled:opacity-30 flex items-center gap-3"
+                            [disabled]="isLoading() || !newPollTitle().trim()">
+                            <span *ngIf="!isLoading()" class="material-symbols-outlined text-base">send</span>
+                            <span *ngIf="isLoading()" class="material-symbols-outlined text-base animate-spin">progress_activity</span>
+                            {{ isEditingAnnouncement() ? 'Update Poll' : 'Send Poll' }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

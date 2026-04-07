@@ -315,24 +315,6 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Personal Email</label>
-                            <input [(ngModel)]="newEmployee.personalEmail" type="email"
-                                class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
-                        </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
-                            <input [(ngModel)]="newEmployee.phone" type="text"
-                                class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
-                        </div>
-                    </div>
-
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-medium text-slate-400 uppercase tracking-widest ml-1">Emergency Contact (SOS) <span class="text-red-500">*</span></label>
-                        <input [(ngModel)]="newEmployee.emergencyContact" type="text" placeholder="E.g. 1234567890(Father)"
-                            class="w-full px-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-brand-1 focus:bg-white transition-all">
-                    </div>
 
 
                     <div class="pt-8 flex justify-center">
@@ -460,10 +442,6 @@
                     </div>
                 </div>
             </div>
-
-            <button (click)="closeModal()" class="w-full mt-8 py-3.5 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.25em] shadow-xl shadow-slate-900/20 hover:-translate-y-0.5 transition-all active:scale-95">
-                Close Profile
-            </button>
         </div>
     </div>
 </div>
