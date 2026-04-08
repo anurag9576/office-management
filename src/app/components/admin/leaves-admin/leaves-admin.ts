@@ -20,6 +20,15 @@ export class LeavesAdmin implements OnInit {
   leaveRequests = signal<any[]>([]);
   isLoading = signal(false);
   confirmDeletionId = signal<string | null>(null);
+  userRole = signal<string>('');
+
+  constructor() {
+    const userJson = localStorage.getItem('currentUser');
+    if (userJson) {
+      const user = JSON.parse(userJson);
+      this.userRole.set(user.role || '');
+    }
+  }
 
   // Holiday Management
   holidays = signal<any[]>([]);
