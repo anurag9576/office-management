@@ -1,0 +1,100 @@
+<div class="p-4 md:p-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-semibold text-slate-900 tracking-tighter">Leave Reports</h1>
+            <p class="text-xs font-medium text-slate-400 font-bold uppercase tracking-widest mt-1">
+                Detailed history of all employee leave applications
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="bg-white rounded-[1.0rem] shadow-xl border border-slate-100 overflow-hidden">
+        <div class="overflow-x-auto overflow-y-auto max-h-[600px] relative no-scrollbar">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="text-xs font-black text-slate-900 uppercase tracking-widest border-b border-slate-200">
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] whitespace-nowrap">
+                            Employee
+                        </th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] whitespace-nowrap">
+                            Type
+                        </th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] whitespace-nowrap">
+                            Duration
+                        </th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-left border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] whitespace-nowrap">
+                            Reason
+                        </th>
+                        <th class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center shadow-[0_1px_0_0_rgba(0,0,0,0.05)] whitespace-nowrap">
+                            Status / Approver
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50 relative">
+                    <!-- Loading Overlay -->
+                    <div *ngIf="isLoading()"
+                        class="absolute inset-0 bg-white/50 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                        <div class="w-8 h-8 border-4 border-brand-1 border-t-transparent rounded-full animate-spin">
+                        </div>
+                    </div>
+
+                    <tr *ngFor="let record of summary()" class="group hover:bg-slate-50/30 transition-colors">
+                        <!-- Employee Info -->
+                        <td class="px-6 py-5 border-r border-slate-50 text-left">
+                            <div class="flex items-center gap-3">
+                                <div class="min-w-0">
+                                    <div class="text-sm font-semibold text-slate-800 leading-none mb-1">
+                                        {{record.firstName}} {{record.lastName}}
+                                    </div>
+                                    <div class="text-[10px] font-medium text-slate-400 uppercase tracking-widest">
+                                        {{record.employeeId}}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Type -->
+                        <td class="px-6 py-5 text-center border-r border-slate-50 text-sm font-medium text-slate-600">
+                            {{record.type}}
+                        </td>
+
+                        <!-- Duration -->
+                        <td class="px-6 py-5 text-center border-r border-slate-50">
+                            <span class="text-sm font-bold text-slate-700">{{record.days}} Days</span>
+                            <p class="text-[9px] text-slate-400 mt-1 font-medium">{{record.startDate | date:'shortDate'}}</p>
+                        </td>
+
+                        <!-- Reason -->
+                        <td class="px-6 py-5 border-r border-slate-50 text-left">
+                            <p class="text-xs text-slate-500 font-medium line-clamp-2 max-w-[250px]" [title]="record.reason">
+                                {{record.reason}}
+                            </p>
+                        </td>
+
+                        <!-- Status Badge / Approver (Merged) -->
+                        <td class="px-6 py-5 text-center">
+                            <span 
+                                [class]="'px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider inline-block shadow-sm ' + 
+                                (record.status.toLowerCase() === 'approved' ? 'bg-emerald-100 text-emerald-600' : 
+                                 record.status.toLowerCase() === 'rejected' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600')">
+                                {{ record.status.toLowerCase() === 'pending' ? 'Pending' : record.approvedBy }}
+                            </span>
+                        </td>
+                    </tr>
+
+                    <!-- Empty State -->
+                    <tr *ngIf="summary().length === 0 && !isLoading()">
+                        <td colspan="5" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <span class="material-symbols-outlined text-4xl text-slate-200">history</span>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No leave records found</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

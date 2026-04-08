@@ -19,6 +19,7 @@ export class RolesMgmt {
     { label: 'Roles Mgmt', key: 'roles' },
 
     { label: 'Leave Approvals', key: 'leaves-admin' },
+    { label: 'Leave Reports', key: 'leaves-reports' },
     { label: 'Payroll Admin', key: 'payroll-admin' },
     { label: 'Task Distribution', key: 'tasks' },
     { label: 'System Reports', key: 'reports' },
