@@ -33,6 +33,7 @@ export class Sidebar {
     { label: 'Roles Mgmt', icon: 'manage_accounts', route: '/dashboard/roles', permissionKey: 'roles' },
     { label: 'Announcement', icon: 'campaign', route: '/dashboard/announcement', permissionKey: 'announcement' },
     { label: 'Leave Mgmt', icon: 'event_busy', route: '/dashboard/leaves-admin', permissionKey: 'leaves-admin' },
+    { label: 'Leave Reports', icon: 'summarize', route: '/dashboard/leaves-summary', permissionKey: 'leaves-reports' },
     { label: 'Timesheet Reports', icon: 'pending_actions', route: '/dashboard/timesheet-admin', permissionKey: 'timesheet-admin' },
     { label: 'Docs Mgmt', icon: 'content_paste', route: '/dashboard/documents-admin', permissionKey: 'documents' },
     { label: 'Payroll Admin', icon: 'payments', route: '/dashboard/payroll-admin', permissionKey: 'payroll-admin' },
@@ -133,6 +134,12 @@ export class Sidebar {
     
     return allItems.filter(item => {
       if (!item.permissionKey) return true;
+      
+      // Restricted to Admin and HR
+      if (item.label === 'Leave Reports' && userRole !== 'admin' && userRole !== 'hr') {
+        return false;
+      }
+
       const personalItems = ['profile', 'leaves', 'payroll', 'help'];
       if (userRole !== 'admin' && personalItems.includes(item.permissionKey)) {
         return true;

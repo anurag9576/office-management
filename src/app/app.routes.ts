@@ -22,6 +22,7 @@ import { Timesheet } from './components/dashboard/timesheet/timesheet';
 import { TimesheetAdmin } from './components/admin/timesheet-admin/timesheet-admin';
 import { authGuard } from './guards/auth.guard';
 import { DocumentsAdmin } from './components/admin/documents/documents-admin';
+import { LeavesSummary } from './components/admin/leaves-summary/leaves-summary';
 
 import { NotFoundComponent } from './components/shared/not-found/not-found';
 
@@ -42,6 +43,7 @@ export const routes: Routes = [
       { path: 'timesheet', component: Timesheet, data: { permission: 'timesheet' } },
       { path: 'timesheet-admin', component: TimesheetAdmin, data: { role: 'Admin', permission: 'timesheet-admin' } },
       { path: 'leaves-admin', component: LeavesAdmin, data: { role: 'Admin', permission: 'leaves-admin' } },
+      { path: 'leaves-summary', component: LeavesSummary, data: { permission: 'leaves-reports' } },
       { path: 'announcement', component: Announcement },
       { path: 'payroll', component: Payroll, data: { role: 'Employee' } },
       { path: 'payroll-admin', component: PayrollAdmin, data: { role: 'Admin', permission: 'payroll-admin' } },

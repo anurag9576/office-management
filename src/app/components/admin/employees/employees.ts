@@ -34,7 +34,8 @@ export class EmployeesMgmt implements OnInit {
     password: '',
     role: '',
     designation: '',
-    status: 'Active'
+    status: 'Active',
+    reportingManager: ''
   } as any;
 
   // Pagination for Active Employees
@@ -43,6 +44,13 @@ export class EmployeesMgmt implements OnInit {
 
   activeEmployees = computed(() => {
     return this.employees().filter(e => e.status !== 'Terminated');
+  });
+
+  managers = computed(() => {
+    // Return employees who can be managers (e.g., Role is Manager, Admin, or HR Manager)
+    return this.employees().filter(e => 
+      ['Manager', 'Admin', 'HR Manager'].includes(e.role) && e.status === 'Active'
+    );
   });
 
   paginatedActiveEmployees = computed(() => {
@@ -160,7 +168,8 @@ export class EmployeesMgmt implements OnInit {
       password: '',
       role: '',
       designation: '',
-      status: 'Active'
+      status: 'Active',
+      reportingManager: ''
     };
 
     this.showPassword.set(false);
@@ -171,6 +180,11 @@ export class EmployeesMgmt implements OnInit {
     this.isEditing.set(true);
     // Deep clone to avoid direct signal mutation and ensure structure
     this.newEmployee = JSON.parse(JSON.stringify(emp));
+    
+    // Convert reportingManager object to ID string for the dropdown if it exists
+    if (this.newEmployee.reportingManager && typeof this.newEmployee.reportingManager === 'object') {
+      this.newEmployee.reportingManager = this.newEmployee.reportingManager._id;
+    }
     
     this.showPassword.set(false);
     this.showModal.set(true);

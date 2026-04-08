@@ -50,6 +50,14 @@
                                     class="material-symbols-outlined text-[10px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
                             </div>
                         </th>
+                        <th *ngIf="userRole() === 'Admin'"
+                            class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center border-r border-slate-200/60 shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[160px]">
+                            <div class="flex items-center justify-center gap-1 cursor-pointer group/th">
+                                Approved By
+                                <span
+                                    class="material-symbols-outlined text-[10px] opacity-0 group-hover/th:opacity-100 transition-opacity text-brand-1">arrow_upward</span>
+                            </div>
+                        </th>
                         <th
                             class="sticky top-0 z-20 bg-slate-100 px-6 py-5 text-center shadow-[0_1px_0_0_rgba(0,0,0,0.05)] w-[140px]">
                             Actions
@@ -89,6 +97,24 @@
                                 {{request.status}}
                             </span>
                         </td>
+                        <td *ngIf="userRole() === 'Admin'" class="px-6 py-5 text-center border-r border-slate-50 text-sm font-medium text-slate-600">
+                            <!-- Show Actual Processor if available -->
+                            <div *ngIf="request.approvedBy" class="flex flex-col items-center">
+                                <span class="text-xs font-bold text-slate-600 uppercase leading-none">{{request.approvedBy.firstName}} {{request.approvedBy.lastName}}</span>
+                            </div>
+
+                            <!-- Show Assigned Manager if not processed yet -->
+                            <div *ngIf="!request.approvedBy" class="flex flex-col items-center">
+                                <!-- Priority: 1. Snapshot Manager, 2. Current Reporting Manager -->
+                                <ng-container *ngIf="request.manager || request.employee.reportingManager">
+                                    <span class="text-xs font-bold text-slate-500 leading-none">
+                                        {{ (request.manager || request.employee.reportingManager).firstName }} 
+                                        {{ (request.manager || request.employee.reportingManager).lastName }}
+                                    </span>
+                                </ng-container>
+                                <span *ngIf="!request.manager && !request.employee.reportingManager" class="text-xs font-medium text-slate-300 uppercase italic">Admin Only</span>
+                            </div>
+                        </td>
                         <td class="px-6 py-5 text-center">
                             <div *ngIf="request.status === 'Pending'" class="flex items-center justify-center gap-2">
                                 <button (click)="approveLeave(request._id)"
@@ -111,7 +137,7 @@
 
                     <!-- Empty State -->
                     <tr *ngIf="paginatedRequests().length === 0 && !isLoading()">
-                        <td colspan="5" class="px-6 py-20 text-center">
+                        <td [attr.colspan]="userRole() === 'Admin' ? 6 : 5" class="px-6 py-20 text-center">
                             <div class="flex flex-col items-center gap-3">
                                 <span class="material-symbols-outlined text-4xl text-slate-200">event_busy</span>
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No leave requests

@@ -93,6 +93,11 @@ export class ApiService {
     return this.http.put(`${this.baseUrl}/leaves/${id}`, { status }, { headers: this.getHeaders() });
   }
 
+  // Get comprehensive leave summary for HR/Admin
+  getLeaveSummary(): Observable<any> {
+    return this.http.get(`${this.baseUrl}/leaves/summary`, { headers: this.getHeaders() });
+  }
+
   // Holiday Management
   getHolidays(year?: number): Observable<any> {
     return this.http.get(`${this.baseUrl}/holidays${year ? '?year=' + year : ''}`, { headers: this.getHeaders() });

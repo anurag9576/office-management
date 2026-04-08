@@ -127,7 +127,7 @@ export class Announcement implements OnInit {
         this.currentUser.set(user);
         const role = user.role?.toLowerCase();
         this.isAdmin.set(role === 'admin');
-        this.canManage.set(['admin', 'hr manager', 'manager'].includes(role));
+        this.canManage.set(['admin', 'hr', 'manager'].includes(role));
       }
     } catch (e) {
       console.error('Error loading user:', e);
