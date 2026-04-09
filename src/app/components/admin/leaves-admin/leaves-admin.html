@@ -5,7 +5,7 @@
             <p class="text-xs font-medium text-slate-400 font-bold uppercase tracking-widest mt-1">Approve or reject
                 employee leave requests</p>
         </div>
-        <button (click)="openHolidayModal()"
+        <button *ngIf="userRole() === 'Admin'" (click)="openHolidayModal()"
             class="flex items-center gap-2 px-5 py-3 bg-brand-5 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-brand-1 transition-all shadow-lg shadow-brand-5/20 border border-brand-5 hover:border-brand-1 active:scale-95 cursor-pointer">
             <span class="material-symbols-outlined text-[18px]">event</span>
             Add Holidays

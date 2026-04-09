@@ -142,7 +142,7 @@
                         <div class="space-y-1">
                             <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-2">From</label>
                             <div class="relative w-full">
-                                <input [matDatepicker]="startPicker" name="startDate" [(ngModel)]="leaveForm.startDate"
+                                <input [matDatepicker]="startPicker" [matDatepickerFilter]="weekendFilter" name="startDate" [(ngModel)]="leaveForm.startDate"
                                     [min]="minDate()" (click)="startPicker.open()" readonly placeholder="Select Date..."
                                     class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white placeholder-white/50 font-semibold outline-none cursor-pointer text-xs pr-10">
                                 <div
@@ -156,8 +156,8 @@
                         <div class="space-y-1">
                             <label class="text-[9px] font-semibold uppercase tracking-widest text-brand-1">To</label>
                             <div class="relative w-full">
-                                <input [matDatepicker]="endPicker" name="endDate" [(ngModel)]="leaveForm.endDate"
-                                    [min]="minDate()" (click)="endPicker.open()" readonly placeholder="Select Date..."
+                                <input [matDatepicker]="endPicker" [matDatepickerFilter]="weekendFilter" name="endDate" [(ngModel)]="leaveForm.endDate"
+                                    [min]="minDate()" (click)="endPicker.open()" readonly placeholder="Optional..."
                                     class="w-full bg-white/10 border border-white/20 rounded-xl p-2.5 text-white placeholder-white/50 font-semibold outline-none cursor-pointer text-xs pr-10">
                                 <div
                                     class="absolute right-0 top-1/2 -translate-y-1/2 text-white scale-75 cursor-pointer">
