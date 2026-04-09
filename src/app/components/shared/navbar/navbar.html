@@ -4,7 +4,7 @@
     <div class="flex items-center space-x-3 md:space-x-6">
 
 
-        <div class="relative group hidden sm:block">
+        <!-- <div class="relative group hidden sm:block">
             <span
                 class="absolute inset-y-0 left-0 pl-3 flex items-center text-brand-3 group-focus-within:text-brand-1 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -15,7 +15,7 @@
             </span>
             <input type="text" placeholder="Search..."
                 class="bg-brand-2/10 border border-brand-2/20 rounded-lg pl-9 pr-4 py-1.5 text-sm outline-none focus:ring-2 focus:ring-brand-1/20 focus:border-brand-1 focus:bg-white w-32 md:w-64 transition-all" />
-        </div>
+        </div> -->
     </div>
 
     <!-- Right side: Notifications, Time, Actions -->
@@ -80,7 +80,7 @@
                                         [class]="'text-xs tracking-tight ' + (note.isRead ? 'font-semibold text-slate-600' : 'font-bold text-slate-900')">
                                         {{note.title}}</h4>
                                     <span
-                                        class="text-[10px] text-slate-400 font-medium whitespace-nowrap ml-2">{{note.createdAt
+                                        class="text-[10px] text-slate-400 font-medium whitespace-nowrap ml-2">{{formatNotificationDate(note.createdAt)}}, {{note.createdAt
                                         | date:'shortTime'}}</span>
                                 </div>
                                 <p

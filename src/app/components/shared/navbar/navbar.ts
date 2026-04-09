@@ -228,6 +228,25 @@ export class Navbar implements OnInit, OnDestroy {
     }
   }
 
+  formatNotificationDate(date: any): string {
+    if (!date) return '';
+    const d = new Date(date);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    const checkDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
+    if (checkDate.getTime() === today.getTime()) {
+      return 'Today';
+    } else if (checkDate.getTime() === yesterday.getTime()) {
+      return 'Yesterday';
+    } else {
+      return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+  }
+
   // Logout Methods
   onLogout() {
     this.showLogoutModal.set(true);

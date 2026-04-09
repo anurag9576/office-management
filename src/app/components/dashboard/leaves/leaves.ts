@@ -60,6 +60,12 @@ export class Leaves implements OnInit {
 
   isLoading = signal(false);
 
+  weekendFilter = (d: Date | null): boolean => {
+    const day = (d || new Date()).getDay();
+    // 0 = Sunday, 6 = Saturday
+    return day !== 0 && day !== 6;
+  };
+
   showAllHolidays = signal(false);
   displayedHolidays = computed(() => this.showAllHolidays() ? this.holidays() : this.holidays().slice(0, 3));
 
@@ -129,13 +135,19 @@ export class Leaves implements OnInit {
   }
 
   applyLeave() {
-    if (!this.leaveForm.startDate || !this.leaveForm.endDate || !this.leaveForm.reason) {
-      this.toastService.show('Please fill all required fields', 'error');
+    if (!this.leaveForm.startDate || !this.leaveForm.reason) {
+      this.toastService.show('Please fill Start Date and Reason', 'error');
       return;
     }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+
+    // If endDate is not filled, it's a one-day leave
+    if (!this.leaveForm.endDate) {
+        this.leaveForm.endDate = this.leaveForm.startDate;
+    }
+
     const start = new Date(this.leaveForm.startDate);
     const end = new Date(this.leaveForm.endDate);
 
