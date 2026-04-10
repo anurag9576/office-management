@@ -110,6 +110,7 @@ export class Timesheet implements OnInit {
     id: 0,
     date: new Date(),
     project: '',
+    taskName: '',
     branchName: '',
     workStatus: '',
     task: '',
@@ -121,6 +122,7 @@ export class Timesheet implements OnInit {
     this.newLog = {
       date: new Date(),
       project: '',
+      taskName: '',
       branchName: '',
       workStatus: '',
       task: '',
@@ -145,8 +147,8 @@ export class Timesheet implements OnInit {
   }
 
   saveLog() {
-    if (!this.newLog.project || !this.newLog.branchName || !this.newLog.task || this.newLog.minutes <= 0 || !this.newLog.workStatus) {
-      alert('Please fill all fields');
+    if (!this.newLog.project || !this.newLog.taskName || !this.newLog.task || this.newLog.minutes <= 0 || !this.newLog.workStatus) {
+      alert('Please fill all required fields');
       return;
     }
 
