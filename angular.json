@@ -33,7 +33,10 @@
               "core-js",
               "raf",
               "rgbcolor",
-              "html2canvas"
+              "html2canvas",
+              "exceljs",
+              "jspdf",
+              "xlsx"
             ]
           },
           "configurations": {
