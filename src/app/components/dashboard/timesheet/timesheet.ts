@@ -145,8 +145,8 @@ export class Timesheet implements OnInit {
   }
 
   saveLog() {
-    if (!this.newLog.project || !this.newLog.branchName || !this.newLog.task || this.newLog.minutes <= 0 || !this.newLog.workStatus) {
-      alert('Please fill all fields');
+    if (!this.newLog.project || !this.newLog.task || this.newLog.minutes <= 0 || !this.newLog.workStatus) {
+      alert('Please fill all required fields');
       return;
     }
 

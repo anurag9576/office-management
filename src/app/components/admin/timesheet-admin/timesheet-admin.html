@@ -101,6 +101,14 @@
                         </select>
                     </div>
 
+                    <button mat-flat-button (click)="downloadAllToExcel()"
+                        class="!bg-brand-5 !text-white !rounded-xl !py-3 !px-4 !text-[10px] !font-bold uppercase tracking-widest shadow-lg shadow-brand-5/20 hover:scale-105 active:scale-95 transition-all">
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[16px]">download</span>
+                            All Reports
+                        </div>
+                    </button>
+
                     <div
                         class="hidden md:flex items-center gap-3 bg-white px-4 py-2.5 rounded-2xl border border-slate-100 shadow-sm focus-within:ring-4 focus-within:ring-brand-1/5 transition-all">
                         <span class="material-symbols-outlined text-slate-400 text-[18px]">search</span>

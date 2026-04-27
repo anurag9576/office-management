@@ -155,6 +155,7 @@
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Search
                             Employee *</label>
                         <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+                            [class.!border-red-500]="attemptedSubmit() && !payrollForm().employeeId"
                             placeholder="Name or Email..."
                             class="w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl text-slate-800 font-bold focus:border-brand-1 outline-none transition-all">
 
@@ -180,10 +181,11 @@
                     <div class="grid grid-cols-1 gap-4">
                         <div class="space-y-1">
                             <label
-                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Employee Designation</label>
+                                class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Employee Designation *</label>
                             <input type="text" [ngModel]="payrollForm().designation"
                                 (ngModelChange)="updateDesignation($event)"
-                                class="w-full px-4 py-3 bg-white/50 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-600 outline-none">
+                                [class.!border-red-500]="attemptedSubmit() && !payrollForm().designation.trim()"
+                                class="w-full px-4 py-3 bg-white/50 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-600 outline-none transition-all">
                         </div>
                     </div>
                 </div>
@@ -210,8 +212,8 @@
                             <thead>
                                 <tr
                                     class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                                    <th class="pb-4 pl-2">Description</th>
-                                    <th class="pb-4 text-center">Actual Amount</th>
+                                    <th class="pb-4 pl-2">Description *</th>
+                                    <th class="pb-4 text-center">Actual Amount *</th>
                                     <th class="pb-4 text-center">Earned Amount</th>
                                     <th class="pb-4 pr-2 text-right">Action</th>
                                 </tr>
@@ -221,13 +223,15 @@
                                     class="group border-b border-slate-50 last:border-0">
                                     <td class="py-3">
                                         <input [(ngModel)]="item.label"
-                                            class="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none"
+                                            [class.!border-red-500]="attemptedSubmit() && !item.label.trim()"
+                                            class="w-full bg-transparent px-2 py-1 border border-transparent rounded-lg text-[11px] font-bold text-slate-700 outline-none focus:border-emerald-200 transition-all"
                                             placeholder="Label">
                                     </td>
                                     <td class="py-3">
                                         <input type="number" [(ngModel)]="item.actualAmount"
                                             (input)="item.amount = item.actualAmount"
-                                            class="w-full bg-slate-50 px-3 py-2 rounded-lg text-[11px] font-black text-center outline-none focus:bg-white border border-transparent focus:border-emerald-200">
+                                            [class.!border-red-500]="attemptedSubmit() && item.actualAmount <= 0"
+                                            class="w-full bg-slate-50 px-3 py-2 rounded-lg text-[11px] font-black text-center outline-none focus:bg-white border border-transparent focus:border-emerald-200 transition-all">
                                     </td>
                                     <td class="py-3">
                                         <input type="number" [(ngModel)]="item.amount"
@@ -262,8 +266,8 @@
                             <thead>
                                 <tr
                                     class="text-[8px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
-                                    <th class="pb-4 pl-2">Description</th>
-                                    <th class="pb-4 text-center">Amount (₹)</th>
+                                    <th class="pb-4 pl-2">Description *</th>
+                                    <th class="pb-4 text-center">Amount (₹) *</th>
                                     <th class="pb-4 pr-2 text-right">Action</th>
                                 </tr>
                             </thead>
@@ -272,12 +276,14 @@
                                     class="group border-b border-slate-50 last:border-0">
                                     <td class="py-3">
                                         <input [(ngModel)]="item.label"
-                                            class="w-full bg-transparent text-[11px] font-bold text-slate-700 outline-none"
+                                            [class.!border-red-500]="attemptedSubmit() && !item.label.trim()"
+                                            class="w-full bg-transparent px-2 py-1 border border-transparent rounded-lg text-[11px] font-bold text-slate-700 outline-none focus:border-red-200 transition-all"
                                             placeholder="Label">
                                     </td>
                                     <td class="py-3">
                                         <input type="number" [(ngModel)]="item.amount"
-                                            class="w-full bg-red-50/50 px-3 py-2 rounded-lg text-[11px] font-black text-center text-red-600 outline-none focus:bg-white border border-transparent focus:border-red-200">
+                                            [class.!border-red-500]="attemptedSubmit() && item.amount < 0"
+                                            class="w-full bg-red-50/50 px-3 py-2 rounded-lg text-[11px] font-black text-center text-red-600 outline-none focus:bg-white border border-transparent focus:border-red-200 transition-all">
                                     </td>
                                     <td class="py-3 text-right">
                                         <button (click)="removeDeduction(i)"
@@ -300,9 +306,13 @@
             class="p-8 bg-slate-50 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
                 <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 leading-none">Status Overview</p>
-                <span class="px-5 py-3 bg-brand-1/5 text-brand-1 rounded-2xl text-[11px] font-black uppercase border border-brand-1/10 inline-flex items-center gap-2 shadow-sm">
+                <span *ngIf="isFormValid()" class="px-5 py-3 bg-emerald-50 text-emerald-600 rounded-2xl text-[11px] font-black uppercase border border-emerald-100 inline-flex items-center gap-2 shadow-sm">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     Ready for Auto-Generation
+                </span>
+                <span *ngIf="!isFormValid()" class="px-5 py-3 bg-amber-50 text-amber-600 rounded-2xl text-[11px] font-black uppercase border border-amber-100 inline-flex items-center gap-2 shadow-sm">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    Incomplete Configuration
                 </span>
             </div>
 
@@ -310,7 +320,7 @@
                 <div class="flex gap-4">
                     <button (click)="showUploadModal = false"
                         class="px-10 py-5 bg-white border border-slate-100 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-all shadow-sm">Discard</button>
-                    <button (click)="submitPayroll()" [disabled]="isSubmitting() || !payrollForm().employeeId"
+                    <button (click)="submitPayroll()" [disabled]="isSubmitting()"
                         class="px-12 py-5 bg-brand-1 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:scale-105 active:scale-95 transition-all shadow-2xl flex items-center gap-3">
                         <span *ngIf="isSubmitting()"
                             class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>

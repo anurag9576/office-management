@@ -63,6 +63,23 @@ export class PayrollAdmin implements OnInit {
   showUploadModal = false;
   isLoading = signal(false);
   isSubmitting = signal(false);
+  attemptedSubmit = signal(false);
+
+  isFormValid = computed(() => {
+    const form = this.payrollForm();
+    if (!form.employeeId || !form.designation.trim()) return false;
+    
+    const earningsValid = form.earnings.length > 0 && form.earnings.every(e => 
+      e.label.trim() !== '' && e.actualAmount > 0
+    );
+    
+    // Deductions can be empty, but if they exist, they must have labels
+    const deductionsValid = form.deductionsList.every(d => 
+      d.label.trim() !== ''
+    );
+    
+    return earningsValid && deductionsValid;
+  });
   errorMessage = signal('');
   successMessage = signal('');
   editingPayrollId = signal<string | null>(null);
@@ -220,6 +237,7 @@ export class PayrollAdmin implements OnInit {
     });
     this.searchTerm.set('');
     this.selectedEmployeeEmail.set('');
+    this.attemptedSubmit.set(false);
   }
 
   updateDesignation(val: string) {
@@ -278,6 +296,14 @@ export class PayrollAdmin implements OnInit {
   }
 
   async submitPayroll() {
+    this.attemptedSubmit.set(true);
+    
+    // Check validation first and stop if invalid
+    if (!this.isFormValid()) {
+      this.toastService.show('Please fill all required fields correctly', 'error');
+      return;
+    }
+
     const data = { ...this.payrollForm() };
     
     if (!data.employeeId) {

@@ -141,16 +141,8 @@ export class TimesheetAdmin implements OnInit {
     this.selectedEmployee.set(null);
   }
 
-  exportToCSV() {
+  async exportToCSV() {
     let logs = this.filteredLogs();
-    let filename = `Timesheet_Report_${this.months[this.selectedMonth()]}_${this.selectedYear()}.csv`;
-
-    // If in detail view, only export for the selected employee
-    const selectedEmp = this.selectedEmployee();
-    if (this.viewMode() === 'detail' && selectedEmp) {
-      logs = logs.filter(log => (log.employeeId?._id || 'unknown') === selectedEmp.id);
-      filename = `${selectedEmp.name.replace(/\s+/g, '_')}_Timesheet_${this.months[this.selectedMonth()]}.csv`;
-    }
 
     // Sort logs by date ascending (oldest first)
     logs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
@@ -160,32 +152,166 @@ export class TimesheetAdmin implements OnInit {
       return;
     }
 
-    const headers = ['Employee', 'Date', 'Project', 'Task', 'Minutes', 'Status'];
-    const csvContent = [
-      headers.join(','),
-      ...logs.map(log => {
-        const d = new Date(log.date);
-        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        return [
-          `"${log.employeeId ? (log.employeeId.firstName + ' ' + log.employeeId.lastName).trim() : 'N/A'}"`,
-          `"${dateStr}"`,
-          `"${log.project}"`,
-          `"${log.task.replace(/"/g, '""')}"`,
-          log.minutes,
-          `"${log.workStatus}"`
-        ].join(',');
-      })
-    ].join('\n');
+    const selectedEmp = this.selectedEmployee();
+    let filename = `Timesheet_Report_${this.months[this.selectedMonth()]}_${this.selectedYear()}.xlsx`;
 
-    // Add BOM for Excel UTF-8 support
-    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', filename);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (this.viewMode() === 'detail' && selectedEmp) {
+      logs = logs.filter(log => (log.employeeId?._id || 'unknown') === selectedEmp.id);
+      filename = `${selectedEmp.name.replace(/\s+/g, '_')}_Timesheet_${this.months[this.selectedMonth()]}.xlsx`;
+    }
+
+    try {
+      const ExcelJS = (await import('exceljs')).default || await import('exceljs');
+      const workbook = new (ExcelJS as any).Workbook();
+      
+      const sheetName = (this.viewMode() === 'detail' && selectedEmp) 
+        ? selectedEmp.name.substring(0, 31) 
+        : 'Timesheet';
+      const worksheet = workbook.addWorksheet(sheetName);
+
+      // Define columns
+      const headers = ['DATE', 'DETAILS', 'PORTAL', 'TIME (MINS)', 'Activity', 'Group'];
+      worksheet.columns = headers.map(h => ({ header: h, key: h, width: 20 }));
+
+      // Style Header Row
+      const headerRow = worksheet.getRow(1);
+      headerRow.eachCell((cell: any) => {
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FF3B82F6' } // Blue background
+        };
+        cell.font = {
+          bold: true,
+          color: { argb: 'FFFFFFFF' }, // White text
+          size: 11
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+      headerRow.height = 25;
+
+      // Add Data Rows
+      let lastDate = '';
+      logs.forEach(log => {
+        const d = new Date(log.date);
+        const dateStr = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
+        
+        let displayDate = dateStr;
+        if (dateStr === lastDate) {
+          displayDate = '';
+        } else {
+          lastDate = dateStr;
+        }
+
+        const row = worksheet.addRow({
+          'DATE': displayDate,
+          'DETAILS': log.task || '',
+          'PORTAL': log.project || '',
+          'TIME (MINS)': log.minutes,
+          'Activity': log.workStatus || '',
+          'Group': ''
+        });
+
+        // Style each cell in the row
+        row.eachCell((cell: any) => {
+          cell.border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+          cell.alignment = { vertical: 'middle' };
+          if (cell.address.startsWith('D')) { // TIME (MINS) column
+             cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          }
+        });
+      });
+
+      // Write to buffer and download
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      
+    } catch (error) {
+      console.error('Error generating Excel:', error);
+      alert('Error generating Excel file. Please check console for details.');
+    }
+  }
+
+  async downloadAllToExcel() {
+    const stats = this.employeeStats();
+    if (stats.length === 0) {
+      alert('No data to export');
+      return;
+    }
+
+    try {
+      const ExcelJS = (await import('exceljs')).default || await import('exceljs');
+      const workbook = new (ExcelJS as any).Workbook();
+      const filename = `Detailed_Bulk_Reports_${this.months[this.selectedMonth()]}_${this.selectedYear()}.xlsx`;
+
+      for (const emp of stats) {
+        const sheetName = emp.name.substring(0, 31).replace(/[\[\]\?\*\/\\:]/g, ''); 
+        const worksheet = workbook.addWorksheet(sheetName);
+        
+        const headers = ['DATE', 'DETAILS', 'PORTAL', 'TIME (MINS)', 'Activity', 'Group'];
+        worksheet.columns = headers.map(h => ({ header: h, key: h, width: 20 }));
+
+        const headerRow = worksheet.getRow(1);
+        headerRow.eachCell((cell: any) => {
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3B82F6' } };
+          cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+          cell.alignment = { vertical: 'middle', horizontal: 'center' };
+          cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+        });
+        headerRow.height = 25;
+
+        let lastDate = '';
+        const logs = [...emp.logs];
+        logs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        logs.forEach(log => {
+          const d = new Date(log.date);
+          const dateStr = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}/${d.getFullYear()}`;
+          let displayDate = (dateStr === lastDate) ? '' : dateStr;
+          lastDate = dateStr;
+
+          const row = worksheet.addRow({
+            'DATE': displayDate,
+            'DETAILS': log.task || '',
+            'PORTAL': log.project || '',
+            'TIME (MINS)': log.minutes,
+            'Activity': log.workStatus || '',
+            'Group': ''
+          });
+
+          row.eachCell((cell: any) => {
+            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+            cell.alignment = { vertical: 'middle' };
+          });
+        });
+      }
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    } catch (error) {
+      console.error('Bulk Excel Error:', error);
+      alert('Error generating bulk report.');
+    }
   }
 }
