@@ -2,6 +2,7 @@ import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../../services/api.service';
+import { HolidayAutomationService } from '../../../services/holiday-automation.service';
 
 @Component({
   selector: 'app-admin-home',
@@ -12,6 +13,7 @@ import { ApiService } from '../../../services/api.service';
 })
 export class AdminHome implements OnInit {
   private apiService = inject(ApiService);
+  private holidayAutomation = inject(HolidayAutomationService);
 
   stats = signal([
     { label: 'Total Employees', value: '...', icon: 'group', color: 'bg-brand-1', bgOp5: 'bg-brand-1/5', bgOp10: 'bg-brand-1/10', textCls: 'text-brand-1', trend: 'Loading...' },
@@ -24,6 +26,7 @@ export class AdminHome implements OnInit {
 
   ngOnInit() {
     this.loadStats();
+    this.holidayAutomation.checkAndPostHolidayAnnouncement();
   }
 
   loadStats() {
